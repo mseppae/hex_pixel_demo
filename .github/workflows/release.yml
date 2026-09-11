@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: hex_pixel_demo-linux-amd64
+          - os: windows-latest
+            asset: hex_pixel_demo-windows-amd64.exe
+          - os: macos-latest
+            asset: hex_pixel_demo-macos-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: latest
+
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        run: odin build . -out:${{ matrix.asset }} -o:speed
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          odin build . -out:${{ matrix.asset }} -o:speed
+          codesign --force --deep --sign - ${{ matrix.asset }}
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: odin build . -out:${{ matrix.asset }} -o:speed -subsystem:windows
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: ${{ matrix.asset }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Extract changelog section for this tag
+        id: changelog
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          notes_file="$(mktemp)"
+          awk -v ver="$version" '
+            /^## \[/ { if (found) exit; if (index($0, "[" ver "]")) found=1; next }
+            /^\[.*\]:/ { if (found) exit }
+            found { print }
+          ' CHANGELOG.md > "$notes_file"
+          echo "notes_file=$notes_file" >> "$GITHUB_OUTPUT"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          body_path: ${{ steps.changelog.outputs.notes_file }}

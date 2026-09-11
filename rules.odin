@@ -138,6 +138,7 @@ start_new_game :: proc(scene: ^Scene, game_seed: u64) {
 	add_to_inventory(&scene.inventory, Item_Stack{.Healing_Potion, 1})
 	apply_equipment(scene)
 	scene.open_panel = .None
+	scene.travel_destination = nil
 	append(&scene.levels, generate_level(scene, 0))
 	scene.current_depth = 0
 	scene.player.hex = current_level(scene).stairs_up_hex
@@ -152,6 +153,7 @@ start_new_game :: proc(scene: ^Scene, game_seed: u64) {
 handle_click :: proc(scene: ^Scene, clicked_hex: hexgrid.Hex) {
 	switch scene.turn_phase {
 	case .Player_Acting, .Monsters_Acting, .Changing_Level:
+		scene.travel_destination = nil // any click, even mid-step, cancels a walk in progress
 		return // wait for the current action to finish
 	case .Player_Dead:
 		return // the ranking screen takes over
@@ -160,6 +162,7 @@ handle_click :: proc(scene: ^Scene, clicked_hex: hexgrid.Hex) {
 
 	player := &scene.player
 	level := current_level(scene)
+	scene.travel_destination = nil // a fresh command always overrides any walk in progress
 
 	// Clicking the stairs you're standing on uses them.
 	if clicked_hex == player.hex {
@@ -177,6 +180,8 @@ handle_click :: proc(scene: ^Scene, clicked_hex: hexgrid.Hex) {
 		next_step, path_exists := find_first_step(scene, player, stop_next_to_hex = clicked_hex)
 		if path_exists {
 			start_walk(player, next_step)
+			scene.travel_destination = clicked_hex
+			scene.travel_adjacent_only = true
 			scene.turn_phase = .Player_Acting
 		}
 		return
@@ -186,14 +191,32 @@ handle_click :: proc(scene: ^Scene, clicked_hex: hexgrid.Hex) {
 	containers_there := container_indices_at(level, clicked_hex)
 	if clicked_creature == nil && len(containers_there) > 0 {
 		// Next to that hex (or on it): look through everything lying there.
-		// Otherwise: walk toward it.
 		if hexgrid.hex_distance(player.hex, clicked_hex) <= 1 {
 			open_loot_panel(scene, containers_there[:])
 			return
 		}
-		next_step, path_exists := find_first_step(scene, player, stop_next_to_hex = clicked_hex)
+
+		// A chest can't be walked onto, so approach and stop next to it. Corpses and
+		// dropped items don't block movement, so walk straight onto the hex.
+		blocks_movement := false
+		for index in containers_there {
+			if container_blocks_movement(&level.containers[index]) do blocks_movement = true
+		}
+		if blocks_movement {
+			next_step, path_exists := find_first_step(scene, player, stop_next_to_hex = clicked_hex)
+			if path_exists {
+				start_walk(player, next_step)
+				scene.travel_destination = clicked_hex
+				scene.travel_adjacent_only = true
+				scene.turn_phase = .Player_Acting
+			}
+			return
+		}
+		next_step, path_exists := find_first_step(scene, player, destination = clicked_hex)
 		if path_exists {
 			start_walk(player, next_step)
+			scene.travel_destination = clicked_hex
+			scene.travel_adjacent_only = false
 			scene.turn_phase = .Player_Acting
 		}
 		return
@@ -220,6 +243,8 @@ handle_click :: proc(scene: ^Scene, clicked_hex: hexgrid.Hex) {
 		return
 	}
 	start_walk(player, next_step)
+	scene.travel_destination = clicked_hex
+	scene.travel_adjacent_only = false
 	// Stepping onto the stairs you clicked takes them, once the step has finished.
 	if next_step == clicked_hex {
 		scene.stairs_after_this_step = stairs_at(level, next_step)
@@ -267,7 +292,51 @@ start_next_monster_turn :: proc(scene: ^Scene) {
 	if scene.player.is_dead {
 		player_has_died(scene)
 	} else {
-		scene.turn_phase = .Player_Choosing
+		continue_travel(scene)
+	}
+}
+
+any_monster_awake :: proc(level: ^Level) -> bool {
+	for &monster in level.monsters {
+		if monster.is_awake && !monster.is_dead do return true
+	}
+	return false
+}
+
+// Once the player's step and every monster's turn have finished, either keep walking
+// toward a travel destination on autopilot, or hand control back to the player.
+continue_travel :: proc(scene: ^Scene) {
+	scene.turn_phase = .Player_Choosing
+	destination, traveling := scene.travel_destination.?
+	if !traveling do return
+
+	player := &scene.player
+	arrived := hexgrid.hex_distance(player.hex, destination) <= 1 if scene.travel_adjacent_only else player.hex == destination
+	if arrived {
+		scene.travel_destination = nil
+		return
+	}
+	if any_monster_awake(current_level(scene)) {
+		scene.travel_destination = nil
+		set_message(scene, "Something's nearby. You stop.")
+		return
+	}
+
+	next_step: hexgrid.Hex
+	path_exists: bool
+	if scene.travel_adjacent_only {
+		next_step, path_exists = find_first_step(scene, player, stop_next_to_hex = destination)
+	} else {
+		next_step, path_exists = find_first_step(scene, player, destination = destination)
+	}
+	if !path_exists {
+		scene.travel_destination = nil
+		return
+	}
+	start_walk(player, next_step)
+	scene.turn_phase = .Player_Acting
+	if !scene.travel_adjacent_only && next_step == destination {
+		scene.stairs_after_this_step = stairs_at(current_level(scene), next_step)
 	}
 }
 
@@ -342,6 +411,7 @@ move_to_level :: proc(scene: ^Scene, direction: Stairs_Direction) {
 	}
 	scene.current_depth = target_depth
 	scene.deepest_depth = max(scene.deepest_depth, target_depth)
+	scene.travel_destination = nil
 	level := current_level(scene)
 
 	// Going down, you arrive on the new level's stairs up, and the other way round.

@@ -122,6 +122,8 @@ Scene :: struct {
 	monster_turn_index:     int, // which monster of the current level is acting
 	stairs_after_this_step: Stairs_Direction,
 	level_change:           Level_Change,
+	travel_destination:     Maybe(hexgrid.Hex), // walking toward this on its own, one step per turn, until it arrives or a monster wakes
+	travel_adjacent_only:   bool,               // stop next to travel_destination (an NPC or chest) instead of walking onto it
 
 	// Things only needed for drawing
 	creature_sprites:          [Creature_Kind]rl.Texture2D,

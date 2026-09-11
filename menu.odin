@@ -58,6 +58,8 @@ handle_escape_key :: proc(scene: ^Scene) {
 	switch {
 	case scene.open_panel != .None:
 		scene.open_panel = .None
+	case scene.travel_destination != nil:
+		scene.travel_destination = nil
 	case scene.menu == .Save_Slots || scene.menu == .Load_Slots:
 		scene.menu = .Start if scene.screen == .Start_Menu else .Game
 	case scene.menu == .Ranking:

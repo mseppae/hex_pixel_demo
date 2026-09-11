@@ -1,0 +1,20 @@
+# Compiled output
+hex_pixel_demo
+hex_pixel_demo.exe
+hex_pixel_demo.bin
+*.o
+*.obj
+*.pdb
+*.exe
+
+# Local playthroughs and the ranking list
+saves/
+
+# Python leftovers from the asset scripts
+__pycache__/
+*.pyc
+
+# Editor and operating system files
+.DS_Store
+.vscode/
+.idea/

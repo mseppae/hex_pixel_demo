@@ -1,0 +1,67 @@
+{
+ "version": 1,
+ "_comment": "Villagers, quests and named creatures. Edit this file to change names, dialogue, rewards and monster strength; no recompiling needed. The game reads assets/content.json next to the program if it exists, otherwise the copy built into it. The ids (Elder, Slay_Grishnak, Grishnak, ...) must match the enums in village.odin; item ids match Item_Kind in items.odin.",
+
+ "named_creatures": [
+  {
+   "id": "Grishnak", "name": "Grishnak", "title": "the Goblin Warlord", "kind": "Goblin", "depth": 2,
+   "max_hit_points": 26, "damage_dice": {"count": 2, "sides": 4, "bonus": 1}, "armor": 1,
+   "tint": [255, 130, 120, 255],
+   "trophy": [{"kind": "Gold", "count": 40}, {"kind": "Healing_Potion", "count": 1}]
+  },
+  {
+   "id": "Gorluk", "name": "Gorluk", "title": "the Ogre Chieftain", "kind": "Ogre", "depth": 4,
+   "max_hit_points": 45, "damage_dice": {"count": 3, "sides": 4, "bonus": 2}, "armor": 2,
+   "tint": [190, 150, 255, 255],
+   "trophy": [{"kind": "Gold", "count": 90}, {"kind": "Healing_Potion", "count": 2}]
+  }
+ ],
+
+ "npcs": [
+  {
+   "id": "Elder", "name": "Elder Mara", "tint": [210, 170, 255, 255], "offset": {"q": 1, "r": -2},
+   "idle_line": "You have done more than enough. Rest a while."
+  },
+  {
+   "id": "Smith", "name": "Tomas the smith", "tint": [255, 190, 140, 255], "offset": {"q": -4, "r": 2},
+   "idle_line": "The forge is hot, but I've nothing for you now."
+  }
+ ],
+
+ "quests": [
+  {
+   "id": "Slay_Grishnak", "giver": "Elder", "title": "Slay Grishnak (depth 2)",
+   "target": "Grishnak", "reward_gold": 60, "reward_item": "Chain_Shirt",
+   "offer": [
+    "Grishnak, a goblin warlord, raids us from",
+    "the second depth. Our fields burn.",
+    "Slay him, and you'll have gold, and",
+    "the chain shirt my son once wore."
+   ],
+   "reminder": "Grishnak still lives. Depth 2, adventurer.",
+   "thanks": ["Grishnak is dead? The village owes you.", "Take these, as promised."]
+  },
+  {
+   "id": "Smiths_Club", "giver": "Smith", "title": "Bring Tomas a spiked club",
+   "wanted_item": "Spiked_Club", "reward_gold": 20, "reward_item": "Longsword",
+   "offer": [
+    "Ogres carry clubs studded with old iron.",
+    "Bring me one in your backpack, and I'll",
+    "reforge the nails into a proper blade."
+   ],
+   "reminder": "No club yet? The ogres below carry them.",
+   "thanks": ["Ha! Good iron under all that rust.", "Here: a longsword, as promised."]
+  },
+  {
+   "id": "Slay_Gorluk", "giver": "Elder", "title": "Slay Gorluk (depth 4)",
+   "target": "Gorluk", "reward_gold": 150, "requires": "Slay_Grishnak",
+   "offer": [
+    "With Grishnak gone, Gorluk the ogre",
+    "chieftain gathers the tribes at depth 4.",
+    "End him, and songs will be sung of you."
+   ],
+   "reminder": "Gorluk waits at depth 4.",
+   "thanks": ["Gorluk is dead. The songs begin tonight.", "This is all the gold we could gather."]
+  }
+ ]
+}

@@ -28,6 +28,8 @@ Tile_Kind :: enum u8 {
 	Wall,
 	Stairs_Down,
 	Stairs_Up,
+	Forest, // grassy ground you can't walk through: the village is ringed with it
+	// New kinds go at the END: saves store these as numbers.
 }
 
 FLOOR_VARIANT_COUNT :: 4 // plain, cracked, pebbles, mossy
@@ -44,6 +46,7 @@ Level :: struct {
 	tiles:              []Tile,
 	monsters:           [dynamic]Actor,
 	containers:         [dynamic]Container, // corpses and chests, with whatever loot is still in them
+	props:              [dynamic]Prop,      // trees and bushes; worked out from the tiles, never saved
 	npcs:               [dynamic]Npc,       // villagers (only in the village)
 	blood_stains:       [dynamic]Blood_Stain,
 	oldest_stain_index: int, // once the stain list is full, the oldest one gets replaced
@@ -68,6 +71,7 @@ destroy_level :: proc(level: ^Level) {
 	for container in level.containers do delete(container.items)
 	delete(level.containers)
 	delete(level.npcs)
+	delete(level.props)
 	delete(level.blood_stains)
 	free(level)
 }
@@ -383,10 +387,12 @@ mesh_for_tile :: proc(meshes: ^Tile_Meshes, tile: Tile) -> rl.Mesh {
 	case .Wall:        return meshes.walls[tile.variant]
 	case .Stairs_Down: return meshes.stairs_down
 	case .Stairs_Up:   return meshes.stairs_up
+	case .Forest:      return meshes.floors[3] // the mossy floor, as woodland ground
 	}
 	return meshes.floors[0]
 }
 
 tile_top_height :: proc(level: ^Level, hex: hexgrid.Hex) -> f32 {
-	return WALL_HEIGHT if is_wall(level, hex) else FLOOR_HEIGHT
+	tile, _ := tile_at(level, hex)
+	return WALL_HEIGHT if tile.kind == .Wall else FLOOR_HEIGHT
 }

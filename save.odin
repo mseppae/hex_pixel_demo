@@ -294,6 +294,7 @@ restore_game :: proc(scene: ^Scene, save: ^Save_Game) {
 		level.stairs_up_hex = saved.stairs_up_hex
 		level.stairs_down_hex = saved.stairs_down_hex
 		if level.depth == 0 do add_village_npcs(level)
+		add_trees(level)
 		append(&scene.levels, level)
 	}
 	scene.current_depth = clamp(save.current_depth, 0, len(scene.levels) - 1)

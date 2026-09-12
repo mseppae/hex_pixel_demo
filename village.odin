@@ -100,10 +100,15 @@ generate_village :: proc(scene: ^Scene) -> ^Level {
 	random_state := rand.create_u64(scene.game_seed ~ 0x5EED_0000_0000)
 	generator := rand.default_random_generator(&random_state)
 
+	// Open ground in the middle, a band of forest around it, rock beyond that.
 	for &tile, index in level.tiles {
 		hex := hexgrid.grid_hex_at(level.size, index)
-		is_open := hexgrid.hex_distance(hex, VILLAGE_CENTER) <= VILLAGE_RADIUS && !is_border_index(level, index)
-		tile.kind = .Floor if is_open else .Wall
+		distance := hexgrid.hex_distance(hex, VILLAGE_CENTER)
+		switch {
+		case distance <= VILLAGE_RADIUS && !is_border_index(level, index):     tile.kind = .Floor
+		case distance <= VILLAGE_RADIUS + 3 && !is_border_index(level, index): tile.kind = .Forest
+		case:                                                                 tile.kind = .Wall
+		}
 	}
 	for house in VILLAGE_HOUSES {
 		for offset in TRIANGLE_FOOTPRINT {
@@ -116,7 +121,44 @@ generate_village :: proc(scene: ^Scene) -> ^Level {
 	set_tile_kind(level, level.stairs_down_hex, .Stairs_Down)
 	choose_tile_variants(level, generator)
 	add_village_npcs(level)
+	add_trees(level)
 	return level
+}
+
+// Trees aren't saved either: where they stand is worked out from the tiles. Their
+// positions are jittered, but from the hex's own coordinates, so they never jump
+// around between visits.
+//
+// A hex holds a small thicket rather than one tree: a few trees plus undergrowth, at
+// different sizes and offsets. That is what stops the band of forest from looking like
+// a row of lollipops on a honeycomb.
+TREES_PER_HEX :: 3 // at most; thinner hexes get fewer
+
+add_trees :: proc(level: ^Level) {
+	for tile, index in level.tiles {
+		if tile.kind != .Forest do continue
+		hex := hexgrid.grid_hex_at(level.size, index)
+		// A fixed, repeatable jumble of bits from the hex's own coordinates.
+		scatter := u32(hex.q * 73856093 ~ hex.r * 19349663)
+		if scatter % 16 == 0 do continue // a clearing here and there
+
+		// Deeper in the band, the growth gets thicker.
+		from_edge := hexgrid.hex_distance(hex, VILLAGE_CENTER) - VILLAGE_RADIUS
+		thickness := clamp(int(from_edge) + int(scatter >> 4 % 2), 1, TREES_PER_HEX)
+
+		for plant in 0 ..< thickness {
+			bits := scatter >> u32(plant * 7) ~ u32(plant * 2654435761)
+			is_undergrowth := plant > 0 && bits % 3 == 0
+			append(&level.props, Prop {
+				hex     = hex,
+				// The last variant is the bush; undergrowth always uses it.
+				variant = u8(PROP_VARIANT_COUNT - 1) if is_undergrowth else u8(bits >> 3) % u8(PROP_VARIANT_COUNT - 1),
+				// Up to about half a hex off center, so crowns overlap their neighbours.
+				offset  = {f32(bits >> 6 % 18) - 8.5, f32(bits >> 11 % 18) - 8.5},
+				scale   = (0.5 + f32(bits >> 16 % 4) * 0.06) if is_undergrowth else (0.8 + f32(bits >> 16 % 6) * 0.07),
+			})
+		}
+	}
 }
 
 // Villagers aren't saved: they're put back whenever the village is built or loaded.

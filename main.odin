@@ -71,6 +71,7 @@ GOBLIN_SHEET_PNG     :: #load("assets/goblin_sheet.png")
 OGRE_SHEET_PNG       :: #load("assets/ogre_sheet.png")
 ITEM_ICONS_PNG       :: #load("assets/item_icons.png")
 OBJECTS_PNG          :: #load("assets/objects.png") // corpses and chests
+TREES_PNG            :: #load("assets/trees.png") // trees and bushes on forest tiles
 
 // Each sprite sheet has six columns (directions, in hexgrid.Direction order as seen
 // on screen: right, back-right, back-left, left, front-left, front-right)
@@ -129,6 +130,7 @@ Scene :: struct {
 	creature_sprites:          [Creature_Kind]rl.Texture2D,
 	item_icons:                rl.Texture2D,
 	object_sprites:            rl.Texture2D, // corpses and chests
+	tree_sprites:              rl.Texture2D, // trees and bushes
 	tile_meshes:               Tile_Meshes,
 	tiles_material:            rl.Material,
 	sprite_shader:             rl.Shader,
@@ -184,8 +186,10 @@ main :: proc() {
 	defer for sprite_sheet in scene.creature_sprites do rl.UnloadTexture(sprite_sheet)
 	scene.item_icons = load_embedded_png_texture(ITEM_ICONS_PNG)
 	scene.object_sprites = load_embedded_png_texture(OBJECTS_PNG)
+	scene.tree_sprites = load_embedded_png_texture(TREES_PNG)
 	defer rl.UnloadTexture(scene.item_icons)
 	defer rl.UnloadTexture(scene.object_sprites)
+	defer rl.UnloadTexture(scene.tree_sprites)
 
 	scene.tile_meshes = build_tile_meshes()
 	defer unload_tile_meshes(&scene.tile_meshes)
@@ -482,7 +486,7 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 	// pixels from hiding things, but a creature fading out after death is partly
 	// see-through, and those pixels only blend correctly over what's already drawn.
 	Draw_Order_Entry :: struct {
-		drawable:           union {^Actor, ^Container, ^Npc}, // a creature, a corpse or chest, or a villager
+		drawable:           union {^Actor, ^Container, ^Npc, ^Prop}, // a creature, a corpse or chest, a villager, or a tree
 		light:              f32,
 		distance_to_camera: f32,
 	}
@@ -502,6 +506,11 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 		if light == 0 do continue
 		append(&draw_order, Draw_Order_Entry{drawable = &container, light = light, distance_to_camera = rl.Vector3Distance(camera.position, container_center(&container))})
 	}
+	for &prop in level.props {
+		light := light_at_hex(scene, prop.hex)
+		if light == 0 do continue
+		append(&draw_order, Draw_Order_Entry{drawable = &prop, light = light, distance_to_camera = rl.Vector3Distance(camera.position, prop_position(&prop))})
+	}
 	for &npc in level.npcs {
 		light := light_at_hex(scene, npc.hex)
 		if light == 0 do continue
@@ -516,6 +525,7 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 		case ^Actor:     draw_actor(scene, drawable, camera, entry.light)
 		case ^Container: draw_container(scene, drawable, camera, entry.light)
 		case ^Npc:       draw_npc(scene, drawable, camera, entry.light)
+		case ^Prop:      draw_prop(scene, drawable, camera, entry.light)
 		}
 	}
 	rl.EndShaderMode()
@@ -543,6 +553,29 @@ draw_container :: proc(scene: ^Scene, container: ^Container, camera: rl.Camera3D
 	view_direction := rl.Vector3Normalize(camera.target - camera.position)
 	position := container_center(container) + view_direction * 1.5
 	rl.DrawBillboardPro(camera, texture, source, position, {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(rl.WHITE, light))
+}
+
+// A tree or bush: an upright picture, taller and wider than its hex, so its crown
+// spills over the edges and the grid stops looking like a honeycomb.
+PROP_FRAME :: rl.Vector2{32, 44}
+PROP_VARIANT_COUNT :: 4 // three trees and a bush, in assets/trees.png
+
+Prop :: struct {
+	hex:     hexgrid.Hex,
+	variant: u8,
+	offset:  rl.Vector2, // nudged off the hex center, in world units
+	scale:   f32,
+}
+
+prop_position :: proc(prop: ^Prop) -> rl.Vector3 {
+	position := hex_floor_position(prop.hex)
+	return position + {prop.offset.x, 0, prop.offset.y}
+}
+
+draw_prop :: proc(scene: ^Scene, prop: ^Prop, camera: rl.Camera3D, light: f32) {
+	source := rl.Rectangle{f32(prop.variant) * PROP_FRAME.x, 0, PROP_FRAME.x, PROP_FRAME.y}
+	size := rl.Vector2{PROP_FRAME.x * prop.scale, PROP_FRAME.y * prop.scale * upright_stretch(camera)}
+	rl.DrawBillboardPro(camera, scene.tree_sprites, source, prop_position(prop), {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(rl.WHITE, light))
 }
 
 // A tiny health bar above a wounded actor's head, drawn in the small image's pixels.

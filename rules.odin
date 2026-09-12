@@ -53,9 +53,10 @@ is_on_map :: proc(level: ^Level, hex: hexgrid.Hex) -> bool {
 }
 
 // Hexes outside the map count as walls.
+// "Wall" here means anything you can't walk through, trees included.
 is_wall :: proc(level: ^Level, hex: hexgrid.Hex) -> bool {
 	tile, inside := tile_at(level, hex)
-	return !inside || tile.kind == .Wall
+	return !inside || tile.kind == .Wall || tile.kind == .Forest
 }
 
 is_open_ground :: proc(level: ^Level, hex: hexgrid.Hex) -> bool {

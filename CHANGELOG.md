@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A `Forest` tile kind, and trees and bushes as props standing on them: the
+  village is ringed with woodland, several plants to a hex at different sizes
+  and offsets, so the crowns overhang the hex edges and the map's outline no
+  longer reads as a honeycomb (`art_source/trees.py`, `assets/trees.png`)
 - Behaviour components: each creature lists behaviours (`Flee_When_Hurt`,
   `Melee_Attack`, `Chase_Player`, `Wander`) in priority order in
   `assets/content.json`; on its turn each is tried until one acts

@@ -482,19 +482,17 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 	// pixels from hiding things, but a creature fading out after death is partly
 	// see-through, and those pixels only blend correctly over what's already drawn.
 	Draw_Order_Entry :: struct {
-		actor:              ^Actor,     // a creature,
-		container:          ^Container, // a corpse or chest,
-		npc:                ^Npc,       // or a villager
+		drawable:           union {^Actor, ^Container, ^Npc}, // a creature, a corpse or chest, or a villager
 		light:              f32,
 		distance_to_camera: f32,
 	}
 	draw_order := make([dynamic]Draw_Order_Entry, context.temp_allocator)
-	append(&draw_order, Draw_Order_Entry{actor = &scene.player, light = 1, distance_to_camera = rl.Vector3Distance(camera.position, actor_visual_position(&scene.player))})
+	append(&draw_order, Draw_Order_Entry{drawable = &scene.player, light = 1, distance_to_camera = rl.Vector3Distance(camera.position, actor_visual_position(&scene.player))})
 	for &monster in level.monsters {
 		if monster.is_dead && monster.death_seconds >= DEATH_SECONDS do continue
 		light := light_on_actor(scene, &monster)
 		if light == 0 do continue // out of sight
-		append(&draw_order, Draw_Order_Entry{actor = &monster, light = light, distance_to_camera = rl.Vector3Distance(camera.position, actor_visual_position(&monster))})
+		append(&draw_order, Draw_Order_Entry{drawable = &monster, light = light, distance_to_camera = rl.Vector3Distance(camera.position, actor_visual_position(&monster))})
 	}
 	for &container in level.containers {
 		light: f32 = 0
@@ -502,22 +500,22 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 			light = max(light, light_at_hex(scene, hexgrid.hex_add(container.anchor_hex, offset)))
 		}
 		if light == 0 do continue
-		append(&draw_order, Draw_Order_Entry{container = &container, light = light, distance_to_camera = rl.Vector3Distance(camera.position, container_center(&container))})
+		append(&draw_order, Draw_Order_Entry{drawable = &container, light = light, distance_to_camera = rl.Vector3Distance(camera.position, container_center(&container))})
 	}
 	for &npc in level.npcs {
 		light := light_at_hex(scene, npc.hex)
 		if light == 0 do continue
-		append(&draw_order, Draw_Order_Entry{npc = &npc, light = light, distance_to_camera = rl.Vector3Distance(camera.position, hex_floor_position(npc.hex))})
+		append(&draw_order, Draw_Order_Entry{drawable = &npc, light = light, distance_to_camera = rl.Vector3Distance(camera.position, hex_floor_position(npc.hex))})
 	}
 	slice.sort_by(draw_order[:], proc(first, second: Draw_Order_Entry) -> bool {
 		return first.distance_to_camera > second.distance_to_camera
 	})
 	rl.BeginShaderMode(scene.sprite_shader)
 	for entry in draw_order {
-		switch {
-		case entry.actor != nil:     draw_actor(scene, entry.actor, camera, entry.light)
-		case entry.container != nil: draw_container(scene, entry.container, camera, entry.light)
-		case entry.npc != nil:       draw_npc(scene, entry.npc, camera, entry.light)
+		switch drawable in entry.drawable {
+		case ^Actor:     draw_actor(scene, drawable, camera, entry.light)
+		case ^Container: draw_container(scene, drawable, camera, entry.light)
+		case ^Npc:       draw_npc(scene, drawable, camera, entry.light)
 		}
 	}
 	rl.EndShaderMode()

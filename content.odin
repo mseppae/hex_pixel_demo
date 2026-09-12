@@ -60,8 +60,40 @@ Content_Quest :: struct {
 	thanks:      []string,
 }
 
+Content_Behaviour :: struct {
+	kind:            string,
+	below:           f32,
+	notice_distance: i32,
+	damage_dice:     Dice,
+	verb:            string,
+	chance:          f32,
+}
+
+Content_Creature :: struct {
+	id:                    string,
+	name:                  string,
+	attack_verb:           string,
+	frame_size:            [2]f32,
+	footprint:             string, // "single" or "triangle"
+	shadow_radius:         f32,
+	blood_color:           [4]u8,
+	damage_dice:           Dice,
+	armor:                 int,
+	max_hit_points:        int,
+	walk_seconds:          f32,
+	attack_seconds:        f32,
+	knockback_distance:    f32,
+	turns_between_actions: int,
+	shakes_screen_on_hit:  bool,
+	weapon_sound:          string,
+	hurt_sound:            string,
+	death_sound:           string,
+	behaviours:            []Content_Behaviour,
+}
+
 Content_File :: struct {
 	version:         int,
+	creatures:       []Content_Creature,
 	named_creatures: []Content_Named_Creature,
 	npcs:            []Content_Npc,
 	quests:          []Content_Quest,
@@ -94,6 +126,47 @@ apply_content :: proc(data: []u8) -> (ok: bool) {
 		value, found = reflect.enum_from_name(Enum_Type, name)
 		if !found do fmt.eprintfln("content.json: unknown %s \"%s\"", what, name)
 		return
+	}
+
+	CREATURES = {}
+	for entry in file.creatures {
+		id := from_name(Creature_Kind, entry.id, "creature id") or_continue
+		definition := Creature_Definition {
+			name                  = keep(entry.name),
+			attack_verb           = keep(entry.attack_verb),
+			frame_size            = {entry.frame_size[0], entry.frame_size[1]},
+			footprint             = TRIANGLE_FOOTPRINT[:] if entry.footprint == "triangle" else SINGLE_HEX_FOOTPRINT[:],
+			shadow_radius         = entry.shadow_radius,
+			blood_color           = {entry.blood_color[0], entry.blood_color[1], entry.blood_color[2], entry.blood_color[3]},
+			damage_dice           = entry.damage_dice,
+			armor                 = entry.armor,
+			max_hit_points        = entry.max_hit_points,
+			walk_seconds          = entry.walk_seconds,
+			attack_seconds        = entry.attack_seconds,
+			knockback_distance    = entry.knockback_distance,
+			turns_between_actions = entry.turns_between_actions,
+			shakes_screen_on_hit  = entry.shakes_screen_on_hit,
+		}
+		if sound, found := from_name(Weapon_Sound, entry.weapon_sound, "weapon sound"); found do definition.weapon_sound = sound
+		if sound, found := from_name(Sound_Id, entry.hurt_sound, "sound"); found do definition.hurt_sound = sound
+		if sound, found := from_name(Sound_Id, entry.death_sound, "sound"); found do definition.death_sound = sound
+
+		// The behaviours are kept in the order they are listed: that is their priority.
+		behaviours := make([dynamic]Behaviour)
+		for listed in entry.behaviours {
+			kind := from_name(Behaviour_Kind, listed.kind, "behaviour") or_continue
+			append(&behaviours, Behaviour {
+				kind            = kind,
+				below           = listed.below,
+				notice_distance = listed.notice_distance,
+				damage_dice     = listed.damage_dice,
+				verb            = keep(listed.verb),
+				chance          = listed.chance,
+			})
+			if len(behaviours) >= MAX_BEHAVIOURS do break
+		}
+		definition.behaviours = behaviours[:]
+		CREATURES[id] = definition
 	}
 
 	NAMED_CREATURES = {}

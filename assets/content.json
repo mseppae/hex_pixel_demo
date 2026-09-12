@@ -1,37 +1,233 @@
 {
  "version": 1,
- "_comment": "Villagers, quests and named creatures. Edit this file to change names, dialogue, rewards and monster strength; no recompiling needed. The game reads assets/content.json next to the program if it exists, otherwise the copy built into it. The ids (Elder, Slay_Grishnak, Grishnak, ...) must match the enums in village.odin; item ids match Item_Kind in items.odin.",
-
- "named_creatures": [
+ "_comment": "Creatures, villagers, quests and named creatures. Edit this file to change names, dialogue, rewards, monster strength and what monsters do; no recompiling needed. The game reads assets/content.json next to the program if it exists, otherwise the copy built into it. The ids (Goblin, Elder, Slay_Grishnak, ...) must match the enums in the source; each creature's 'behaviours' are tried in the order listed, and each name is a capability implemented in behaviour.odin.",
+ "creatures": [
   {
-   "id": "Grishnak", "name": "Grishnak", "title": "the Goblin Warlord", "kind": "Goblin", "depth": 2,
-   "max_hit_points": 26, "damage_dice": {"count": 2, "sides": 4, "bonus": 1}, "armor": 1,
-   "tint": [255, 130, 120, 255],
-   "trophy": [{"kind": "Gold", "count": 40}, {"kind": "Healing_Potion", "count": 1}]
+   "id": "Adventurer",
+   "name": "adventurer",
+   "attack_verb": "hits",
+   "frame_size": [
+    16,
+    24
+   ],
+   "footprint": "single",
+   "shadow_radius": 6,
+   "blood_color": [
+    200,
+    30,
+    30,
+    255
+   ],
+   "damage_dice": {
+    "count": 1,
+    "sides": 6,
+    "bonus": 1
+   },
+   "armor": 0,
+   "max_hit_points": 20,
+   "walk_seconds": 0.3,
+   "attack_seconds": 0.5,
+   "knockback_distance": 4,
+   "turns_between_actions": 1,
+   "shakes_screen_on_hit": false,
+   "weapon_sound": "Light",
+   "hurt_sound": "Hurt_Player",
+   "death_sound": "Death_Player",
+   "behaviours": []
   },
   {
-   "id": "Gorluk", "name": "Gorluk", "title": "the Ogre Chieftain", "kind": "Ogre", "depth": 4,
-   "max_hit_points": 45, "damage_dice": {"count": 3, "sides": 4, "bonus": 2}, "armor": 2,
-   "tint": [190, 150, 255, 255],
-   "trophy": [{"kind": "Gold", "count": 90}, {"kind": "Healing_Potion", "count": 2}]
+   "id": "Goblin",
+   "name": "goblin",
+   "attack_verb": "stabs",
+   "frame_size": [
+    16,
+    24
+   ],
+   "footprint": "single",
+   "shadow_radius": 6,
+   "blood_color": [
+    150,
+    20,
+    20,
+    255
+   ],
+   "damage_dice": {
+    "count": 1,
+    "sides": 4,
+    "bonus": 0
+   },
+   "armor": 0,
+   "max_hit_points": 10,
+   "walk_seconds": 0.3,
+   "attack_seconds": 0.5,
+   "knockback_distance": 4,
+   "turns_between_actions": 1,
+   "shakes_screen_on_hit": false,
+   "weapon_sound": "Light",
+   "hurt_sound": "Hurt_Goblin",
+   "death_sound": "Death_Goblin",
+   "behaviours": [
+    {
+     "kind": "Flee_When_Hurt",
+     "below": 0.25
+    },
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 7
+    },
+    {
+     "kind": "Wander",
+     "chance": 0.4
+    }
+   ]
+  },
+  {
+   "id": "Ogre",
+   "name": "ogre",
+   "attack_verb": "smashes",
+   "frame_size": [
+    40,
+    48
+   ],
+   "footprint": "triangle",
+   "shadow_radius": 15,
+   "blood_color": [
+    120,
+    25,
+    15,
+    255
+   ],
+   "damage_dice": {
+    "count": 2,
+    "sides": 4,
+    "bonus": 0
+   },
+   "armor": 0,
+   "max_hit_points": 18,
+   "walk_seconds": 0.45,
+   "attack_seconds": 0.8,
+   "knockback_distance": 1.5,
+   "turns_between_actions": 2,
+   "shakes_screen_on_hit": true,
+   "weapon_sound": "Heavy",
+   "hurt_sound": "Hurt_Ogre",
+   "death_sound": "Death_Ogre",
+   "behaviours": [
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 8
+    }
+   ]
   }
  ],
-
+ "named_creatures": [
+  {
+   "id": "Grishnak",
+   "name": "Grishnak",
+   "title": "the Goblin Warlord",
+   "kind": "Goblin",
+   "depth": 2,
+   "max_hit_points": 26,
+   "damage_dice": {
+    "count": 2,
+    "sides": 4,
+    "bonus": 1
+   },
+   "armor": 1,
+   "tint": [
+    255,
+    130,
+    120,
+    255
+   ],
+   "trophy": [
+    {
+     "kind": "Gold",
+     "count": 40
+    },
+    {
+     "kind": "Healing_Potion",
+     "count": 1
+    }
+   ]
+  },
+  {
+   "id": "Gorluk",
+   "name": "Gorluk",
+   "title": "the Ogre Chieftain",
+   "kind": "Ogre",
+   "depth": 4,
+   "max_hit_points": 45,
+   "damage_dice": {
+    "count": 3,
+    "sides": 4,
+    "bonus": 2
+   },
+   "armor": 2,
+   "tint": [
+    190,
+    150,
+    255,
+    255
+   ],
+   "trophy": [
+    {
+     "kind": "Gold",
+     "count": 90
+    },
+    {
+     "kind": "Healing_Potion",
+     "count": 2
+    }
+   ]
+  }
+ ],
  "npcs": [
   {
-   "id": "Elder", "name": "Elder Mara", "tint": [210, 170, 255, 255], "offset": {"q": 1, "r": -2},
+   "id": "Elder",
+   "name": "Elder Mara",
+   "tint": [
+    210,
+    170,
+    255,
+    255
+   ],
+   "offset": {
+    "q": 1,
+    "r": -2
+   },
    "idle_line": "You have done more than enough. Rest a while."
   },
   {
-   "id": "Smith", "name": "Tomas the smith", "tint": [255, 190, 140, 255], "offset": {"q": -4, "r": 2},
+   "id": "Smith",
+   "name": "Tomas the smith",
+   "tint": [
+    255,
+    190,
+    140,
+    255
+   ],
+   "offset": {
+    "q": -4,
+    "r": 2
+   },
    "idle_line": "The forge is hot, but I've nothing for you now."
   }
  ],
-
  "quests": [
   {
-   "id": "Slay_Grishnak", "giver": "Elder", "title": "Slay Grishnak (depth 2)",
-   "target": "Grishnak", "reward_gold": 60, "reward_item": "Chain_Shirt",
+   "id": "Slay_Grishnak",
+   "giver": "Elder",
+   "title": "Slay Grishnak (depth 2)",
+   "target": "Grishnak",
+   "reward_gold": 60,
+   "reward_item": "Chain_Shirt",
    "offer": [
     "Grishnak, a goblin warlord, raids us from",
     "the second depth. Our fields burn.",
@@ -39,29 +235,46 @@
     "the chain shirt my son once wore."
    ],
    "reminder": "Grishnak still lives. Depth 2, adventurer.",
-   "thanks": ["Grishnak is dead? The village owes you.", "Take these, as promised."]
+   "thanks": [
+    "Grishnak is dead? The village owes you.",
+    "Take these, as promised."
+   ]
   },
   {
-   "id": "Smiths_Club", "giver": "Smith", "title": "Bring Tomas a spiked club",
-   "wanted_item": "Spiked_Club", "reward_gold": 20, "reward_item": "Longsword",
+   "id": "Smiths_Club",
+   "giver": "Smith",
+   "title": "Bring Tomas a spiked club",
+   "wanted_item": "Spiked_Club",
+   "reward_gold": 20,
+   "reward_item": "Longsword",
    "offer": [
     "Ogres carry clubs studded with old iron.",
     "Bring me one in your backpack, and I'll",
     "reforge the nails into a proper blade."
    ],
    "reminder": "No club yet? The ogres below carry them.",
-   "thanks": ["Ha! Good iron under all that rust.", "Here: a longsword, as promised."]
+   "thanks": [
+    "Ha! Good iron under all that rust.",
+    "Here: a longsword, as promised."
+   ]
   },
   {
-   "id": "Slay_Gorluk", "giver": "Elder", "title": "Slay Gorluk (depth 4)",
-   "target": "Gorluk", "reward_gold": 150, "requires": "Slay_Grishnak",
+   "id": "Slay_Gorluk",
+   "giver": "Elder",
+   "title": "Slay Gorluk (depth 4)",
+   "target": "Gorluk",
+   "reward_gold": 150,
+   "requires": "Slay_Grishnak",
    "offer": [
     "With Grishnak gone, Gorluk the ogre",
     "chieftain gathers the tribes at depth 4.",
     "End him, and songs will be sung of you."
    ],
    "reminder": "Gorluk waits at depth 4.",
-   "thanks": ["Gorluk is dead. The songs begin tonight.", "This is all the gold we could gather."]
+   "thanks": [
+    "Gorluk is dead. The songs begin tonight.",
+    "This is all the gold we could gather."
+   ]
   }
  ]
 }

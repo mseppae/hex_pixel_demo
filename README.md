@@ -45,10 +45,15 @@ from any folder. `saves/` is created next to the program.
 
 ## Editing content
 
-- `assets/content.json` holds the villagers, quests and named creatures: names,
-  dialogue, rewards, stats. The game reads this file if it sits next to the
-  program, otherwise the copy built into it, so you can edit and restart
-  without recompiling.
+- `assets/content.json` holds the creatures, villagers, quests and named
+  creatures: names, dialogue, rewards, stats, and what each monster does on its
+  turn. The game reads this file if it sits next to the program, otherwise the
+  copy built into it, so you can edit and restart without recompiling.
+- **Behaviours**: each creature lists behaviours in priority order, e.g. the
+  goblin has `Flee_When_Hurt`, `Melee_Attack`, `Chase_Player`, `Wander`. On its
+  turn each is tried in order until one acts, so changing how a monster fights
+  is a data change. The capabilities themselves live in `behaviour.odin`;
+  adding a new one there makes it available to every creature.
 - `art_source/*.py` regenerate the images and sounds in `assets/` (needs Python
   with numpy, scipy and Pillow).
 - `sounds_guide.png`, `atlas_layout_guide.png`, `sprite_sheet_guide.png` and

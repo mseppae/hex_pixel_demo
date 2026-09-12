@@ -346,13 +346,13 @@ player_has_died :: proc(scene: ^Scene) {
 	end_adventure(scene)
 }
 
-// Returns true if the monster started an action (walking or attacking).
+// Returns true if the monster started an action. The monster itself decides nothing:
+// its behaviours (see behaviour.odin) are tried in order until one acts.
 take_monster_turn :: proc(scene: ^Scene, monster: ^Actor) -> bool {
 	if monster.is_dead do return false
-	player := &scene.player
 
 	if !monster.is_awake {
-		if actors_distance(monster, player) > MONSTER_NOTICE_DISTANCE do return false
+		if actors_distance(monster, &scene.player) > notice_distance_of(monster) do return false
 		monster.is_awake = true
 	}
 
@@ -361,14 +361,8 @@ take_monster_turn :: proc(scene: ^Scene, monster: ^Actor) -> bool {
 	if monster.turns_waited < monster.turns_between_actions do return false
 	monster.turns_waited = 0
 
-	if actors_distance(monster, player) == 1 {
-		start_attack(monster, player)
-		return true
-	}
-	next_step, path_exists := find_first_step(scene, monster, stop_next_to = player)
-	if path_exists {
-		start_walk(monster, next_step)
-		return true
+	for behaviour in monster.behaviours {
+		if try_behaviour(scene, monster, behaviour) do return true
 	}
 	return false
 }

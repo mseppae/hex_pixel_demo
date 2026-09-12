@@ -70,6 +70,7 @@ Actor :: struct {
 	knockback_distance:    f32,           // how far a hit pushes it; heavy creatures barely move
 	turns_between_actions: int,           // 1 = acts every turn, 2 = every other turn
 	shakes_screen_on_hit:  bool,
+	behaviours:            []Behaviour,   // what it can do on its turn, in priority order
 	weapon_sound:          Weapon_Sound,  // the swoosh and impact of its attacks
 	hurt_sound:            Sound_Id,
 	death_sound:           Sound_Id,

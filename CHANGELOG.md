@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Behaviour components: each creature lists behaviours (`Flee_When_Hurt`,
+  `Melee_Attack`, `Chase_Player`, `Wander`) in priority order in
+  `assets/content.json`; on its turn each is tried until one acts
+  (`behaviour.odin`)
+- Wounded goblins now flee, and idle ones wander
+
+### Changed
+
+- Creature stats, sounds and sprite sizes moved from `creatures.odin` into
+  `assets/content.json`; the code keeps only the ids
+
 ## [0.1.0] - 2026-09-12
 
 ### Added

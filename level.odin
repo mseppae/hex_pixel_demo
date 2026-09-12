@@ -309,7 +309,7 @@ place_monsters :: proc(scene: ^Scene, level: ^Level, depth: int, generator: runt
 	// A named creature lives on its own depth, unless it has already been slain.
 	for named in Named_Creature {
 		if named == .None || NAMED_CREATURES[named].depth != depth || scene.named_slain[named] do continue
-		creature := make_named_creature(scene, named, {})
+		creature := make_named_creature(named, {})
 		for spot in candidate_spots {
 			if can_stand_in(level, nil, &creature, spot) {
 				creature.hex = spot
@@ -320,7 +320,7 @@ place_monsters :: proc(scene: ^Scene, level: ^Level, depth: int, generator: runt
 	}
 
 	for kind in kinds_to_place {
-		monster := make_creature(scene, kind, {})
+		monster := make_creature(kind, {})
 		monster.facing = rand.choice_enum(hexgrid.Direction, generator)
 		for spot in candidate_spots {
 			if can_stand_in(level, nil, &monster, spot) {

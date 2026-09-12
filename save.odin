@@ -258,7 +258,7 @@ restore_game :: proc(scene: ^Scene, save: ^Save_Game) {
 
 	scene.game_seed = save.game_seed
 	scene.adventure_id = save.adventure_id
-	scene.player = restore_creature(scene, save.player)
+	scene.player = restore_creature(save.player)
 
 	inventory := &scene.inventory
 	clear(&inventory.backpack)
@@ -276,7 +276,7 @@ restore_game :: proc(scene: ^Scene, save: ^Save_Game) {
 		level.tiles = make([]Tile, len(saved.tiles))
 		copy(level.tiles, saved.tiles)
 		for saved_monster in saved.monsters {
-			append(&level.monsters, restore_creature(scene, saved_monster))
+			append(&level.monsters, restore_creature(saved_monster))
 		}
 		for saved_container in saved.containers {
 			container := Container {
@@ -306,8 +306,8 @@ restore_game :: proc(scene: ^Scene, save: ^Save_Game) {
 	scene.open_panel = .None
 }
 
-restore_creature :: proc(scene: ^Scene, saved: Saved_Creature) -> Actor {
-	creature := make_named_creature(scene, saved.named, saved.hex) if saved.named != .None else make_creature(scene, saved.kind, saved.hex)
+restore_creature :: proc(saved: Saved_Creature) -> Actor {
+	creature := make_named_creature(saved.named, saved.hex) if saved.named != .None else make_creature(saved.kind, saved.hex)
 	creature.facing = saved.facing
 	creature.hit_points = saved.hit_points
 	creature.is_dead = saved.is_dead

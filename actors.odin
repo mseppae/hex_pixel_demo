@@ -51,29 +51,18 @@ Dice :: struct {
 }
 
 Actor :: struct {
-	// What kind of creature this is (see creatures.odin)
-	kind:                  Creature_Kind,
-	named:                 Named_Creature, // .None for ordinary creatures (see village.odin)
-	name:                  string,
-	tint:                  rl.Color,       // multiplied with the sprite's colors; white = unchanged
-	attack_verb:           string,        // "The ogre smashes you for 6."
-	sprite_sheet:          rl.Texture2D,
-	frame_size:            rl.Vector2,    // one frame of the sprite sheet, in pixels
-	footprint:             []hexgrid.Hex, // hexes covered, relative to `hex`
-	shadow_radius:         f32,
-	blood_color:           rl.Color,
-	damage_dice:           Dice,
-	armor:                 int,           // every hit on this creature does this much less (at least 1)
-	max_hit_points:        int,
-	walk_seconds:          f32,
-	attack_seconds:        f32,
-	knockback_distance:    f32,           // how far a hit pushes it; heavy creatures barely move
-	turns_between_actions: int,           // 1 = acts every turn, 2 = every other turn
-	shakes_screen_on_hit:  bool,
-	behaviours:            []Behaviour,   // what it can do on its turn, in priority order
-	weapon_sound:          Weapon_Sound,  // the swoosh and impact of its attacks
-	hurt_sound:            Sound_Id,
-	death_sound:           Sound_Id,
+	// What kind of creature this is (see creatures.odin), and its resolved instance
+	// stats: normally equal to CREATURES[kind], but overridden for named bosses (see
+	// village.odin) and, for the player, by whatever is currently equipped.
+	kind:               Creature_Kind,
+	named:              Named_Creature, // .None for ordinary creatures (see village.odin)
+	name:               string,
+	tint:               rl.Color, // multiplied with the sprite's colors; white = unchanged
+	damage_dice:        Dice,
+	armor:              int,      // every hit on this creature does this much less (at least 1)
+	max_hit_points:     int,
+	knockback_distance: f32,      // how far a hit pushes it; heavy creatures barely move
+	weapon_sound:       Weapon_Sound, // the swoosh and impact of its attacks
 
 	// Rules state
 	hex:                hexgrid.Hex,      // the anchor hex; the footprint is placed relative to it
@@ -99,9 +88,15 @@ Actor :: struct {
 // Footprints
 // ---------------------------------------------------------------------------
 
+// The hexes this actor covers, relative to its anchor hex — shared by every creature
+// of its kind (see creatures.odin).
+actor_footprint :: proc(actor: ^Actor) -> []hexgrid.Hex {
+	return CREATURES[actor.kind].footprint
+}
+
 // Does the actor cover `hex` when its anchor stands on `anchor`?
 footprint_covers :: proc(actor: ^Actor, anchor, hex: hexgrid.Hex) -> bool {
-	for offset in actor.footprint {
+	for offset in actor_footprint(actor) {
 		if hexgrid.hex_add(anchor, offset) == hex do return true
 	}
 	return false
@@ -111,8 +106,8 @@ footprint_covers :: proc(actor: ^Actor, anchor, hex: hexgrid.Hex) -> bool {
 // 1 means they stand next to each other and can fight.
 footprint_distance :: proc(first: ^Actor, first_anchor: hexgrid.Hex, second: ^Actor, second_anchor: hexgrid.Hex) -> i32 {
 	shortest := max(i32)
-	for first_offset in first.footprint {
-		for second_offset in second.footprint {
+	for first_offset in actor_footprint(first) {
+		for second_offset in actor_footprint(second) {
 			distance := hexgrid.hex_distance(hexgrid.hex_add(first_anchor, first_offset), hexgrid.hex_add(second_anchor, second_offset))
 			shortest = min(shortest, distance)
 		}
@@ -133,10 +128,11 @@ hex_floor_position :: proc(hex: hexgrid.Hex) -> rl.Vector3 {
 // triangle the corner where its three hexes meet. Sprites stand here.
 footprint_center :: proc(actor: ^Actor, anchor: hexgrid.Hex) -> rl.Vector3 {
 	sum: rl.Vector3
-	for offset in actor.footprint {
+	footprint := actor_footprint(actor)
+	for offset in footprint {
 		sum += hex_floor_position(hexgrid.hex_add(anchor, offset))
 	}
-	return sum / f32(len(actor.footprint))
+	return sum / f32(len(footprint))
 }
 
 // ---------------------------------------------------------------------------
@@ -161,6 +157,7 @@ start_attack :: proc(attacker, target: ^Actor) {
 }
 
 update_actor :: proc(scene: ^Scene, actor: ^Actor, frame_seconds: f32) {
+	definition := CREATURES[actor.kind]
 	actor.hurt_seconds_left = max(0, actor.hurt_seconds_left - frame_seconds)
 	if actor.is_dead {
 		actor.death_seconds += frame_seconds
@@ -170,12 +167,12 @@ update_actor :: proc(scene: ^Scene, actor: ^Actor, frame_seconds: f32) {
 	case .None:
 	case .Walking:
 		actor.action_seconds += frame_seconds
-		if actor.action_seconds >= actor.walk_seconds {
+		if actor.action_seconds >= definition.walk_seconds {
 			actor.action = .None
 		}
 	case .Attacking:
 		actor.action_seconds += frame_seconds
-		progress := actor.action_seconds / actor.attack_seconds
+		progress := actor.action_seconds / definition.attack_seconds
 		// The swoosh starts as the wind-up ends and the attacker lunges forward.
 		if !actor.swing_has_sounded && progress >= ATTACK_WIND_UP_END {
 			actor.swing_has_sounded = true
@@ -199,12 +196,13 @@ actor_is_animating :: proc(actor: ^Actor) -> bool {
 
 // Where the actor's feet are drawn this frame, including walking, lunging and knockback.
 actor_visual_position :: proc(actor: ^Actor) -> rl.Vector3 {
+	definition := CREATURES[actor.kind]
 	position := footprint_center(actor, actor.hex)
 
 	switch actor.action {
 	case .None:
 	case .Walking:
-		progress := clamp(actor.action_seconds / actor.walk_seconds, 0, 1)
+		progress := clamp(actor.action_seconds / definition.walk_seconds, 0, 1)
 		// Smoothstep: starts gently, speeds up, and stops gently.
 		eased_progress := progress * progress * (3 - 2 * progress)
 		start := footprint_center(actor, actor.walk_start_hex)
@@ -213,7 +211,7 @@ actor_visual_position :: proc(actor: ^Actor) -> rl.Vector3 {
 	case .Attacking:
 		target_center := footprint_center(actor.attack_target, actor.attack_target.hex)
 		toward_target := rl.Vector3Normalize(target_center - position)
-		position += toward_target * attack_lunge_offset(actor.action_seconds / actor.attack_seconds)
+		position += toward_target * attack_lunge_offset(actor.action_seconds / definition.attack_seconds)
 	}
 
 	if actor.hurt_seconds_left > 0 {
@@ -238,13 +236,14 @@ attack_lunge_offset :: proc(progress: f32) -> f32 {
 }
 
 actor_pose :: proc(actor: ^Actor) -> Pose {
+	definition := CREATURES[actor.kind]
 	switch actor.action {
 	case .None:
 	case .Walking:
-		progress := clamp(actor.action_seconds / actor.walk_seconds, 0, 0.999)
+		progress := clamp(actor.action_seconds / definition.walk_seconds, 0, 0.999)
 		return WALK_CYCLE[int(progress * len(WALK_CYCLE))]
 	case .Attacking:
-		progress := actor.action_seconds / actor.attack_seconds
+		progress := actor.action_seconds / definition.attack_seconds
 		if progress < ATTACK_WIND_UP_END do return .Attack_Wind_Up
 		if progress < ATTACK_FOLLOW_THROUGH_END do return .Strike
 	}
@@ -263,7 +262,9 @@ camera_up_direction :: proc(camera: rl.Camera3D) -> rl.Vector3 {
 	return rl.Vector3CrossProduct(camera_right, view_direction)
 }
 
-draw_actor :: proc(actor: ^Actor, camera: rl.Camera3D, light: f32) {
+draw_actor :: proc(scene: ^Scene, actor: ^Actor, camera: rl.Camera3D, light: f32) {
+	definition := CREATURES[actor.kind]
+	sprite_sheet := scene.creature_sprites[actor.kind]
 	feet_position := actor_visual_position(actor)
 	opacity: f32 = 1
 
@@ -276,27 +277,27 @@ draw_actor :: proc(actor: ^Actor, camera: rl.Camera3D, light: f32) {
 
 	// A faint dark disc under the feet, so the sprite looks like it stands on the tile.
 	shadow_position := rl.Vector3{feet_position.x, FLOOR_HEIGHT + 0.1, feet_position.z}
-	rl.DrawCylinder(shadow_position, actor.shadow_radius, actor.shadow_radius, 0.1, 16, rl.Fade(rl.BLACK, 0.35 * opacity))
+	rl.DrawCylinder(shadow_position, definition.shadow_radius, definition.shadow_radius, 0.1, 16, rl.Fade(rl.BLACK, 0.35 * opacity))
 
 	// Sprites stand upright, like cardboard cutouts on the floor. Seen from the tilted
 	// camera, an upright cutout looks squashed (at a 60 degree tilt, to half its height),
 	// so it's stretched taller by exactly that amount and the pixels come out square.
 	// (Leaning sprites back to face the camera also gives square pixels, but then a
 	// tall sprite's top reaches backward into any wall standing behind it.)
-	stretched_size := rl.Vector2{actor.frame_size.x, actor.frame_size.y * upright_stretch(camera)}
+	stretched_size := rl.Vector2{definition.frame_size.x, definition.frame_size.y * upright_stretch(camera)}
 	world_up := rl.Vector3{0, 1, 0}
 
 	column := sprite_frame_for(actor.facing, camera)
 	row := int(actor_pose(actor))
 	frame_in_sheet := rl.Rectangle {
-		f32(column) * actor.frame_size.x,
-		f32(row) * actor.frame_size.y,
-		actor.frame_size.x,
-		actor.frame_size.y,
+		f32(column) * definition.frame_size.x,
+		f32(row) * definition.frame_size.y,
+		definition.frame_size.x,
+		definition.frame_size.y,
 	}
 	bottom_center := rl.Vector2{stretched_size.x / 2, 0} // the feet touch feet_position
 
-	rl.DrawBillboardPro(camera, actor.sprite_sheet, frame_in_sheet, feet_position, world_up, stretched_size, bottom_center, 0, rl.Fade(shade(actor.tint, light), opacity))
+	rl.DrawBillboardPro(camera, sprite_sheet, frame_in_sheet, feet_position, world_up, stretched_size, bottom_center, 0, rl.Fade(shade(actor.tint, light), opacity))
 
 	// Hit flash: draw the same sprite again with additive blending, which adds its
 	// colors on top of themselves and pushes them toward white. No shader needed.
@@ -304,7 +305,7 @@ draw_actor :: proc(actor: ^Actor, camera: rl.Camera3D, light: f32) {
 		flash_strength := actor.hurt_seconds_left / HURT_SECONDS
 		rl.BeginBlendMode(.ADDITIVE)
 		for _ in 0 ..< 2 {
-			rl.DrawBillboardPro(camera, actor.sprite_sheet, frame_in_sheet, feet_position, world_up, stretched_size, bottom_center, 0, rl.Fade(rl.WHITE, flash_strength))
+			rl.DrawBillboardPro(camera, sprite_sheet, frame_in_sheet, feet_position, world_up, stretched_size, bottom_center, 0, rl.Fade(rl.WHITE, flash_strength))
 		}
 		rl.EndBlendMode()
 	}

@@ -410,7 +410,7 @@ light_at_hex :: proc(scene: ^Scene, hex: hexgrid.Hex) -> f32 {
 // A creature is as brightly lit as its nearest hex (the ogre covers three).
 light_on_actor :: proc(scene: ^Scene, actor: ^Actor) -> f32 {
 	brightest: f32 = 0
-	for offset in actor.footprint {
+	for offset in actor_footprint(actor) {
 		brightest = max(brightest, light_at_hex(scene, hexgrid.hex_add(actor.hex, offset)))
 	}
 	return brightest
@@ -458,7 +458,7 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 		hovered_creature := actor_at(scene, scene.hovered_hex)
 		if hovered_creature != nil && hovered_creature != &scene.player {
 			// Outline every hex the monster covers, so its size is clear.
-			for offset in hovered_creature.footprint {
+			for offset in actor_footprint(hovered_creature) {
 				draw_hex_outline(hexgrid.hex_add(hovered_creature.hex, offset), FLOOR_HEIGHT + 0.2, rl.RED)
 			}
 		} else if npc_index_at(level, scene.hovered_hex) >= 0 {
@@ -515,7 +515,7 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 	rl.BeginShaderMode(scene.sprite_shader)
 	for entry in draw_order {
 		switch {
-		case entry.actor != nil:     draw_actor(entry.actor, camera, entry.light)
+		case entry.actor != nil:     draw_actor(scene, entry.actor, camera, entry.light)
 		case entry.container != nil: draw_container(scene, entry.container, camera, entry.light)
 		case entry.npc != nil:       draw_npc(scene, entry.npc, camera, entry.light)
 		}
@@ -550,8 +550,9 @@ draw_container :: proc(scene: ^Scene, container: ^Container, camera: rl.Camera3D
 // A tiny health bar above a wounded actor's head, drawn in the small image's pixels.
 draw_hit_point_bar :: proc(actor: ^Actor, camera: rl.Camera3D) {
 	if actor.is_dead || actor.hit_points == actor.max_hit_points do return
-	bar_width := i32(actor.frame_size.x * 0.75)
-	above_head := actor_visual_position(actor) + camera_up_direction(camera) * (actor.frame_size.y + 3)
+	definition := CREATURES[actor.kind]
+	bar_width := i32(definition.frame_size.x * 0.75)
+	above_head := actor_visual_position(actor) + camera_up_direction(camera) * (definition.frame_size.y + 3)
 	screen_position := rl.GetWorldToScreenEx(above_head, camera, LOW_RES_WIDTH, LOW_RES_HEIGHT)
 	bar_left := i32(screen_position.x) - bar_width / 2
 	bar_top := i32(screen_position.y)

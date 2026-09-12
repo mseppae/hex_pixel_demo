@@ -32,9 +32,9 @@ Named_Creature_Definition :: struct {
 // Filled from assets/content.json at startup (see content.odin).
 NAMED_CREATURES: [Named_Creature]Named_Creature_Definition
 
-make_named_creature :: proc(scene: ^Scene, named: Named_Creature, hex: hexgrid.Hex) -> Actor {
+make_named_creature :: proc(named: Named_Creature, hex: hexgrid.Hex) -> Actor {
 	definition := NAMED_CREATURES[named]
-	creature := make_creature(scene, definition.kind, hex)
+	creature := make_creature(definition.kind, hex)
 	creature.named = named
 	creature.name = definition.name
 	creature.max_hit_points = definition.max_hit_points

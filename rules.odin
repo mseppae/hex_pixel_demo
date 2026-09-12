@@ -86,7 +86,7 @@ actor_at :: proc(scene: ^Scene, hex: hexgrid.Hex) -> ^Actor {
 // taken, which matters for the ogre: its next position overlaps its current one.)
 // `player` may be nil while a level is still being built.
 can_stand_in :: proc(level: ^Level, player: ^Actor, mover: ^Actor, anchor: hexgrid.Hex) -> bool {
-	for offset in mover.footprint {
+	for offset in actor_footprint(mover) {
 		hex := hexgrid.hex_add(anchor, offset)
 		if !is_open_ground(level, hex) do return false
 		if player != nil && player != mover && !player.is_dead && footprint_covers(player, player.hex, hex) do return false
@@ -129,7 +129,7 @@ start_new_game :: proc(scene: ^Scene, game_seed: u64) {
 	scene.deepest_depth = 0
 	scene.quest_states = {}
 	scene.named_slain = {}
-	scene.player = make_creature(scene, .Adventurer, {})
+	scene.player = make_creature(.Adventurer, {})
 	clear(&scene.inventory.backpack)
 	scene.inventory.gold = 0
 	scene.inventory.gold_collected = 0
@@ -350,6 +350,7 @@ player_has_died :: proc(scene: ^Scene) {
 // its behaviours (see behaviour.odin) are tried in order until one acts.
 take_monster_turn :: proc(scene: ^Scene, monster: ^Actor) -> bool {
 	if monster.is_dead do return false
+	definition := CREATURES[monster.kind]
 
 	if !monster.is_awake {
 		if actors_distance(monster, &scene.player) > notice_distance_of(monster) do return false
@@ -358,10 +359,10 @@ take_monster_turn :: proc(scene: ^Scene, monster: ^Actor) -> bool {
 
 	// Slow creatures only act every few turns.
 	monster.turns_waited += 1
-	if monster.turns_waited < monster.turns_between_actions do return false
+	if monster.turns_waited < definition.turns_between_actions do return false
 	monster.turns_waited = 0
 
-	for behaviour in monster.behaviours {
+	for behaviour in definition.behaviours {
 		if try_behaviour(scene, monster, behaviour) do return true
 	}
 	return false
@@ -426,6 +427,9 @@ move_to_level :: proc(scene: ^Scene, direction: Stairs_Direction) {
 
 // The moment a weapon connects: roll damage, then trigger the flash, knockback, blood and number.
 resolve_attack_impact :: proc(scene: ^Scene, attacker, target: ^Actor) {
+	attacker_definition := CREATURES[attacker.kind]
+	target_definition := CREATURES[target.kind]
+
 	// Armor takes some of the sting out of every hit, but a hit always does at least 1.
 	damage := max(1, roll_dice(attacker.damage_dice) - target.armor)
 	target.hit_points = max(0, target.hit_points - damage)
@@ -435,27 +439,27 @@ resolve_attack_impact :: proc(scene: ^Scene, attacker, target: ^Actor) {
 	away_from_attacker := rl.Vector3Normalize(target_center - footprint_center(attacker, attacker.hex))
 	target.hurt_seconds_left = HURT_SECONDS
 	target.knockback_direction = away_from_attacker
-	if attacker.shakes_screen_on_hit {
+	if attacker_definition.shakes_screen_on_hit {
 		scene.screen_shake_seconds_left = SCREEN_SHAKE_SECONDS
 	}
 
 	// Halfway up the (stretched) upright sprite, so the spray starts at the chest
 	// of the drawing rather than at its knees.
-	chest_height := target_center + {0, target.frame_size.y * 0.5 / scene.camera_up.y, 0}
-	spawn_blood_spray(&scene.effects, chest_height, away_from_attacker, target.blood_color, 10 + damage * 4)
+	chest_height := target_center + {0, target_definition.frame_size.y * 0.5 / scene.camera_up.y, 0}
+	spawn_blood_spray(&scene.effects, chest_height, away_from_attacker, target_definition.blood_color, 10 + damage * 4)
 
 	// The impact, and the victim's cry: a death cry if this blow kills.
 	play_sound(&scene.sound, IMPACT_SOUNDS[attacker.weapon_sound])
-	play_sound(&scene.sound, target.death_sound if target.hit_points == 0 else target.hurt_sound)
+	play_sound(&scene.sound, target_definition.death_sound if target.hit_points == 0 else target_definition.hurt_sound)
 
 	target_is_player := target == &scene.player
 	number_color := rl.RED if target_is_player else rl.WHITE
-	add_floating_number(&scene.effects, target_center, target.frame_size.y + 16, damage, number_color) // above the health bar
+	add_floating_number(&scene.effects, target_center, target_definition.frame_size.y + 16, damage, number_color) // above the health bar
 
 	if attacker == &scene.player {
 		set_message(scene, "You hit %s for %d.", display_name(target), damage)
 	} else {
-		set_message(scene, "%s %s you for %d.", display_name(attacker, start_of_sentence = true), attacker.attack_verb, damage)
+		set_message(scene, "%s %s you for %d.", display_name(attacker, start_of_sentence = true), attacker_definition.attack_verb, damage)
 	}
 
 	if target.hit_points == 0 {
@@ -465,7 +469,7 @@ resolve_attack_impact :: proc(scene: ^Scene, attacker, target: ^Actor) {
 		// A last, bigger burst in every direction.
 		for _ in 0 ..< 6 {
 			angle := rand.float32_range(0, 2 * math.PI)
-			spawn_blood_spray(&scene.effects, chest_height, {math.cos(angle), 0, math.sin(angle)}, target.blood_color, len(target.footprint) * 10)
+			spawn_blood_spray(&scene.effects, chest_height, {math.cos(angle), 0, math.sin(angle)}, target_definition.blood_color, len(target_definition.footprint) * 10)
 		}
 		if target_is_player {
 			scene.killed_by = attacker.kind

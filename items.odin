@@ -151,7 +151,7 @@ use_backpack_item :: proc(scene: ^Scene, slot_index: int) -> (used_a_turn: bool)
 		player.hit_points += healed
 		inventory.backpack[slot_index].count -= 1
 		if inventory.backpack[slot_index].count == 0 do ordered_remove(&inventory.backpack, slot_index)
-		add_floating_number(&scene.effects, footprint_center(player, player.hex), player.frame_size.y + 16, healed, rl.GREEN, is_heal = true)
+		add_floating_number(&scene.effects, footprint_center(player, player.hex), CREATURES[player.kind].frame_size.y + 16, healed, rl.GREEN, is_heal = true)
 		set_message(scene, "You drink the %s and heal %d.", definition.name, healed)
 		return true
 	case .Weapon:
@@ -391,7 +391,7 @@ leave_corpse :: proc(scene: ^Scene, creature: ^Actor) {
 	corpse := Container {
 		kind       = corpse_kind_for(creature.kind),
 		anchor_hex = creature.hex,
-		footprint  = creature.footprint,
+		footprint  = actor_footprint(creature),
 	}
 	if creature != &scene.player {
 		roll_creature_loot(creature.kind, scene.current_depth, &corpse.items)

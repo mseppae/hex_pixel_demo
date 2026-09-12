@@ -36,33 +36,20 @@ Creature_Definition :: struct {
 
 CREATURES: [Creature_Kind]Creature_Definition
 
-make_creature :: proc(scene: ^Scene, kind: Creature_Kind, hex: hexgrid.Hex) -> Actor {
+make_creature :: proc(kind: Creature_Kind, hex: hexgrid.Hex) -> Actor {
 	definition := CREATURES[kind]
 	creature := Actor {
-		kind                  = kind,
-		name                  = definition.name,
-		attack_verb           = definition.attack_verb,
-		frame_size            = definition.frame_size,
-		footprint             = definition.footprint,
-		shadow_radius         = definition.shadow_radius,
-		blood_color           = definition.blood_color,
-		damage_dice           = definition.damage_dice,
-		armor                 = definition.armor,
-		max_hit_points        = definition.max_hit_points,
-		walk_seconds          = definition.walk_seconds,
-		attack_seconds        = definition.attack_seconds,
-		knockback_distance    = definition.knockback_distance,
-		turns_between_actions = definition.turns_between_actions,
-		shakes_screen_on_hit  = definition.shakes_screen_on_hit,
-		weapon_sound          = definition.weapon_sound,
-		hurt_sound            = definition.hurt_sound,
-		death_sound           = definition.death_sound,
-		behaviours            = definition.behaviours,
-		tint                  = rl.WHITE,
-		sprite_sheet          = scene.creature_sprites[kind],
-		hex                   = hex,
-		hit_points            = definition.max_hit_points,
-		facing                = .South_East,
+		kind               = kind,
+		name               = definition.name,
+		damage_dice        = definition.damage_dice,
+		armor              = definition.armor,
+		max_hit_points     = definition.max_hit_points,
+		knockback_distance = definition.knockback_distance,
+		weapon_sound       = definition.weapon_sound,
+		tint               = rl.WHITE,
+		hex                = hex,
+		hit_points         = definition.max_hit_points,
+		facing             = .South_East,
 	}
 	return creature
 }

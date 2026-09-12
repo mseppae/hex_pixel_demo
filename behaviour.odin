@@ -85,7 +85,7 @@ step_away_from :: proc(scene: ^Scene, creature: ^Actor, from: hexgrid.Hex) -> (s
 // How far this creature notices the player, from whichever behaviour cares.
 notice_distance_of :: proc(creature: ^Actor) -> i32 {
 	furthest: i32 = 1
-	for behaviour in creature.behaviours {
+	for behaviour in CREATURES[creature.kind].behaviours {
 		if behaviour.kind == .Chase_Player do furthest = max(furthest, behaviour.notice_distance)
 	}
 	return furthest

@@ -23,6 +23,7 @@ Item_Kind :: enum u8 {
 	Longsword,
 	Leather_Armor,
 	Chain_Shirt,
+	Town_Portal_Scroll,
 }
 
 Item_Category :: enum u8 {
@@ -30,6 +31,7 @@ Item_Category :: enum u8 {
 	Potion,
 	Weapon,
 	Armor,
+	Scroll,
 }
 
 // How fast a weapon or armor lets its wearer counter-attack after a parry (see
@@ -68,6 +70,7 @@ ITEMS := [Item_Kind]Item_Definition {
 	.Longsword      = {name = "Longsword", category = .Weapon, damage_dice = {count = 1, sides = 8, bonus = 2}, weight = .Medium, sound = .Blade, flavor = "Balanced, keen, old."},
 	.Leather_Armor  = {name = "Leather armor", category = .Armor, armor = 1, armor_weight = .Light, flavor = "Stiff, but it turns a blade."},
 	.Chain_Shirt    = {name = "Chain shirt", category = .Armor, armor = 2, armor_weight = .Medium, flavor = "Heavy rings, carefully mended."},
+	.Town_Portal_Scroll = {name = "Scroll of Town Portal", category = .Scroll, flavor = "The ink is still faintly warm."},
 }
 
 // Punching with bare hands, when no weapon is wielded: a fist is Light, same as a dagger.
@@ -76,7 +79,7 @@ FIST_DICE :: Dice{count = 1, sides = 2}
 // Gold and potions pile up in one slot; everything else takes a slot each.
 is_stackable :: proc(kind: Item_Kind) -> bool {
 	category := ITEMS[kind].category
-	return category == .Gold || category == .Potion
+	return category == .Gold || category == .Potion || category == .Scroll
 }
 
 dice_text :: proc(dice: Dice) -> string {
@@ -93,6 +96,7 @@ item_rules_text :: proc(kind: Item_Kind) -> string {
 	case .Potion: return fmt.tprintf("Heals %s.", dice_text(definition.heal_dice))
 	case .Weapon: return fmt.tprintf("Damage %s.", dice_text(definition.damage_dice))
 	case .Armor:  return fmt.tprintf("Armor %d: hits on you do %d less.", definition.armor, definition.armor)
+	case .Scroll: return "Opens a portal back to the village."
 	}
 	return ""
 }
@@ -196,8 +200,28 @@ use_backpack_item :: proc(scene: ^Scene, slot_index: int) -> (used_a_turn: bool)
 		}
 		apply_equipment(scene)
 		set_message(scene, "You put on the %s.", definition.name)
+	case .Scroll:
+		if !open_portal(scene) do return false // the message already explains why
+		inventory.backpack[slot_index].count -= 1
+		if inventory.backpack[slot_index].count == 0 do ordered_remove(&inventory.backpack, slot_index)
+		return true
 	}
 	return false
+}
+
+// Buying from a villager's shop (see NPCS[role].sells in village.odin). Doesn't cost
+// a turn: haggling in the village is safe.
+buy_item :: proc(scene: ^Scene, item: Item_Kind, price: int) {
+	if scene.inventory.gold < price {
+		set_message(scene, "You can't afford that.")
+		return
+	}
+	if !add_to_inventory(&scene.inventory, Item_Stack{item, 1}) {
+		set_message(scene, "Your backpack is full.")
+		return
+	}
+	scene.inventory.gold -= price
+	set_message(scene, "You buy the %s.", ITEMS[item].name)
 }
 
 Equipment_Slot :: enum {

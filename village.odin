@@ -59,6 +59,7 @@ display_name :: proc(creature: ^Actor, start_of_sentence := false) -> string {
 Npc_Role :: enum u8 {
 	Elder,
 	Smith,
+	Merchant,
 }
 
 Npc_Definition :: struct {
@@ -66,6 +67,8 @@ Npc_Definition :: struct {
 	tint:      rl.Color, // they wear the adventurer's sprite in other colors
 	offset:    hexgrid.Hex, // where they stand, from the village center
 	idle_line: string,
+	sells:     Maybe(Item_Kind), // nil unless this villager runs a shop
+	price:     int,
 }
 
 NPCS: [Npc_Role]Npc_Definition
@@ -280,6 +283,12 @@ dialogue_content :: proc(scene: ^Scene) -> (lines: [4]string, action: string, re
 	npc := current_level(scene).npcs[scene.dialogue_npc_index]
 	quest_id, has_quest := current_quest_of(scene, npc.role)
 	if !has_quest {
+		if item, sells := NPCS[npc.role].sells.?; sells {
+			lines[0] = fmt.tprintf("%s: %d gold.", ITEMS[item].name, NPCS[npc.role].price)
+			lines[1] = ITEMS[item].flavor
+			action = fmt.tprintf("Buy (%d gold)", NPCS[npc.role].price)
+			return
+		}
 		lines[0] = NPCS[npc.role].idle_line
 		return
 	}
@@ -323,13 +332,18 @@ handle_dialogue_click :: proc(scene: ^Scene) {
 	_, action, _ := dialogue_content(scene)
 	if action == "" || !mouse_is_over(scene, DIALOGUE_ACTION_BUTTON) do return
 	npc := current_level(scene).npcs[scene.dialogue_npc_index]
-	quest_id, _ := current_quest_of(scene, npc.role)
-	if scene.quest_states[quest_id] == .Not_Offered {
-		scene.quest_states[quest_id] = .Active
-		set_message(scene, "New quest: %s.", QUESTS[quest_id].title)
-		scene.open_panel = .None
-	} else {
-		complete_quest(scene, quest_id)
+	if quest_id, has_quest := current_quest_of(scene, npc.role); has_quest {
+		if scene.quest_states[quest_id] == .Not_Offered {
+			scene.quest_states[quest_id] = .Active
+			set_message(scene, "New quest: %s.", QUESTS[quest_id].title)
+			scene.open_panel = .None
+		} else {
+			complete_quest(scene, quest_id)
+		}
+		return
+	}
+	if item, sells := NPCS[npc.role].sells.?; sells {
+		buy_item(scene, item, NPCS[npc.role].price) // panel stays open: buying several is fine
 	}
 }
 

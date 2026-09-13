@@ -44,6 +44,8 @@ Content_Npc :: struct {
 	tint:      [4]u8,
 	offset:    hexgrid.Hex,
 	idle_line: string,
+	sells:     string, // an Item_Kind name, or "" for a villager with no shop
+	price:     int,
 }
 
 Content_Quest :: struct {
@@ -206,12 +208,17 @@ apply_content :: proc(data: []u8) -> (ok: bool) {
 	NPCS = {}
 	for entry in file.npcs {
 		id := from_name(Npc_Role, entry.id, "villager id") or_continue
-		NPCS[id] = Npc_Definition {
+		definition := Npc_Definition {
 			name      = keep(entry.name),
 			tint      = {entry.tint[0], entry.tint[1], entry.tint[2], entry.tint[3]},
 			offset    = entry.offset,
 			idle_line = keep(entry.idle_line),
+			price     = entry.price,
 		}
+		if item, sells := from_name(Item_Kind, entry.sells, "item"); sells {
+			definition.sells = item
+		}
+		NPCS[id] = definition
 	}
 
 	QUESTS = {}

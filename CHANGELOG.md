@@ -18,6 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `assets/content.json`; on its turn each is tried until one acts
   (`behaviour.odin`)
 - Wounded goblins now flee, and idle ones wander
+- Attributes (Strength/Dexterity/Constitution), a Neutral/Aggressive/Defensive
+  stance (`T`), and weight-gated parry/riposte for melee combat: parrying can
+  crit or fumble on a natural 20/1, and a successful parry can trigger a
+  bonus-damage riposte unless the defender's weapon is Heavy (`rules.odin`,
+  `DESIGN_COMBAT.md`)
+- A Scroll of Town Portal: opens a one-shot, two-way link back to the village
+  that closes the moment either end is used (`portal.odin`), sold by a new
+  Merchant villager
+- A dialogue-based shop: a villager can offer an item for gold instead of a
+  quest (`NPCS[role].sells`), bought via the existing dialogue action button
 
 ### Changed
 

@@ -37,6 +37,7 @@ Stairs_Direction :: enum {
 
 Level_Change :: struct {
 	direction:   Stairs_Direction,
+	via_portal:  bool, // true for a Scroll of Town Portal's link, instead of stairs
 	seconds:     f32,  // time since the fade started
 	has_swapped: bool, // true once the new level is in place (at full black)
 }
@@ -223,6 +224,7 @@ start_new_game :: proc(scene: ^Scene, game_seed: u64) {
 	scene.deepest_depth = 0
 	scene.quest_states = {}
 	scene.named_slain = {}
+	scene.portal = {}
 	scene.player = make_creature(.Adventurer, {})
 	clear(&scene.inventory.backpack)
 	scene.inventory.gold = 0
@@ -230,6 +232,7 @@ start_new_game :: proc(scene: ^Scene, game_seed: u64) {
 	scene.inventory.weapon = Item_Kind.Short_Sword
 	scene.inventory.armor = nil
 	add_to_inventory(&scene.inventory, Item_Stack{.Healing_Potion, 1})
+	add_to_inventory(&scene.inventory, Item_Stack{.Town_Portal_Scroll, 1})
 	apply_equipment(scene)
 	scene.open_panel = .None
 	scene.travel_destination = nil
@@ -237,7 +240,7 @@ start_new_game :: proc(scene: ^Scene, game_seed: u64) {
 	scene.current_depth = 0
 	scene.player.hex = current_level(scene).stairs_up_hex
 	scene.turn_phase = .Player_Choosing
-	set_message(scene, "The village. Talk to the elder and the smith. (seed %d)", game_seed)
+	set_message(scene, "The village. Talk to the elder, the smith, and the merchant. (seed %d)", game_seed)
 }
 
 // ---------------------------------------------------------------------------
@@ -258,8 +261,12 @@ handle_click :: proc(scene: ^Scene, clicked_hex: hexgrid.Hex) {
 	level := current_level(scene)
 	scene.travel_destination = nil // a fresh command always overrides any walk in progress
 
-	// Clicking the stairs you're standing on uses them.
+	// Clicking the stairs, or a portal, you're standing on uses it.
 	if clicked_hex == player.hex {
+		if portal_hex, on_portal := portal_hex_here(scene); on_portal && clicked_hex == portal_hex {
+			begin_portal_change(scene)
+			return
+		}
 		direction := stairs_at(level, clicked_hex)
 		if direction != .None do begin_level_change(scene, direction)
 		return
@@ -359,6 +366,10 @@ advance_turns :: proc(scene: ^Scene) {
 			direction := scene.stairs_after_this_step
 			scene.stairs_after_this_step = .None
 			begin_level_change(scene, direction)
+			return
+		}
+		if portal_hex, on_portal := portal_hex_here(scene); on_portal && scene.player.hex == portal_hex {
+			begin_portal_change(scene)
 			return
 		}
 		scene.turn_phase = .Monsters_Acting
@@ -477,7 +488,11 @@ update_level_change :: proc(scene: ^Scene, frame_seconds: f32) {
 	change := &scene.level_change
 	change.seconds += frame_seconds
 	if !change.has_swapped && change.seconds >= LEVEL_FADE_SECONDS {
-		move_to_level(scene, change.direction)
+		if change.via_portal {
+			move_through_portal(scene)
+		} else {
+			move_to_level(scene, change.direction)
+		}
 		change.has_swapped = true
 	}
 	if change.seconds >= 2 * LEVEL_FADE_SECONDS {

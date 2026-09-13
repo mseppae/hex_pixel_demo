@@ -236,6 +236,23 @@
     "r": 2
    },
    "idle_line": "The forge is hot, but I've nothing for you now."
+  },
+  {
+   "id": "Merchant",
+   "name": "Old Kessa",
+   "tint": [
+    170,
+    220,
+    190,
+    255
+   ],
+   "offset": {
+    "q": 4,
+    "r": -1
+   },
+   "idle_line": "Careful down there.",
+   "sells": "Town_Portal_Scroll",
+   "price": 40
   }
  ],
  "quests": [

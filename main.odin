@@ -72,6 +72,7 @@ OGRE_SHEET_PNG       :: #load("assets/ogre_sheet.png")
 ITEM_ICONS_PNG       :: #load("assets/item_icons.png")
 OBJECTS_PNG          :: #load("assets/objects.png") // corpses and chests
 TREES_PNG            :: #load("assets/trees.png") // trees and bushes on forest tiles
+PORTAL_PNG           :: #load("assets/portal.png") // a Scroll of Town Portal's rift
 
 // Each sprite sheet has six columns (directions, in hexgrid.Direction order as seen
 // on screen: right, back-right, back-left, left, front-left, front-right)
@@ -107,6 +108,7 @@ Scene :: struct {
 	adventure_id:  u64,             // marks this adventure's save files (see save.odin)
 	deepest_depth: int,             // for the score
 	killed_by:     Creature_Kind,   // set when the player dies
+	portal:        Portal,          // a Scroll of Town Portal's open link, if any (see portal.odin)
 	quest_states:  [Quest_Id]Quest_State,
 	named_slain:   [Named_Creature]bool,
 	dialogue_npc_index: int,        // which villager the dialogue panel shows
@@ -131,6 +133,7 @@ Scene :: struct {
 	item_icons:                rl.Texture2D,
 	object_sprites:            rl.Texture2D, // corpses and chests
 	tree_sprites:              rl.Texture2D, // trees and bushes
+	portal_sprite:             rl.Texture2D, // a Scroll of Town Portal's rift
 	tile_meshes:               Tile_Meshes,
 	tiles_material:            rl.Material,
 	sprite_shader:             rl.Shader,
@@ -187,9 +190,11 @@ main :: proc() {
 	scene.item_icons = load_embedded_png_texture(ITEM_ICONS_PNG)
 	scene.object_sprites = load_embedded_png_texture(OBJECTS_PNG)
 	scene.tree_sprites = load_embedded_png_texture(TREES_PNG)
+	scene.portal_sprite = load_embedded_png_texture(PORTAL_PNG)
 	defer rl.UnloadTexture(scene.item_icons)
 	defer rl.UnloadTexture(scene.object_sprites)
 	defer rl.UnloadTexture(scene.tree_sprites)
+	defer rl.UnloadTexture(scene.portal_sprite)
 
 	scene.tile_meshes = build_tile_meshes()
 	defer unload_tile_meshes(&scene.tile_meshes)
@@ -480,6 +485,8 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 			}
 		} else if stairs_at(level, scene.hovered_hex) != .None {
 			draw_hex_outline(scene.hovered_hex, FLOOR_HEIGHT + 0.2, rl.SKYBLUE)
+		} else if portal_hex, on_portal := portal_hex_here(scene); on_portal && scene.hovered_hex == portal_hex {
+			draw_hex_outline(scene.hovered_hex, FLOOR_HEIGHT + 0.2, rl.PURPLE)
 		} else {
 			draw_hex_outline(scene.hovered_hex, tile_top_height(level, scene.hovered_hex) + 0.2, rl.YELLOW)
 		}
@@ -489,7 +496,7 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 	// pixels from hiding things, but a creature fading out after death is partly
 	// see-through, and those pixels only blend correctly over what's already drawn.
 	Draw_Order_Entry :: struct {
-		drawable:           union {^Actor, ^Container, ^Npc, ^Prop}, // a creature, a corpse or chest, a villager, or a tree
+		drawable:           union {^Actor, ^Container, ^Npc, ^Prop, ^Portal}, // a creature, a corpse or chest, a villager, a tree, or a portal
 		light:              f32,
 		distance_to_camera: f32,
 	}
@@ -519,6 +526,12 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 		if light == 0 do continue
 		append(&draw_order, Draw_Order_Entry{drawable = &npc, light = light, distance_to_camera = rl.Vector3Distance(camera.position, hex_floor_position(npc.hex))})
 	}
+	if portal_hex, on_portal := portal_hex_here(scene); on_portal {
+		light := light_at_hex(scene, portal_hex)
+		if light > 0 {
+			append(&draw_order, Draw_Order_Entry{drawable = &scene.portal, light = light, distance_to_camera = rl.Vector3Distance(camera.position, hex_floor_position(portal_hex))})
+		}
+	}
 	slice.sort_by(draw_order[:], proc(first, second: Draw_Order_Entry) -> bool {
 		return first.distance_to_camera > second.distance_to_camera
 	})
@@ -529,6 +542,7 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 		case ^Container: draw_container(scene, drawable, camera, entry.light)
 		case ^Npc:       draw_npc(scene, drawable, camera, entry.light)
 		case ^Prop:      draw_prop(scene, drawable, camera, entry.light)
+		case ^Portal:    draw_portal(scene, camera, entry.light)
 		}
 	}
 	rl.EndShaderMode()
@@ -579,6 +593,18 @@ draw_prop :: proc(scene: ^Scene, prop: ^Prop, camera: rl.Camera3D, light: f32) {
 	source := rl.Rectangle{f32(prop.variant) * PROP_FRAME.x, 0, PROP_FRAME.x, PROP_FRAME.y}
 	size := rl.Vector2{PROP_FRAME.x * prop.scale, PROP_FRAME.y * prop.scale * upright_stretch(camera)}
 	rl.DrawBillboardPro(camera, scene.tree_sprites, source, prop_position(prop), {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(rl.WHITE, light))
+}
+
+// A Scroll of Town Portal's rift: a standing rift of shimmering color, like the trees
+// and corpses drawn as an upright picture on its hex.
+PORTAL_FRAME :: rl.Vector2{20, 32}
+
+draw_portal :: proc(scene: ^Scene, camera: rl.Camera3D, light: f32) {
+	portal_hex, on_portal := portal_hex_here(scene)
+	if !on_portal do return
+	source := rl.Rectangle{0, 0, PORTAL_FRAME.x, PORTAL_FRAME.y}
+	size := rl.Vector2{PORTAL_FRAME.x, PORTAL_FRAME.y * upright_stretch(camera)}
+	rl.DrawBillboardPro(camera, scene.portal_sprite, source, hex_floor_position(portal_hex), {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(rl.WHITE, light))
 }
 
 // A tiny health bar above a wounded actor's head, drawn in the small image's pixels.

@@ -26,6 +26,7 @@ MATERIALS = {
     "ogre":     (rgb("#8f9a5a"), rgb("#adb872"), rgb("#6b7440")),
     "fur":      (rgb("#6b4a2b"), rgb("#86603a"), rgb("#4e3520")),
     "inside":   (rgb("#2a1e14"), rgb("#3a2a1c"), rgb("#1e150e")),
+    "parchment":(rgb("#d8c48a"), rgb("#f0e2b4"), rgb("#a8925c")),
 }
 DETAIL = {
     "dark": rgb("#1b1a20"), "shine": rgb("#ffffff"), "tusk": rgb("#e8e0c8"),
@@ -134,7 +135,14 @@ def icon_chain_shirt():
             if (x + y) % 2 == 0 and not (x in (7, 8) and y < 6): details[(x, y)] = "ring_dark" if y % 2 else "ring_light"
     return icon(*armor_shape("chain"), details=details)
 
-ICONS = [icon_gold, icon_potion, icon_short_sword, icon_goblin_dagger, icon_spiked_club, icon_longsword, icon_leather_armor, icon_chain_shirt]
+def icon_town_portal_scroll():
+    layers = [L("parchment").rect(3, 6, 12, 9),                       # rolled body
+              L("parchment").ellipse(3, 7.5, 1.7, 2.3),               # left rolled end
+              L("parchment").ellipse(12, 7.5, 1.7, 2.3),              # right rolled end
+              L("red").rect(7, 4, 8, 11)]                             # ribbon tied around it
+    return icon(*layers, details={(7, 7): "gold", (8, 7): "gold_dark", (5, 7): "shine"})
+
+ICONS = [icon_gold, icon_potion, icon_short_sword, icon_goblin_dagger, icon_spiked_club, icon_longsword, icon_leather_armor, icon_chain_shirt, icon_town_portal_scroll]
 
 # ---------------------------------------------------------------------------
 # Corpses and chests
@@ -213,7 +221,7 @@ if __name__ == "__main__":
     icons, objects = build_icons(), build_objects()
     icons.save("item_icons.png")
     objects.save("objects.png")
-    preview = Image.new("RGBA", (128 + 8, 16 + 8 + 48), (40, 44, 58, 255))
+    preview = Image.new("RGBA", (max(96, 16 * len(ICONS)) + 8, 16 + 8 + 48), (40, 44, 58, 255))
     preview.alpha_composite(icons, (0, 0))
     preview.alpha_composite(objects, (0, 24))
     preview.resize((preview.width * 7, preview.height * 7), Image.NEAREST).save("/tmp/objects_preview.png")

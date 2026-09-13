@@ -84,6 +84,7 @@ Save_Game :: struct {
 	levels:        []Saved_Level,  // levels[0] is the village
 	quest_states:  []Quest_State,  // one per Quest_Id, in enum order
 	named_slain:   []bool,         // one per Named_Creature, in enum order
+	portal:        Portal,         // a Scroll of Town Portal's open link, if any
 }
 
 // A few fields of Save_Game: reading only these is enough for the slot list.
@@ -204,6 +205,7 @@ build_save_game :: proc(scene: ^Scene) -> Save_Game {
 	for state, id in scene.quest_states do save.quest_states[id] = state
 	save.named_slain = make([]bool, len(Named_Creature))
 	for slain, named in scene.named_slain do save.named_slain[named] = slain
+	save.portal = scene.portal
 	return save
 }
 
@@ -304,6 +306,7 @@ restore_game :: proc(scene: ^Scene, save: ^Save_Game) {
 	for state, index in save.quest_states do if index < len(Quest_Id) do scene.quest_states[Quest_Id(index)] = state
 	scene.named_slain = {}
 	for slain, index in save.named_slain do if index < len(Named_Creature) do scene.named_slain[Named_Creature(index)] = slain
+	scene.portal = save.portal
 	scene.deepest_depth = max(save.deepest_depth, len(scene.levels) - 1)
 	scene.turn_phase = .Player_Choosing
 	scene.open_panel = .None

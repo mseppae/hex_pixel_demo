@@ -334,6 +334,7 @@ draw_inventory_panel :: proc(scene: ^Scene) {
 			case .Potion: hover_hint = "Click to drink it. Right-click to drop it."
 			case .Weapon: hover_hint = "Click to wield it. Right-click to drop it."
 			case .Armor:  hover_hint = "Click to wear it. Right-click to drop it."
+			case .Scroll: hover_hint = "Click to read it. Right-click to drop it."
 			}
 		}
 	}

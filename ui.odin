@@ -11,7 +11,8 @@ Open_Panel :: enum {
 	None,
 	Inventory,
 	Loot,
-	Dialogue, // talking to a villager (see village.odin)
+	Dialogue,  // talking to a villager (see village.odin)
+	Quest_Log, // every quest currently active (see village.odin)
 }
 
 UI_FONT_SIZE    :: 10 // raylib's built-in font is pixel-exact at size 10
@@ -28,11 +29,14 @@ TEXT_COLOR        :: rl.Color{236, 230, 214, 255}
 DIM_TEXT_COLOR    :: rl.Color{150, 144, 130, 255}
 GOLD_TEXT_COLOR   :: rl.Color{248, 226, 122, 255}
 
-INVENTORY_PANEL :: rl.Rectangle{83, 40, 260, 176} // 20px taller than before, for the attributes/stance lines
-LOOT_PANEL      :: rl.Rectangle{83, 52, 260, 128}
-BAG_BUTTON      :: rl.Rectangle{LOW_RES_WIDTH - 64, LOW_RES_HEIGHT - 20, 60, 16}
-TAKE_ALL_BUTTON :: rl.Rectangle{LOOT_PANEL.x + 8, LOOT_PANEL.y + LOOT_PANEL.height - 22, 60, 16}
-CLOSE_BUTTON    :: rl.Rectangle{LOOT_PANEL.x + LOOT_PANEL.width - 56, LOOT_PANEL.y + LOOT_PANEL.height - 22, 48, 16}
+INVENTORY_PANEL  :: rl.Rectangle{83, 40, 260, 176} // 20px taller than before, for the attributes/stance lines
+LOOT_PANEL       :: rl.Rectangle{83, 52, 260, 128}
+QUEST_LOG_PANEL  :: rl.Rectangle{63, 30, 300, 200}
+BAG_BUTTON       :: rl.Rectangle{LOW_RES_WIDTH - 64, LOW_RES_HEIGHT - 20, 60, 16}
+QUEST_LOG_BUTTON :: rl.Rectangle{LOW_RES_WIDTH - 132, LOW_RES_HEIGHT - 20, 64, 16}
+TAKE_ALL_BUTTON  :: rl.Rectangle{LOOT_PANEL.x + 8, LOOT_PANEL.y + LOOT_PANEL.height - 22, 60, 16}
+CLOSE_BUTTON     :: rl.Rectangle{LOOT_PANEL.x + LOOT_PANEL.width - 56, LOOT_PANEL.y + LOOT_PANEL.height - 22, 48, 16}
+QUEST_LOG_CLOSE_BUTTON :: rl.Rectangle{QUEST_LOG_PANEL.x + QUEST_LOG_PANEL.width - 56, QUEST_LOG_PANEL.y + QUEST_LOG_PANEL.height - 22, 48, 16}
 
 backpack_slot_rectangle :: proc(index: int) -> rl.Rectangle {
 	return {
@@ -61,12 +65,13 @@ mouse_is_over :: proc(scene: ^Scene, rectangle: rl.Rectangle) -> bool {
 }
 
 mouse_is_over_ui :: proc(scene: ^Scene) -> bool {
-	if mouse_is_over(scene, BAG_BUTTON) do return true
+	if mouse_is_over(scene, BAG_BUTTON) || mouse_is_over(scene, QUEST_LOG_BUTTON) do return true
 	switch scene.open_panel {
 	case .None:      return false
 	case .Inventory: return mouse_is_over(scene, INVENTORY_PANEL)
 	case .Loot:      return mouse_is_over(scene, LOOT_PANEL)
 	case .Dialogue:  return mouse_is_over(scene, DIALOGUE_PANEL)
+	case .Quest_Log: return mouse_is_over(scene, QUEST_LOG_PANEL)
 	}
 	return false
 }
@@ -138,6 +143,10 @@ handle_ui_click :: proc(scene: ^Scene) -> bool {
 		scene.open_panel = .None if scene.open_panel == .Inventory else .Inventory
 		return true
 	}
+	if mouse_is_over(scene, QUEST_LOG_BUTTON) {
+		scene.open_panel = .None if scene.open_panel == .Quest_Log else .Quest_Log
+		return true
+	}
 
 	switch scene.open_panel {
 	case .None:
@@ -190,6 +199,12 @@ handle_ui_click :: proc(scene: ^Scene) -> bool {
 			}
 		}
 		return true
+
+	case .Quest_Log:
+		if !mouse_is_over(scene, QUEST_LOG_PANEL) || mouse_is_over(scene, QUEST_LOG_CLOSE_BUTTON) {
+			scene.open_panel = .None
+		}
+		return true
 	}
 	return false
 }
@@ -229,11 +244,13 @@ take_loot :: proc(scene: ^Scene, container: ^Container, index: int) -> bool {
 
 draw_ui :: proc(scene: ^Scene) {
 	draw_button(scene, BAG_BUTTON, "Items (I)")
+	draw_button(scene, QUEST_LOG_BUTTON, "Quests (L)")
 	switch scene.open_panel {
 	case .None:
 	case .Inventory: draw_inventory_panel(scene)
 	case .Loot:      draw_loot_panel(scene)
 	case .Dialogue:  draw_dialogue_panel(scene)
+	case .Quest_Log: draw_quest_log_panel(scene)
 	}
 }
 
@@ -335,6 +352,7 @@ draw_inventory_panel :: proc(scene: ^Scene) {
 			case .Weapon: hover_hint = "Click to wield it. Right-click to drop it."
 			case .Armor:  hover_hint = "Click to wear it. Right-click to drop it."
 			case .Scroll: hover_hint = "Click to read it. Right-click to drop it."
+			case .Quest_Item: hover_hint = "Right-click to drop it."
 			}
 		}
 	}

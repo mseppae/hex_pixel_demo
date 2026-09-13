@@ -15,6 +15,31 @@ Named_Creature :: enum u8 {
 	None,
 	Grishnak,
 	Gorluk,
+	Skreel,
+	Dunmarr,
+	Ashka,
+	Blackmaw,
+	Threk,
+	Rusk,
+	Gnarl,
+	Kroll,
+	Fenrik,
+	Molgar,
+	Snitch,
+	Marrow,
+	Grendle,
+	Karth,
+	Hollow,
+	Vex,
+	Morrow,
+	Ghurn,
+	Sable,
+	Uldrath,
+	Pike,
+	Grix,
+	Bruundor,
+	Vozgar,
+	Krenn,
 }
 
 Named_Creature_Definition :: struct {
@@ -60,6 +85,9 @@ Npc_Role :: enum u8 {
 	Elder,
 	Smith,
 	Merchant,
+	Hunter,
+	Priestess,
+	Guard_Captain,
 }
 
 Npc_Definition :: struct {
@@ -179,6 +207,53 @@ Quest_Id :: enum u8 {
 	Slay_Grishnak,
 	Smiths_Club,
 	Slay_Gorluk,
+
+	// Each giver's own quests are tried in the order listed here (see
+	// current_quest_of): the first not-yet-done one is what they offer next.
+	Elders_Potions,
+	Elders_Longsword,
+	Elders_Chainmail,
+	Slay_Skreel,
+	Slay_Dunmarr,
+	Slay_Ashka,
+	Slay_Blackmaw,
+	Slay_Threk,
+
+	Smiths_Dagger,
+	Smiths_Leather,
+	Smiths_Potions,
+	Slay_Rusk,
+	Slay_Gnarl,
+	Slay_Kroll,
+	Slay_Fenrik,
+	Slay_Molgar,
+
+	Hunters_Dagger,
+	Hunters_Potions,
+	Hunters_Shortsword,
+	Slay_Snitch,
+	Slay_Marrow,
+	Slay_Grendle,
+	Slay_Karth,
+	Slay_Hollow,
+
+	Priestess_Potions,
+	Priestess_Leather,
+	Priestess_Chainmail,
+	Slay_Vex,
+	Slay_Morrow,
+	Slay_Ghurn,
+	Slay_Sable,
+	Slay_Uldrath,
+
+	Guards_Shortsword,
+	Guards_Chainmail,
+	Guards_Club,
+	Slay_Pike,
+	Slay_Grix,
+	Slay_Bruundor,
+	Slay_Vozgar,
+	Slay_Krenn,
 }
 
 Quest_State :: enum u8 {
@@ -242,15 +317,32 @@ complete_quest :: proc(scene: ^Scene, id: Quest_Id) {
 	set_message(scene, "Quest complete: %s.", quest.title)
 }
 
-// "Quests: Slay Grishnak (depth 2)   Bring Tomas a spiked club"
-active_quests_text :: proc(scene: ^Scene) -> string {
-	text := ""
+QUEST_LOG_LINE_HEIGHT :: 22
+
+// Every quest currently active, however many villagers are waiting on you at once.
+draw_quest_log_panel :: proc(scene: ^Scene) {
+	panel := QUEST_LOG_PANEL
+	left, top := i32(panel.x), i32(panel.y)
+	draw_panel(panel, "Quest Log")
+
+	y := top + 22
+	any_active := false
 	for id in Quest_Id {
 		if scene.quest_states[id] != .Active do continue
-		done := " (done: return to the village)" if quest_is_ready(scene, id) else ""
-		text = fmt.tprintf("%s%s%s%s", text, "   " if text != "" else "Quests: ", QUESTS[id].title, done)
+		any_active = true
+		quest := QUESTS[id]
+		draw_text(quest.title, left + 8, y, TEXT_COLOR)
+		if quest_is_ready(scene, id) {
+			draw_text(fmt.tprintf("Ready to turn in! Talk to %s.", NPCS[quest.giver].name), left + 8, y + 11, GOLD_TEXT_COLOR)
+		} else {
+			draw_text(quest.reminder, left + 8, y + 11, DIM_TEXT_COLOR)
+		}
+		y += QUEST_LOG_LINE_HEIGHT
 	}
-	return text
+	if !any_active {
+		draw_text("No active quests. Talk to a villager.", left + 8, top + 22, DIM_TEXT_COLOR)
+	}
+	draw_button(scene, QUEST_LOG_CLOSE_BUTTON, "Close")
 }
 
 // Called when a creature dies, to keep track of the named ones.

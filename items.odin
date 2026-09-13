@@ -24,6 +24,31 @@ Item_Kind :: enum u8 {
 	Leather_Armor,
 	Chain_Shirt,
 	Town_Portal_Scroll,
+	Skreel_Ear,
+	Dunmarr_Fang,
+	Ashka_Tusk,
+	Blackmaw_Claw,
+	Threk_Skull,
+	Rusk_Ear,
+	Gnarl_Fang,
+	Kroll_Tusk,
+	Fenrik_Claw,
+	Molgar_Skull,
+	Snitch_Ear,
+	Marrow_Fang,
+	Grendle_Tusk,
+	Karth_Claw,
+	Hollow_Skull,
+	Vex_Ear,
+	Morrow_Fang,
+	Ghurn_Tusk,
+	Sable_Claw,
+	Uldrath_Skull,
+	Pike_Ear,
+	Grix_Fang,
+	Bruundor_Tusk,
+	Vozgar_Claw,
+	Krenn_Skull,
 }
 
 Item_Category :: enum u8 {
@@ -32,6 +57,7 @@ Item_Category :: enum u8 {
 	Weapon,
 	Armor,
 	Scroll,
+	Quest_Item, // a trophy or token: no use except being handed to whoever asked for it
 }
 
 // How fast a weapon or armor lets its wearer counter-attack after a parry (see
@@ -71,6 +97,34 @@ ITEMS := [Item_Kind]Item_Definition {
 	.Leather_Armor  = {name = "Leather armor", category = .Armor, armor = 1, armor_weight = .Light, flavor = "Stiff, but it turns a blade."},
 	.Chain_Shirt    = {name = "Chain shirt", category = .Armor, armor = 2, armor_weight = .Medium, flavor = "Heavy rings, carefully mended."},
 	.Town_Portal_Scroll = {name = "Scroll of Town Portal", category = .Scroll, flavor = "The ink is still faintly warm."},
+
+	// Trophies: proof of a slain named creature, handed to whoever wanted it dead.
+	// No use otherwise (see Item_Category.Quest_Item in use_backpack_item).
+	.Skreel_Ear    = {name = "Skreel's ear",             category = .Quest_Item, flavor = "Still warm. Someone will want proof."},
+	.Dunmarr_Fang  = {name = "Dunmarr's fang",           category = .Quest_Item, flavor = "Yellowed and cracked, but unmistakably his."},
+	.Ashka_Tusk    = {name = "Ashka's tusk",             category = .Quest_Item, flavor = "Carved with crude, boastful runes."},
+	.Blackmaw_Claw = {name = "Blackmaw's claw",          category = .Quest_Item, flavor = "Long enough to open a man from throat to belt."},
+	.Threk_Skull   = {name = "Threk's skull",            category = .Quest_Item, flavor = "Heavier than it looks. So was he."},
+	.Rusk_Ear      = {name = "Rusk's ear",               category = .Quest_Item, flavor = "Notched from a hundred old fights."},
+	.Gnarl_Fang    = {name = "Gnarl's fang",             category = .Quest_Item, flavor = "Rimmed black with old poison."},
+	.Kroll_Tusk    = {name = "Kroll's tusk",             category = .Quest_Item, flavor = "Chipped where it met the anvil."},
+	.Fenrik_Claw   = {name = "Fenrik's claw",            category = .Quest_Item, flavor = "Iron-hard, and just as sharp."},
+	.Molgar_Skull  = {name = "Molgar's skull",           category = .Quest_Item, flavor = "The jaw alone could crush a shield."},
+	.Snitch_Ear    = {name = "Snitch's ear",             category = .Quest_Item, flavor = "Pierced with a dozen stolen rings."},
+	.Marrow_Fang   = {name = "Marrow's fang",            category = .Quest_Item, flavor = "Filed to a wicked point."},
+	.Grendle_Tusk  = {name = "Grendle's tusk",           category = .Quest_Item, flavor = "Slick with bog-water, even now."},
+	.Karth_Claw    = {name = "Karth's claw",             category = .Quest_Item, flavor = "Still stained dark at the tip."},
+	.Hollow_Skull  = {name = "The Hollow Fang's skull",  category = .Quest_Item, flavor = "Its eye sockets never seem to close."},
+	.Vex_Ear       = {name = "Vex's ear",                category = .Quest_Item, flavor = "A cursed sigil is scratched behind it."},
+	.Morrow_Fang   = {name = "Morrow's fang",            category = .Quest_Item, flavor = "Cold to the touch, even in your pocket."},
+	.Ghurn_Tusk    = {name = "Ghurn's tusk",             category = .Quest_Item, flavor = "Blighted black at the root."},
+	.Sable_Claw    = {name = "Sable's claw",             category = .Quest_Item, flavor = "Darker than any natural shadow."},
+	.Uldrath_Skull = {name = "Uldrath's skull",          category = .Quest_Item, flavor = "It seems to watch you from the backpack."},
+	.Pike_Ear      = {name = "Pike's ear",                category = .Quest_Item, flavor = "A thief's mark is tattooed on it."},
+	.Grix_Fang     = {name = "Grix's fang",              category = .Quest_Item, flavor = "Bloodied from one blow too many."},
+	.Bruundor_Tusk = {name = "Bruundor's tusk",          category = .Quest_Item, flavor = "Thick enough to use as a club itself."},
+	.Vozgar_Claw   = {name = "Vozgar's claw",            category = .Quest_Item, flavor = "Curved like a reaper's blade."},
+	.Krenn_Skull   = {name = "Warlord Krenn's skull",    category = .Quest_Item, flavor = "Crowned still with a dented iron circlet."},
 }
 
 // Punching with bare hands, when no weapon is wielded: a fist is Light, same as a dagger.
@@ -97,6 +151,7 @@ item_rules_text :: proc(kind: Item_Kind) -> string {
 	case .Weapon: return fmt.tprintf("Damage %s.", dice_text(definition.damage_dice))
 	case .Armor:  return fmt.tprintf("Armor %d: hits on you do %d less.", definition.armor, definition.armor)
 	case .Scroll: return "Opens a portal back to the village."
+	case .Quest_Item: return "A trophy. Someone in the village wants it."
 	}
 	return ""
 }
@@ -205,6 +260,9 @@ use_backpack_item :: proc(scene: ^Scene, slot_index: int) -> (used_a_turn: bool)
 		inventory.backpack[slot_index].count -= 1
 		if inventory.backpack[slot_index].count == 0 do ordered_remove(&inventory.backpack, slot_index)
 		return true
+	case .Quest_Item:
+		set_message(scene, "Someone in the village will want this.")
+		return false
 	}
 	return false
 }

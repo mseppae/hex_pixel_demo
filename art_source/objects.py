@@ -27,6 +27,8 @@ MATERIALS = {
     "fur":      (rgb("#6b4a2b"), rgb("#86603a"), rgb("#4e3520")),
     "inside":   (rgb("#2a1e14"), rgb("#3a2a1c"), rgb("#1e150e")),
     "parchment":(rgb("#d8c48a"), rgb("#f0e2b4"), rgb("#a8925c")),
+    "bone":     (rgb("#e4dcc0"), rgb("#f8f2dc"), rgb("#b0a880")),
+    "claw":     (rgb("#3a3028"), rgb("#544636"), rgb("#221c16")),
 }
 DETAIL = {
     "dark": rgb("#1b1a20"), "shine": rgb("#ffffff"), "tusk": rgb("#e8e0c8"),
@@ -142,7 +144,31 @@ def icon_town_portal_scroll():
               L("red").rect(7, 4, 8, 11)]                             # ribbon tied around it
     return icon(*layers, details={(7, 7): "gold", (8, 7): "gold_dark", (5, 7): "shine"})
 
+# Trophies: five reusable shapes (an ear, a fang, a tusk, a claw, a skull), each drawn
+# once per quest line. The shape says what it is; the quest text says whose it was.
+def icon_trophy_ear():
+    return icon(L("goblin").ellipse(8, 8, 3.2, 6).ellipse(8, 4, 2.3, 2.1),
+                details={(8, 7): "dark", (8, 10): "dark"})
+
+def icon_trophy_fang():
+    return icon(L("bone").tapered(8, 3, 6, 13, 3.2, 0.8), details={(7, 4): "shine"})
+
+def icon_trophy_tusk():
+    return icon(L("bone").tapered(5, 13, 11, 3, 3.6, 1.0), details={(10, 4): "shine"})
+
+def icon_trophy_claw():
+    return icon(L("claw").tapered(4, 13, 12, 2, 2.4, 0.6), details={(11, 3): "shine"})
+
+def icon_trophy_skull():
+    return icon(L("bone").ellipse(8, 6, 4.2, 3.6).rect(5, 8, 11, 10),
+                details={(6, 6): "eye_x", (10, 6): "eye_x", (7, 10): "dark", (9, 10): "dark"})
+
+# One quest line's worth of trophies, in the depth order the line's quests are offered.
+TROPHY_LINE = [icon_trophy_ear, icon_trophy_fang, icon_trophy_tusk, icon_trophy_claw, icon_trophy_skull]
+
 ICONS = [icon_gold, icon_potion, icon_short_sword, icon_goblin_dagger, icon_spiked_club, icon_longsword, icon_leather_armor, icon_chain_shirt, icon_town_portal_scroll]
+for _ in range(5):  # Elder's, Smith's, Hunter's, Priestess's, and the Guard Captain's lines
+    ICONS.extend(TROPHY_LINE)
 
 # ---------------------------------------------------------------------------
 # Corpses and chests

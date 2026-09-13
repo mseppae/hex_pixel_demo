@@ -23,11 +23,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   crit or fumble on a natural 20/1, and a successful parry can trigger a
   bonus-damage riposte unless the defender's weapon is Heavy (`rules.odin`,
   `DESIGN_COMBAT.md`)
-- A Scroll of Town Portal: opens a one-shot, two-way link back to the village
-  that closes the moment either end is used (`portal.odin`), sold by a new
-  Merchant villager
+- A Scroll of Town Portal: opens a two-way link back to the village good for
+  one round trip (`portal.odin`), sold by a new Merchant villager
 - A dialogue-based shop: a villager can offer an item for gold instead of a
   quest (`NPCS[role].sells`), bought via the existing dialogue action button
+- Quest items (`Item_Category.Quest_Item`): trophies with no use besides being
+  handed to whoever wants them, dropped by named creatures alongside a slay
+  quest's existing target-tracking
+- 40 new quests across 3 new quest-giving villagers (Hunter, Priestess, Guard
+  Captain) plus more for the Elder and Smith, and 25 new named creatures to go
+  with them, spanning depths 3-28 — all in `assets/content.json`, no new game
+  logic beyond the quest-item category above
+- A Quest Log panel (`L`, or the "Quests" button), listing every quest
+  currently active and whether it's ready to turn in, replacing the one-line
+  HUD summary that couldn't scale past a couple of quests
 
 ### Changed
 

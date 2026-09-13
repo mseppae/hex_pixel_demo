@@ -229,6 +229,9 @@ main :: proc() {
 		if rl.IsKeyPressed(.I) && !paused {
 			scene.open_panel = .None if scene.open_panel == .Inventory else .Inventory
 		}
+		if rl.IsKeyPressed(.T) && !paused && scene.turn_phase == .Player_Choosing {
+			cycle_stance(&scene)
+		}
 
 		// ---- Camera -------------------------------------------------------------
 
@@ -344,7 +347,7 @@ main :: proc() {
 
 		if scene.screen == .Playing && scene.menu == .None { // menus cover the whole view
 			player := &scene.player
-			rl.DrawText("Q/E: turn   W/S: tilt   I: items   M: sound   Esc: menu   Click: walk, attack, loot, stairs", 16, 16, 20, rl.RAYWHITE)
+			rl.DrawText("Q/E: turn   W/S: tilt   I: items   T: stance   M: sound   Esc: menu   Click: walk, attack, loot, stairs", 16, 16, 20, rl.RAYWHITE)
 			rl.DrawText(fmt.ctprintf("%s     HP %d / %d     Gold %d     Score %d", depth_name(scene.current_depth), player.hit_points, player.max_hit_points, scene.inventory.gold, current_score(&scene)), 16, 42, 20, rl.RED)
 			rl.DrawText(fmt.ctprintf("%s", scene.message), 16, 68, 20, rl.GOLD)
 			rl.DrawText(fmt.ctprintf("%s", active_quests_text(&scene)), 16, 94, 20, rl.SKYBLUE)

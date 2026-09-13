@@ -80,6 +80,12 @@ Content_Creature :: struct {
 	damage_dice:           Dice,
 	armor:                 int,
 	max_hit_points:        int,
+	strength:              int,
+	dexterity:             int,
+	constitution:          int,
+	default_stance:        string,
+	weapon_weight:         string, // "Light", "Medium" or "Heavy"
+	armor_weight:          string, // "Light", "Medium" or "Heavy"
 	walk_seconds:          f32,
 	attack_seconds:        f32,
 	knockback_distance:    f32,
@@ -141,6 +147,9 @@ apply_content :: proc(data: []u8) -> (ok: bool) {
 			damage_dice           = entry.damage_dice,
 			armor                 = entry.armor,
 			max_hit_points        = entry.max_hit_points,
+			strength              = entry.strength,
+			dexterity             = entry.dexterity,
+			constitution          = entry.constitution,
 			walk_seconds          = entry.walk_seconds,
 			attack_seconds        = entry.attack_seconds,
 			knockback_distance    = entry.knockback_distance,
@@ -150,6 +159,9 @@ apply_content :: proc(data: []u8) -> (ok: bool) {
 		if sound, found := from_name(Weapon_Sound, entry.weapon_sound, "weapon sound"); found do definition.weapon_sound = sound
 		if sound, found := from_name(Sound_Id, entry.hurt_sound, "sound"); found do definition.hurt_sound = sound
 		if sound, found := from_name(Sound_Id, entry.death_sound, "sound"); found do definition.death_sound = sound
+		if stance, found := from_name(Stance, entry.default_stance, "stance"); found do definition.default_stance = stance
+		if weight, found := from_name(Weapon_Weight, entry.weapon_weight, "weapon weight"); found do definition.weapon_weight = weight
+		if weight, found := from_name(Armor_Weight, entry.armor_weight, "armor weight"); found do definition.armor_weight = weight
 
 		// The behaviours are kept in the order they are listed: that is their priority.
 		behaviours := make([dynamic]Behaviour)

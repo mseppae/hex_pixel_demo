@@ -33,6 +33,7 @@ Saved_Creature :: struct {
 	is_dead:      bool,
 	is_awake:     bool,
 	turns_waited: int,
+	stance:       Stance,
 }
 
 Saved_Container :: struct {
@@ -216,6 +217,7 @@ save_creature :: proc(creature: ^Actor) -> Saved_Creature {
 		is_dead      = creature.is_dead,
 		is_awake     = creature.is_awake,
 		turns_waited = creature.turns_waited,
+		stance       = creature.stance,
 	}
 }
 
@@ -314,6 +316,7 @@ restore_creature :: proc(saved: Saved_Creature) -> Actor {
 	creature.is_dead = saved.is_dead
 	creature.is_awake = saved.is_awake
 	creature.turns_waited = saved.turns_waited
+	creature.stance = saved.stance
 	if creature.is_dead do creature.death_seconds = DEATH_SECONDS // long gone, not dying right now
 	return creature
 }

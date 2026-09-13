@@ -50,6 +50,15 @@ Dice :: struct {
 	bonus: int,
 }
 
+// A standing combat posture: trades damage for defense, or the other way round.
+// The player switches freely (see cycle_stance in rules.odin); monsters hold a fixed
+// default_stance from their Creature_Definition. See DESIGN_COMBAT.md.
+Stance :: enum u8 {
+	Neutral,
+	Aggressive,
+	Defensive,
+}
+
 Actor :: struct {
 	// What kind of creature this is (see creatures.odin), and its resolved instance
 	// stats: normally equal to CREATURES[kind], but overridden for named bosses (see
@@ -59,7 +68,9 @@ Actor :: struct {
 	name:               string,
 	tint:               rl.Color, // multiplied with the sprite's colors; white = unchanged
 	damage_dice:        Dice,
+	weapon_weight:      Weapon_Weight, // gates riposte availability (see rules.odin)
 	armor:              int,      // every hit on this creature does this much less (at least 1)
+	armor_weight:       Armor_Weight,  // penalizes this creature's own riposte roll
 	max_hit_points:     int,
 	knockback_distance: f32,      // how far a hit pushes it; heavy creatures barely move
 	weapon_sound:       Weapon_Sound, // the swoosh and impact of its attacks
@@ -71,12 +82,14 @@ Actor :: struct {
 	is_dead:            bool,
 	is_awake:           bool, // monsters sleep until you come close
 	turns_waited:       int,
+	stance:             Stance,
 
 	// Animation state
 	action:              Action,
 	action_seconds:      f32,         // time since the current action started
 	walk_start_hex:      hexgrid.Hex, // where the current walk began
 	attack_target:       ^Actor,
+	is_riposte:          bool, // this attack is a riposte: can't itself be parried, and hits harder
 	swing_has_sounded:   bool,
 	attack_has_landed:   bool,
 	hurt_seconds_left:   f32,         // counts down after being hit
@@ -147,9 +160,10 @@ start_walk :: proc(actor: ^Actor, destination: hexgrid.Hex) {
 	actor.action_seconds = 0
 }
 
-start_attack :: proc(attacker, target: ^Actor) {
+start_attack :: proc(attacker, target: ^Actor, is_riposte := false) {
 	attacker.facing = direction_toward_position(footprint_center(attacker, attacker.hex), footprint_center(target, target.hex))
 	attacker.attack_target = target
+	attacker.is_riposte = is_riposte
 	attacker.swing_has_sounded = false
 	attacker.attack_has_landed = false
 	attacker.action = .Attacking

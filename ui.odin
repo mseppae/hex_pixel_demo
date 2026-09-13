@@ -28,7 +28,7 @@ TEXT_COLOR        :: rl.Color{236, 230, 214, 255}
 DIM_TEXT_COLOR    :: rl.Color{150, 144, 130, 255}
 GOLD_TEXT_COLOR   :: rl.Color{248, 226, 122, 255}
 
-INVENTORY_PANEL :: rl.Rectangle{83, 40, 260, 156}
+INVENTORY_PANEL :: rl.Rectangle{83, 40, 260, 176} // 20px taller than before, for the attributes/stance lines
 LOOT_PANEL      :: rl.Rectangle{83, 52, 260, 128}
 BAG_BUTTON      :: rl.Rectangle{LOW_RES_WIDTH - 64, LOW_RES_HEIGHT - 20, 60, 16}
 TAKE_ALL_BUTTON :: rl.Rectangle{LOOT_PANEL.x + 8, LOOT_PANEL.y + LOOT_PANEL.height - 22, 60, 16}
@@ -37,7 +37,7 @@ CLOSE_BUTTON    :: rl.Rectangle{LOOT_PANEL.x + LOOT_PANEL.width - 56, LOOT_PANEL
 backpack_slot_rectangle :: proc(index: int) -> rl.Rectangle {
 	return {
 		INVENTORY_PANEL.x + 8 + f32(index % SLOTS_PER_ROW) * SLOT_SPACING,
-		INVENTORY_PANEL.y + 74 + f32(index / SLOTS_PER_ROW) * SLOT_SPACING,
+		INVENTORY_PANEL.y + 94 + f32(index / SLOTS_PER_ROW) * SLOT_SPACING,
 		SLOT_SIZE,
 		SLOT_SIZE,
 	}
@@ -315,8 +315,14 @@ draw_inventory_panel :: proc(scene: ^Scene) {
 	draw_text(fmt.tprintf("Damage %s", dice_text(scene.player.damage_dice)), left + 124, top + 34, TEXT_COLOR)
 	draw_text(fmt.tprintf("Armor %d", scene.player.armor), left + 124, top + 46, TEXT_COLOR)
 
+	// Attributes are fixed for the player (see CREATURES[.Adventurer] in content.json);
+	// stance is the one thing here the player controls directly.
+	player_definition := CREATURES[scene.player.kind]
+	draw_text(fmt.tprintf("STR %d  DEX %d  CON %d", player_definition.strength, player_definition.dexterity, player_definition.constitution), left + 8, top + 58, DIM_TEXT_COLOR)
+	draw_text(fmt.tprintf("Stance: %s (T)", stance_name(scene.player.stance)), left + 8, top + 70, TEXT_COLOR)
+
 	// Backpack
-	draw_text(fmt.tprintf("Backpack  %d / %d", len(inventory.backpack), BACKPACK_SLOTS), left + 8, top + 62, DIM_TEXT_COLOR)
+	draw_text(fmt.tprintf("Backpack  %d / %d", len(inventory.backpack), BACKPACK_SLOTS), left + 8, top + 82, DIM_TEXT_COLOR)
 	for index in 0 ..< BACKPACK_SLOTS {
 		stack: Maybe(Item_Stack)
 		if index < len(inventory.backpack) do stack = inventory.backpack[index]
@@ -333,10 +339,10 @@ draw_inventory_panel :: proc(scene: ^Scene) {
 	}
 
 	if kind, has_one := hovered_kind.?; has_one {
-		draw_tooltip(kind, hover_hint, left + 8, top + 120)
+		draw_tooltip(kind, hover_hint, left + 8, top + 140)
 	} else {
-		draw_text("Click an item to use it, right-click to drop it", left + 8, top + 120, DIM_TEXT_COLOR)
-		draw_text("(hold Shift to drop a whole stack).", left + 8, top + 131, DIM_TEXT_COLOR)
+		draw_text("Click an item to use it, right-click to drop it", left + 8, top + 140, DIM_TEXT_COLOR)
+		draw_text("(hold Shift to drop a whole stack).", left + 8, top + 151, DIM_TEXT_COLOR)
 	}
 }
 

@@ -32,28 +32,45 @@ Item_Category :: enum u8 {
 	Armor,
 }
 
+// How fast a weapon or armor lets its wearer counter-attack after a parry (see
+// weapon_weight_riposte_modifier and armor_weight_riposte_modifier in rules.odin).
+// A Heavy weapon can't riposte at all; Heavy armor merely makes riposting harder.
+Weapon_Weight :: enum u8 {
+	Light,
+	Medium,
+	Heavy,
+}
+
+Armor_Weight :: enum u8 {
+	Light,
+	Medium,
+	Heavy,
+}
+
 Item_Definition :: struct {
-	name:        string,
-	category:    Item_Category,
-	flavor:      string, // a short line for the tooltip
-	damage_dice: Dice,   // weapons
-	armor:       int,    // armor: every hit on you does this much less
-	heal_dice:   Dice,   // potions
-	sound:       Weapon_Sound, // weapons: how swinging and hitting with it sounds
+	name:         string,
+	category:     Item_Category,
+	flavor:       string, // a short line for the tooltip
+	damage_dice:  Dice,   // weapons
+	weight:       Weapon_Weight, // weapons
+	armor:        int,    // armor: every hit on you does this much less
+	armor_weight: Armor_Weight, // armor
+	heal_dice:    Dice,   // potions
+	sound:        Weapon_Sound, // weapons: how swinging and hitting with it sounds
 }
 
 ITEMS := [Item_Kind]Item_Definition {
 	.Gold           = {name = "Gold", category = .Gold, flavor = "Goblins love it. So do you."},
 	.Healing_Potion = {name = "Healing potion", category = .Potion, heal_dice = {count = 2, sides = 4, bonus = 2}, flavor = "Tastes of cherries and iron."},
-	.Short_Sword    = {name = "Short sword", category = .Weapon, damage_dice = {count = 1, sides = 6, bonus = 1}, sound = .Blade, flavor = "Plain and reliable."},
-	.Goblin_Dagger  = {name = "Goblin dagger", category = .Weapon, damage_dice = {count = 2, sides = 3}, sound = .Light, flavor = "Crude, but it bites."},
-	.Spiked_Club    = {name = "Spiked club", category = .Weapon, damage_dice = {count = 2, sides = 4, bonus = 1}, sound = .Heavy, flavor = "Pried from an ogre's fingers."},
-	.Longsword      = {name = "Longsword", category = .Weapon, damage_dice = {count = 1, sides = 8, bonus = 2}, sound = .Blade, flavor = "Balanced, keen, old."},
-	.Leather_Armor  = {name = "Leather armor", category = .Armor, armor = 1, flavor = "Stiff, but it turns a blade."},
-	.Chain_Shirt    = {name = "Chain shirt", category = .Armor, armor = 2, flavor = "Heavy rings, carefully mended."},
+	.Short_Sword    = {name = "Short sword", category = .Weapon, damage_dice = {count = 1, sides = 6, bonus = 1}, weight = .Medium, sound = .Blade, flavor = "Plain and reliable."},
+	.Goblin_Dagger  = {name = "Goblin dagger", category = .Weapon, damage_dice = {count = 2, sides = 3}, weight = .Light, sound = .Light, flavor = "Crude, but it bites."},
+	.Spiked_Club    = {name = "Spiked club", category = .Weapon, damage_dice = {count = 2, sides = 4, bonus = 1}, weight = .Heavy, sound = .Heavy, flavor = "Pried from an ogre's fingers."},
+	.Longsword      = {name = "Longsword", category = .Weapon, damage_dice = {count = 1, sides = 8, bonus = 2}, weight = .Medium, sound = .Blade, flavor = "Balanced, keen, old."},
+	.Leather_Armor  = {name = "Leather armor", category = .Armor, armor = 1, armor_weight = .Light, flavor = "Stiff, but it turns a blade."},
+	.Chain_Shirt    = {name = "Chain shirt", category = .Armor, armor = 2, armor_weight = .Medium, flavor = "Heavy rings, carefully mended."},
 }
 
-// Punching with bare hands, when no weapon is wielded.
+// Punching with bare hands, when no weapon is wielded: a fist is Light, same as a dagger.
 FIST_DICE :: Dice{count = 1, sides = 2}
 
 // Gold and potions pile up in one slot; everything else takes a slot each.
@@ -125,13 +142,17 @@ apply_equipment :: proc(scene: ^Scene) {
 	inventory := &scene.inventory
 	scene.player.damage_dice = FIST_DICE
 	scene.player.weapon_sound = .Light
+	scene.player.weapon_weight = .Light // unarmed hands are as quick as a dagger
 	if weapon, wielding := inventory.weapon.?; wielding {
 		scene.player.damage_dice = ITEMS[weapon].damage_dice
 		scene.player.weapon_sound = ITEMS[weapon].sound
+		scene.player.weapon_weight = ITEMS[weapon].weight
 	}
 	scene.player.armor = 0
+	scene.player.armor_weight = .Light // unarmored is as nimble as it gets
 	if armor, wearing := inventory.armor.?; wearing {
 		scene.player.armor = ITEMS[armor].armor
+		scene.player.armor_weight = ITEMS[armor].armor_weight
 	}
 }
 

@@ -12,6 +12,13 @@ SCREEN_SHAKE_SECONDS    :: 0.3
 LEVEL_FADE_SECONDS      :: 0.35 // fade to black, then the same back in
 MONSTER_NOTICE_DISTANCE :: 7    // sleeping monsters wake when you come this close
 
+// Combat: attributes, stance, and parry/riposte. See DESIGN_COMBAT.md.
+PARRY_DIFFICULTY   :: 14
+RIPOSTE_DIFFICULTY :: 12
+STANCE_MODIFIER    :: 2   // Aggressive: +2 damage, -2 defense. Defensive: the reverse.
+RIPOSTE_DAMAGE_MULTIPLIER :: f32(1.5)
+CRITICAL_DICE_MULTIPLIER  :: 2 // a forced critical (a natural 1 on the defender's parry) doubles the dice
+
 // Whose turn it is. While someone is "acting", their animation plays and
 // clicks are ignored, so each action finishes before the next one starts.
 Turn_Phase :: enum {
@@ -114,6 +121,92 @@ roll_dice :: proc(dice: Dice) -> int {
 		total += 1 + rand.int_max(dice.sides)
 	}
 	return total
+}
+
+// ---------------------------------------------------------------------------
+// Attributes, stance, and parry/riposte. See DESIGN_COMBAT.md.
+// ---------------------------------------------------------------------------
+
+// The classic d20 curve: 8 -> -1, 10/11 -> 0, 14 -> +2, 18 -> +4.
+attribute_modifier :: proc(score: int) -> int {
+	return int(math.floor(f32(score - 10) / 2))
+}
+
+// Aggressive hits harder but defends worse; Defensive is the other way round. Neutral
+// does neither. The player toggles this freely (see cycle_stance); monsters hold
+// whatever CREATURES[kind].default_stance says.
+stance_damage_bonus :: proc(actor: ^Actor) -> int {
+	switch actor.stance {
+	case .Aggressive: return STANCE_MODIFIER
+	case .Defensive:  return -STANCE_MODIFIER
+	case .Neutral:
+	}
+	return 0
+}
+
+// The same posture that boosts damage costs defense, and vice versa.
+stance_defense_bonus :: proc(actor: ^Actor) -> int {
+	return -stance_damage_bonus(actor)
+}
+
+// Weapon weight gates riposte itself: a Heavy weapon can't riposte at all (checked by
+// the caller), Medium suffers a roll penalty, Light suffers none.
+weapon_weight_riposte_modifier :: proc(weight: Weapon_Weight) -> int {
+	switch weight {
+	case .Light:  return 0
+	case .Medium: return -3
+	case .Heavy:  return 0 // unreachable: Heavy never attempts a riposte roll
+	}
+	return 0
+}
+
+// Armor weight never blocks a riposte outright, unlike weapon weight — it's a
+// straight roll penalty for being less nimble in heavier armor.
+armor_weight_riposte_modifier :: proc(weight: Armor_Weight) -> int {
+	switch weight {
+	case .Light:  return 0
+	case .Medium: return -1
+	case .Heavy:  return -3
+	}
+	return 0
+}
+
+Critical :: enum {
+	None,
+	Failure, // a natural 1
+	Success, // a natural 20
+}
+
+// One opposed d20 roll: a natural 1 always fails (and is reported so the caller can
+// react specially), a natural 20 always succeeds, anything else compares to the
+// difficulty as usual.
+d20_check :: proc(modifier, difficulty: int) -> (success: bool, critical: Critical) {
+	natural := 1 + rand.int_max(20)
+	switch natural {
+	case 1:  return false, .Failure
+	case 20: return true, .Success
+	}
+	return natural + modifier >= difficulty, .None
+}
+
+// Cycles the player's stance: Neutral -> Aggressive -> Defensive -> Neutral.
+cycle_stance :: proc(scene: ^Scene) {
+	player := &scene.player
+	switch player.stance {
+	case .Neutral:    player.stance = .Aggressive
+	case .Aggressive: player.stance = .Defensive
+	case .Defensive:  player.stance = .Neutral
+	}
+	set_message(scene, "Stance: %s.", stance_name(player.stance))
+}
+
+stance_name :: proc(stance: Stance) -> string {
+	switch stance {
+	case .Neutral:    return "Neutral"
+	case .Aggressive: return "Aggressive"
+	case .Defensive:  return "Defensive"
+	}
+	return ""
 }
 
 // ---------------------------------------------------------------------------
@@ -426,15 +519,65 @@ move_to_level :: proc(scene: ^Scene, direction: Stairs_Direction) {
 // Combat
 // ---------------------------------------------------------------------------
 
+// A parried blow announces itself; who's speaking depends on who got parried.
+announce_parry :: proc(scene: ^Scene, attacker, target: ^Actor) {
+	if target == &scene.player {
+		set_message(scene, "You parry %s's attack!", display_name(attacker))
+	} else {
+		set_message(scene, "%s parries your attack!", display_name(target, start_of_sentence = true))
+	}
+}
+
+// A parry landed: decide whether the defender's counter connects (skipped, and
+// guaranteed, on a natural-20 parry), then throw it via the normal attack machinery.
+attempt_riposte :: proc(scene: ^Scene, original_attacker, defender: ^Actor, guaranteed: bool) {
+	if !guaranteed {
+		defender_definition := CREATURES[defender.kind]
+		modifier := attribute_modifier(defender_definition.dexterity) + stance_defense_bonus(defender) +
+			weapon_weight_riposte_modifier(defender.weapon_weight) + armor_weight_riposte_modifier(defender.armor_weight) +
+			attribute_modifier(defender_definition.strength) / 2
+		landed, _ := d20_check(modifier, RIPOSTE_DIFFICULTY)
+		if !landed {
+			if defender == &scene.player {
+				set_message(scene, "You parry, but can't riposte in time.")
+			} else {
+				set_message(scene, "%s parries, but doesn't riposte.", display_name(defender, start_of_sentence = true))
+			}
+			return
+		}
+	}
+	start_attack(defender, original_attacker, is_riposte = true)
+}
+
 // The moment a weapon connects: roll damage, then trigger the flash, knockback, blood and number.
+// A riposte (attacker.is_riposte) skips the parry roll entirely, so counters can't be countered.
 resolve_attack_impact :: proc(scene: ^Scene, attacker, target: ^Actor) {
 	attacker_definition := CREATURES[attacker.kind]
 	target_definition := CREATURES[target.kind]
+	target.is_awake = true
+
+	forced_critical := false
+	if !attacker.is_riposte {
+		parry_modifier := attribute_modifier(target_definition.dexterity) + stance_defense_bonus(target)
+		parried, critical := d20_check(parry_modifier, PARRY_DIFFICULTY)
+		if critical == .Failure {
+			forced_critical = true // the defender fumbled: the blow lands as a critical instead
+		} else if critical == .Success || parried {
+			announce_parry(scene, attacker, target)
+			if critical == .Success || target.weapon_weight != .Heavy {
+				attempt_riposte(scene, attacker, target, guaranteed = critical == .Success)
+			}
+			return
+		}
+	}
 
 	// Armor takes some of the sting out of every hit, but a hit always does at least 1.
-	damage := max(1, roll_dice(attacker.damage_dice) - target.armor)
+	// A forced critical doubles the dice; a riposte multiplies the whole total instead.
+	damage_dice_total := roll_dice(attacker.damage_dice)
+	if forced_critical do damage_dice_total *= CRITICAL_DICE_MULTIPLIER
+	damage := max(1, damage_dice_total + attribute_modifier(attacker_definition.strength) + stance_damage_bonus(attacker) - target.armor)
+	if attacker.is_riposte do damage = int(math.ceil(f32(damage) * RIPOSTE_DAMAGE_MULTIPLIER))
 	target.hit_points = max(0, target.hit_points - damage)
-	target.is_awake = true
 
 	target_center := footprint_center(target, target.hex)
 	away_from_attacker := rl.Vector3Normalize(target_center - footprint_center(attacker, attacker.hex))
@@ -457,9 +600,18 @@ resolve_attack_impact :: proc(scene: ^Scene, attacker, target: ^Actor) {
 	number_color := rl.RED if target_is_player else rl.WHITE
 	add_floating_number(&scene.effects, target_center, target_definition.frame_size.y + 16, damage, number_color) // above the health bar
 
-	if attacker == &scene.player {
+	switch {
+	case attacker.is_riposte && attacker == &scene.player:
+		set_message(scene, "Your riposte hits %s for %d!", display_name(target), damage)
+	case attacker.is_riposte:
+		set_message(scene, "%s ripostes, hitting you for %d!", display_name(attacker, start_of_sentence = true), damage)
+	case forced_critical && attacker == &scene.player:
+		set_message(scene, "Critical hit! You hit %s for %d.", display_name(target), damage)
+	case forced_critical:
+		set_message(scene, "Critical hit! %s %s you for %d.", display_name(attacker, start_of_sentence = true), attacker_definition.attack_verb, damage)
+	case attacker == &scene.player:
 		set_message(scene, "You hit %s for %d.", display_name(target), damage)
-	} else {
+	case:
 		set_message(scene, "%s %s you for %d.", display_name(attacker, start_of_sentence = true), attacker_definition.attack_verb, damage)
 	}
 

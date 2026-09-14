@@ -8,9 +8,16 @@ package main
 // creatures, animation timers. Instead the game is copied into the plain "Saved_"
 // structs below, and rebuilt from them when loading.
 //
-// Enums are written as numbers. So new kinds (items, creatures, tiles, ...) must be
-// added at the END of their enum, or old saves will read them as the wrong thing.
-// If a change can't be done that way, raise SAVE_FORMAT_VERSION: older saves are
+// Enums that are still real enums (Named_Creature, Quest_Id, Stance, Container_Kind,
+// ...) are written as numbers. So new ones must be added at the END of their enum, or
+// old saves will read them as the wrong thing. Creature_Kind and Item_Kind are not
+// enums any more (see DESIGN_DATA_DRIVEN.md): they're indexes into CREATURES/ITEMS
+// that are only valid for the process that resolved them, so a save stores the
+// creature's or item's `id` string instead (see Saved_Creature.kind, Saved_Item_Stack,
+// ...) and resolves it back to an index on load (see restore_creature and friends). A
+// save naming an id that no longer exists is reported and dropped, not misread.
+//
+// If a change can't be done safely at all, raise SAVE_FORMAT_VERSION: older saves are
 // then shown as unreadable instead of loading wrong.
 
 import "core:encoding/json"
@@ -21,11 +28,11 @@ import "core:time/timezone"
 import rl "vendor:raylib"
 import "hexgrid"
 
-SAVE_FORMAT_VERSION :: 2 // 2: the village became depth 0, and quests were added
+SAVE_FORMAT_VERSION :: 3 // 3: creatures and items became data, saved by id instead of by number
 SAVE_SLOT_COUNT     :: 3
 
 Saved_Creature :: struct {
-	kind:         Creature_Kind,
+	kind:         string, // "" for a named creature: see Saved_Creature.named
 	named:        Named_Creature,
 	hex:          hexgrid.Hex,
 	facing:       hexgrid.Direction,
@@ -36,10 +43,16 @@ Saved_Creature :: struct {
 	stance:       Stance,
 }
 
+// Item_Stack, but with the item named instead of indexed: see the comment up top.
+Saved_Item_Stack :: struct {
+	kind:  string,
+	count: int,
+}
+
 Saved_Container :: struct {
 	kind:            Container_Kind,
 	anchor_hex:      hexgrid.Hex,
-	items:           []Item_Stack,
+	items:           []Saved_Item_Stack,
 	has_been_opened: bool,
 }
 
@@ -59,9 +72,9 @@ Saved_Level :: struct {
 Saved_Inventory :: struct {
 	gold:           int,
 	gold_collected: int,
-	backpack: []Item_Stack,
-	weapon:   Maybe(Item_Kind),
-	armor:    Maybe(Item_Kind),
+	backpack: []Saved_Item_Stack,
+	weapon:   Maybe(string),
+	armor:    Maybe(string),
 }
 
 Save_Game :: struct {
@@ -168,9 +181,9 @@ build_save_game :: proc(scene: ^Scene) -> Save_Game {
 		inventory      = Saved_Inventory {
 			gold           = inventory.gold,
 			gold_collected = inventory.gold_collected,
-			backpack       = inventory.backpack[:],
-			weapon         = inventory.weapon,
-			armor          = inventory.armor,
+			backpack       = save_item_stacks(inventory.backpack[:]),
+			weapon         = save_maybe_item(inventory.weapon),
+			armor          = save_maybe_item(inventory.armor),
 		},
 	}
 
@@ -183,7 +196,7 @@ build_save_game :: proc(scene: ^Scene) -> Save_Game {
 			containers[index] = Saved_Container {
 				kind            = container.kind,
 				anchor_hex      = container.anchor_hex,
-				items           = container.items[:],
+				items           = save_item_stacks(container.items[:]),
 				has_been_opened = container.has_been_opened,
 			}
 		}
@@ -211,7 +224,9 @@ build_save_game :: proc(scene: ^Scene) -> Save_Game {
 
 save_creature :: proc(creature: ^Actor) -> Saved_Creature {
 	return Saved_Creature {
-		kind         = creature.kind,
+		// A named creature's kind follows from its name (see NAMED_CREATURES); only
+		// an ordinary creature needs its own kind saved.
+		kind         = "" if creature.named != .None else CREATURES[creature.kind].id,
 		named        = creature.named,
 		hex          = creature.hex,
 		facing       = creature.facing,
@@ -221,6 +236,22 @@ save_creature :: proc(creature: ^Actor) -> Saved_Creature {
 		turns_waited = creature.turns_waited,
 		stance       = creature.stance,
 	}
+}
+
+save_item_stack :: proc(stack: Item_Stack) -> Saved_Item_Stack {
+	return {kind = ITEMS[stack.kind].id, count = stack.count}
+}
+
+save_item_stacks :: proc(stacks: []Item_Stack) -> []Saved_Item_Stack {
+	saved := make([]Saved_Item_Stack, len(stacks))
+	for stack, index in stacks do saved[index] = save_item_stack(stack)
+	return saved
+}
+
+save_maybe_item :: proc(maybe_kind: Maybe(Item_Kind)) -> Maybe(string) {
+	kind, has_one := maybe_kind.?
+	if !has_one do return nil
+	return ITEMS[kind].id
 }
 
 // Like "2026-09-11 18:48", in the player's own time zone when it can be found.
@@ -262,15 +293,19 @@ restore_game :: proc(scene: ^Scene, save: ^Save_Game) {
 
 	scene.game_seed = save.game_seed
 	scene.adventure_id = save.adventure_id
-	scene.player = restore_creature(save.player)
+	if player, ok := restore_creature(save.player); ok {
+		scene.player = player
+	} else {
+		scene.player = make_creature(ADVENTURER, save.player.hex) // shouldn't happen: the built-in id is always there
+	}
 
 	inventory := &scene.inventory
 	clear(&inventory.backpack)
-	append(&inventory.backpack, ..save.inventory.backpack)
+	append(&inventory.backpack, ..restore_item_stacks(save.inventory.backpack))
 	inventory.gold = save.inventory.gold
 	inventory.gold_collected = max(save.inventory.gold_collected, save.inventory.gold) // older saves lack it
-	inventory.weapon = save.inventory.weapon
-	inventory.armor = save.inventory.armor
+	inventory.weapon = restore_maybe_item(save.inventory.weapon)
+	inventory.armor = restore_maybe_item(save.inventory.armor)
 	apply_equipment(scene)
 
 	for saved in save.levels {
@@ -280,7 +315,7 @@ restore_game :: proc(scene: ^Scene, save: ^Save_Game) {
 		level.tiles = make([]Tile, len(saved.tiles))
 		copy(level.tiles, saved.tiles)
 		for saved_monster in saved.monsters {
-			append(&level.monsters, restore_creature(saved_monster))
+			if monster, ok := restore_creature(saved_monster); ok do append(&level.monsters, monster)
 		}
 		for saved_container in saved.containers {
 			container := Container {
@@ -289,7 +324,7 @@ restore_game :: proc(scene: ^Scene, save: ^Save_Game) {
 				footprint       = footprint_for_container(saved_container.kind),
 				has_been_opened = saved_container.has_been_opened,
 			}
-			append(&container.items, ..saved_container.items)
+			append(&container.items, ..restore_item_stacks(saved_container.items))
 			append(&level.containers, container)
 		}
 		append(&level.blood_stains, ..saved.blood_stains)
@@ -312,8 +347,19 @@ restore_game :: proc(scene: ^Scene, save: ^Save_Game) {
 	scene.open_panel = .None
 }
 
-restore_creature :: proc(saved: Saved_Creature) -> Actor {
-	creature := make_named_creature(saved.named, saved.hex) if saved.named != .None else make_creature(saved.kind, saved.hex)
+// Fails only if an ordinary (non-named) creature's id no longer exists in
+// content.json, which is reported and the creature dropped rather than misread.
+restore_creature :: proc(saved: Saved_Creature) -> (creature: Actor, ok: bool) {
+	if saved.named != .None {
+		creature = make_named_creature(saved.named, saved.hex)
+	} else {
+		kind, found := creature_kind_named(saved.kind)
+		if !found {
+			fmt.eprintfln("save file: unknown creature \"%s\"; dropping it", saved.kind)
+			return {}, false
+		}
+		creature = make_creature(kind, saved.hex)
+	}
 	creature.facing = saved.facing
 	creature.hit_points = saved.hit_points
 	creature.is_dead = saved.is_dead
@@ -321,7 +367,32 @@ restore_creature :: proc(saved: Saved_Creature) -> Actor {
 	creature.turns_waited = saved.turns_waited
 	creature.stance = saved.stance
 	if creature.is_dead do creature.death_seconds = DEATH_SECONDS // long gone, not dying right now
-	return creature
+	return creature, true
+}
+
+restore_item_stack :: proc(saved: Saved_Item_Stack) -> (stack: Item_Stack, ok: bool) {
+	kind, found := item_kind_named(saved.kind)
+	if !found {
+		fmt.eprintfln("save file: unknown item \"%s\"; dropping it", saved.kind)
+		return {}, false
+	}
+	return {kind, saved.count}, true
+}
+
+restore_item_stacks :: proc(saved: []Saved_Item_Stack) -> []Item_Stack {
+	stacks := make([dynamic]Item_Stack, 0, len(saved), context.temp_allocator)
+	for entry in saved {
+		if stack, ok := restore_item_stack(entry); ok do append(&stacks, stack)
+	}
+	return stacks[:]
+}
+
+restore_maybe_item :: proc(maybe_id: Maybe(string)) -> Maybe(Item_Kind) {
+	id, has_one := maybe_id.?
+	if !has_one do return nil
+	if kind, found := item_kind_named(id); found do return kind
+	fmt.eprintfln("save file: unknown item \"%s\"; unequipping it", id)
+	return nil
 }
 
 // Reads just the summary of each slot, for the slot list.

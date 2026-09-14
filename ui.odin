@@ -231,7 +231,7 @@ take_loot :: proc(scene: ^Scene, container: ^Container, index: int) -> bool {
 		}
 	}
 	switch {
-	case stack.kind == .Gold: set_message(scene, "You take %d gold.", stack.count)
+	case ITEMS[stack.kind].category == .Gold: set_message(scene, "You take %d gold.", stack.count)
 	case stack.count > 1:     set_message(scene, "You take %d x %s.", stack.count, ITEMS[stack.kind].name)
 	case:                     set_message(scene, "You take the %s.", ITEMS[stack.kind].name)
 	}
@@ -293,7 +293,7 @@ draw_slot :: proc(scene: ^Scene, rectangle: rl.Rectangle, stack: Maybe(Item_Stac
 }
 
 draw_item_icon :: proc(scene: ^Scene, kind: Item_Kind, x, y: f32) {
-	source := rl.Rectangle{f32(kind) * 16, 0, 16, 16}
+	source := rl.Rectangle{f32(ITEMS[kind].icon_column) * 16, 0, 16, 16}
 	rl.DrawTexturePro(scene.item_icons, source, {x, y, 16, 16}, {}, 0, rl.WHITE)
 }
 
@@ -311,7 +311,7 @@ draw_inventory_panel :: proc(scene: ^Scene) {
 	draw_panel(panel, "Inventory")
 
 	// Gold, top right
-	draw_item_icon(scene, .Gold, panel.x + panel.width - 60, panel.y + 3)
+	draw_item_icon(scene, GOLD, panel.x + panel.width - 60, panel.y + 3)
 	draw_text(fmt.tprintf("%d", inventory.gold), i32(panel.x + panel.width) - 40, top + 7, GOLD_TEXT_COLOR)
 
 	hovered_kind: Maybe(Item_Kind)

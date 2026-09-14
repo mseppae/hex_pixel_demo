@@ -278,7 +278,7 @@ camera_up_direction :: proc(camera: rl.Camera3D) -> rl.Vector3 {
 
 draw_actor :: proc(scene: ^Scene, actor: ^Actor, camera: rl.Camera3D, light: f32) {
 	definition := CREATURES[actor.kind]
-	sprite_sheet := scene.creature_sprites[actor.kind]
+	sprite_sheet := scene.creature_sprites[definition.sprite_sheet]
 	feet_position := actor_visual_position(actor)
 	opacity: f32 = 1
 

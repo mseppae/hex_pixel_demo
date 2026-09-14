@@ -5,6 +5,9 @@
   {
    "id": "Adventurer",
    "name": "adventurer",
+   "article": "another adventurer",
+   "sprite_sheet": "adventurer_sheet.png",
+   "corpse": "Adventurer_Corpse",
    "attack_verb": "hits",
    "frame_size": [
     16,
@@ -39,11 +42,15 @@
    "weapon_sound": "Light",
    "hurt_sound": "Hurt_Player",
    "death_sound": "Death_Player",
-   "behaviours": []
+   "behaviours": [],
+   "loot": []
   },
   {
    "id": "Goblin",
    "name": "goblin",
+   "article": "a goblin",
+   "sprite_sheet": "goblin_sheet.png",
+   "corpse": "Goblin_Corpse",
    "attack_verb": "stabs",
    "frame_size": [
     16,
@@ -94,11 +101,37 @@
      "kind": "Wander",
      "chance": 0.4
     }
+   ],
+   "loot": [
+    {
+     "item": "Gold",
+     "chance": 0.6,
+     "min": 2,
+     "max": 8,
+     "max_per_depth": 1
+    },
+    {
+     "item": "Healing_Potion",
+     "chance": 0.25,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    },
+    {
+     "item": "Goblin_Dagger",
+     "chance": 0.15,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    }
    ]
   },
   {
    "id": "Ogre",
    "name": "ogre",
+   "article": "an ogre",
+   "sprite_sheet": "ogre_sheet.png",
+   "corpse": "Ogre_Corpse",
    "attack_verb": "smashes",
    "frame_size": [
     40,
@@ -140,6 +173,29 @@
     {
      "kind": "Chase_Player",
      "notice_distance": 8
+    }
+   ],
+   "loot": [
+    {
+     "item": "Gold",
+     "chance": 1.0,
+     "min": 10,
+     "max": 25,
+     "max_per_depth": 2
+    },
+    {
+     "item": "Healing_Potion",
+     "chance": 0.5,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    },
+    {
+     "item": "Spiked_Club",
+     "chance": 0.4,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
     }
    ]
   }
@@ -1825,6 +1881,722 @@
     "Krenn down. One less name on my list.",
     "Bounty's yours, paid in full."
    ]
+  }
+ ],
+ "items": [
+  {
+   "id": "Gold",
+   "name": "Gold",
+   "category": "Gold",
+   "icon_column": 0,
+   "flavor": "Goblins love it. So do you.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Healing_Potion",
+   "name": "Healing potion",
+   "category": "Potion",
+   "icon_column": 1,
+   "flavor": "Tastes of cherries and iron.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 2,
+    "sides": 4,
+    "bonus": 2
+   },
+   "sound": ""
+  },
+  {
+   "id": "Short_Sword",
+   "name": "Short sword",
+   "category": "Weapon",
+   "icon_column": 2,
+   "flavor": "Plain and reliable.",
+   "damage_dice": {
+    "count": 1,
+    "sides": 6,
+    "bonus": 1
+   },
+   "weight": "Medium",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": "Blade"
+  },
+  {
+   "id": "Goblin_Dagger",
+   "name": "Goblin dagger",
+   "category": "Weapon",
+   "icon_column": 3,
+   "flavor": "Crude, but it bites.",
+   "damage_dice": {
+    "count": 2,
+    "sides": 3,
+    "bonus": 0
+   },
+   "weight": "Light",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": "Light"
+  },
+  {
+   "id": "Spiked_Club",
+   "name": "Spiked club",
+   "category": "Weapon",
+   "icon_column": 4,
+   "flavor": "Pried from an ogre's fingers.",
+   "damage_dice": {
+    "count": 2,
+    "sides": 4,
+    "bonus": 1
+   },
+   "weight": "Heavy",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": "Heavy"
+  },
+  {
+   "id": "Longsword",
+   "name": "Longsword",
+   "category": "Weapon",
+   "icon_column": 5,
+   "flavor": "Balanced, keen, old.",
+   "damage_dice": {
+    "count": 1,
+    "sides": 8,
+    "bonus": 2
+   },
+   "weight": "Medium",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": "Blade"
+  },
+  {
+   "id": "Leather_Armor",
+   "name": "Leather armor",
+   "category": "Armor",
+   "icon_column": 6,
+   "flavor": "Stiff, but it turns a blade.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 1,
+   "armor_weight": "Light",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Chain_Shirt",
+   "name": "Chain shirt",
+   "category": "Armor",
+   "icon_column": 7,
+   "flavor": "Heavy rings, carefully mended.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 2,
+   "armor_weight": "Medium",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Town_Portal_Scroll",
+   "name": "Scroll of Town Portal",
+   "category": "Scroll",
+   "icon_column": 8,
+   "flavor": "The ink is still faintly warm.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Skreel_Ear",
+   "name": "Skreel's ear",
+   "category": "Quest_Item",
+   "icon_column": 9,
+   "flavor": "Still warm. Someone will want proof.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Dunmarr_Fang",
+   "name": "Dunmarr's fang",
+   "category": "Quest_Item",
+   "icon_column": 10,
+   "flavor": "Yellowed and cracked, but unmistakably his.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Ashka_Tusk",
+   "name": "Ashka's tusk",
+   "category": "Quest_Item",
+   "icon_column": 11,
+   "flavor": "Carved with crude, boastful runes.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Blackmaw_Claw",
+   "name": "Blackmaw's claw",
+   "category": "Quest_Item",
+   "icon_column": 12,
+   "flavor": "Long enough to open a man from throat to belt.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Threk_Skull",
+   "name": "Threk's skull",
+   "category": "Quest_Item",
+   "icon_column": 13,
+   "flavor": "Heavier than it looks. So was he.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Rusk_Ear",
+   "name": "Rusk's ear",
+   "category": "Quest_Item",
+   "icon_column": 14,
+   "flavor": "Notched from a hundred old fights.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Gnarl_Fang",
+   "name": "Gnarl's fang",
+   "category": "Quest_Item",
+   "icon_column": 15,
+   "flavor": "Rimmed black with old poison.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Kroll_Tusk",
+   "name": "Kroll's tusk",
+   "category": "Quest_Item",
+   "icon_column": 16,
+   "flavor": "Chipped where it met the anvil.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Fenrik_Claw",
+   "name": "Fenrik's claw",
+   "category": "Quest_Item",
+   "icon_column": 17,
+   "flavor": "Iron-hard, and just as sharp.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Molgar_Skull",
+   "name": "Molgar's skull",
+   "category": "Quest_Item",
+   "icon_column": 18,
+   "flavor": "The jaw alone could crush a shield.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Snitch_Ear",
+   "name": "Snitch's ear",
+   "category": "Quest_Item",
+   "icon_column": 19,
+   "flavor": "Pierced with a dozen stolen rings.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Marrow_Fang",
+   "name": "Marrow's fang",
+   "category": "Quest_Item",
+   "icon_column": 20,
+   "flavor": "Filed to a wicked point.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Grendle_Tusk",
+   "name": "Grendle's tusk",
+   "category": "Quest_Item",
+   "icon_column": 21,
+   "flavor": "Slick with bog-water, even now.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Karth_Claw",
+   "name": "Karth's claw",
+   "category": "Quest_Item",
+   "icon_column": 22,
+   "flavor": "Still stained dark at the tip.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Hollow_Skull",
+   "name": "The Hollow Fang's skull",
+   "category": "Quest_Item",
+   "icon_column": 23,
+   "flavor": "Its eye sockets never seem to close.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Vex_Ear",
+   "name": "Vex's ear",
+   "category": "Quest_Item",
+   "icon_column": 24,
+   "flavor": "A cursed sigil is scratched behind it.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Morrow_Fang",
+   "name": "Morrow's fang",
+   "category": "Quest_Item",
+   "icon_column": 25,
+   "flavor": "Cold to the touch, even in your pocket.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Ghurn_Tusk",
+   "name": "Ghurn's tusk",
+   "category": "Quest_Item",
+   "icon_column": 26,
+   "flavor": "Blighted black at the root.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Sable_Claw",
+   "name": "Sable's claw",
+   "category": "Quest_Item",
+   "icon_column": 27,
+   "flavor": "Darker than any natural shadow.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Uldrath_Skull",
+   "name": "Uldrath's skull",
+   "category": "Quest_Item",
+   "icon_column": 28,
+   "flavor": "It seems to watch you from the backpack.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Pike_Ear",
+   "name": "Pike's ear",
+   "category": "Quest_Item",
+   "icon_column": 29,
+   "flavor": "A thief's mark is tattooed on it.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Grix_Fang",
+   "name": "Grix's fang",
+   "category": "Quest_Item",
+   "icon_column": 30,
+   "flavor": "Bloodied from one blow too many.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Bruundor_Tusk",
+   "name": "Bruundor's tusk",
+   "category": "Quest_Item",
+   "icon_column": 31,
+   "flavor": "Thick enough to use as a club itself.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Vozgar_Claw",
+   "name": "Vozgar's claw",
+   "category": "Quest_Item",
+   "icon_column": 32,
+   "flavor": "Curved like a reaper's blade.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Krenn_Skull",
+   "name": "Warlord Krenn's skull",
+   "category": "Quest_Item",
+   "icon_column": 33,
+   "flavor": "Crowned still with a dented iron circlet.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
   }
  ]
 }

@@ -307,8 +307,8 @@ place_monsters :: proc(scene: ^Scene, level: ^Level, depth: int, generator: runt
 	ogre_count := (depth + 1) / 2
 	goblin_count := min(1 + depth, 6)
 	kinds_to_place := make([dynamic]Creature_Kind, context.temp_allocator)
-	for _ in 0 ..< ogre_count do append(&kinds_to_place, Creature_Kind.Ogre)
-	for _ in 0 ..< goblin_count do append(&kinds_to_place, Creature_Kind.Goblin)
+	for _ in 0 ..< ogre_count do append(&kinds_to_place, OGRE)
+	for _ in 0 ..< goblin_count do append(&kinds_to_place, GOBLIN)
 
 	// A named creature lives on its own depth, unless it has already been slain.
 	for named in Named_Creature {

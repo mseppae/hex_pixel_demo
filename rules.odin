@@ -225,14 +225,14 @@ start_new_game :: proc(scene: ^Scene, game_seed: u64) {
 	scene.quest_states = {}
 	scene.named_slain = {}
 	scene.portal = {}
-	scene.player = make_creature(.Adventurer, {})
+	scene.player = make_creature(ADVENTURER, {})
 	clear(&scene.inventory.backpack)
 	scene.inventory.gold = 0
 	scene.inventory.gold_collected = 0
-	scene.inventory.weapon = Item_Kind.Short_Sword
+	scene.inventory.weapon = SHORT_SWORD
 	scene.inventory.armor = nil
-	add_to_inventory(&scene.inventory, Item_Stack{.Healing_Potion, 1})
-	add_to_inventory(&scene.inventory, Item_Stack{.Town_Portal_Scroll, 1})
+	add_to_inventory(&scene.inventory, Item_Stack{HEALING_POTION, 1})
+	add_to_inventory(&scene.inventory, Item_Stack{TOWN_PORTAL_SCROLL, 1})
 	apply_equipment(scene)
 	scene.open_panel = .None
 	scene.travel_destination = nil

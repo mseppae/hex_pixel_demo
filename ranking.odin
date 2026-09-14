@@ -16,7 +16,7 @@ import rl "vendor:raylib"
 
 POINTS_PER_DEPTH       :: 100
 RANKING_SIZE           :: 10
-RANKING_FORMAT_VERSION :: 1
+RANKING_FORMAT_VERSION :: 2 // 2: killed_by became the resolved article text, not a raw creature index (see DESIGN_DATA_DRIVEN.md)
 
 Calendar_Date :: struct {
 	year:  int,
@@ -24,13 +24,15 @@ Calendar_Date :: struct {
 	day:   int,
 }
 
-// No strings in here, so the list needs no memory bookkeeping: the killer is stored
-// as a creature kind (a number in the file, so the enum rule from save.odin applies).
+// killed_by is the already-resolved article text ("a goblin"), not a creature
+// reference: Creature_Kind is only a valid index into CREATURES for the process that
+// resolved it (see creatures.odin), so anything that outlives the process — this file
+// included — must store the id or, as here, just the text it would have produced.
 Ranking_Entry :: struct {
 	points:         int,
 	deepest_depth:  int,
 	gold_collected: int,
-	killed_by:      Creature_Kind,
+	killed_by:      string,
 	date:           Calendar_Date,
 }
 
@@ -103,7 +105,7 @@ end_adventure :: proc(scene: ^Scene) {
 		points         = current_score(scene),
 		deepest_depth  = scene.deepest_depth,
 		gold_collected = scene.inventory.gold_collected,
-		killed_by      = scene.killed_by,
+		killed_by      = creature_with_article(scene.killed_by),
 		date           = today(),
 	}
 	load_ranking(scene) // in case another copy of the game changed it meanwhile
@@ -118,14 +120,10 @@ end_adventure :: proc(scene: ^Scene) {
 	scene.menu = .Ranking
 }
 
-// "a goblin", "an ogre"
+// "a goblin", "an ogre": each creature names its own (Creature_Definition.article).
 creature_with_article :: proc(kind: Creature_Kind) -> string {
-	switch kind {
-	case .Adventurer: return "another adventurer"
-	case .Goblin:     return "a goblin"
-	case .Ogre:       return "an ogre"
-	}
-	return "something"
+	if kind < 0 || kind >= len(CREATURES) do return "something"
+	return CREATURES[kind].article
 }
 
 // ---------------------------------------------------------------------------
@@ -150,7 +148,7 @@ draw_ranking_panel :: proc(scene: ^Scene) {
 	if scene.ranking_after_death {
 		draw_panel(panel, "You have fallen")
 		run := scene.last_run
-		draw_text(fmt.tprintf("Slain by %s on depth %d.", creature_with_article(run.killed_by), scene.current_depth), left + 8, top + 20, TEXT_COLOR)
+		draw_text(fmt.tprintf("Slain by %s on depth %d.", run.killed_by, scene.current_depth), left + 8, top + 20, TEXT_COLOR)
 		draw_text(fmt.tprintf("Depth %d x %d + %d gold = %d points", run.deepest_depth, POINTS_PER_DEPTH, run.gold_collected, run.points), left + 8, top + 32, GOLD_TEXT_COLOR)
 		if scene.last_run_place >= 0 {
 			draw_text(fmt.tprintf("Rank %d of %d.", scene.last_run_place + 1, len(scene.ranking)), left + 200, top + 20, TEXT_COLOR)
@@ -182,7 +180,7 @@ draw_ranking_panel :: proc(scene: ^Scene) {
 		draw_text(fmt.tprintf("%d", entry.points), column_x[1], y, GOLD_TEXT_COLOR)
 		draw_text(fmt.tprintf("%d", entry.deepest_depth), column_x[2], y, TEXT_COLOR)
 		draw_text(fmt.tprintf("%d", entry.gold_collected), column_x[3], y, TEXT_COLOR)
-		draw_text(fmt.tprintf("%s  %d-%02d-%02d", creature_with_article(entry.killed_by), entry.date.year, entry.date.month, entry.date.day), column_x[4], y, DIM_TEXT_COLOR)
+		draw_text(fmt.tprintf("%s  %d-%02d-%02d", entry.killed_by, entry.date.year, entry.date.month, entry.date.day), column_x[4], y, DIM_TEXT_COLOR)
 	}
 
 	if scene.ranking_after_death {

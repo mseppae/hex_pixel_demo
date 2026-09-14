@@ -12,44 +12,11 @@ import "hexgrid"
 // Item definitions
 // ---------------------------------------------------------------------------
 
-// The icon for each item is at (kind * 16, 0) in assets/item_icons.png, so the
-// order here must match the order of icons in the image.
-Item_Kind :: enum u8 {
-	Gold,
-	Healing_Potion,
-	Short_Sword,
-	Goblin_Dagger,
-	Spiked_Club,
-	Longsword,
-	Leather_Armor,
-	Chain_Shirt,
-	Town_Portal_Scroll,
-	Skreel_Ear,
-	Dunmarr_Fang,
-	Ashka_Tusk,
-	Blackmaw_Claw,
-	Threk_Skull,
-	Rusk_Ear,
-	Gnarl_Fang,
-	Kroll_Tusk,
-	Fenrik_Claw,
-	Molgar_Skull,
-	Snitch_Ear,
-	Marrow_Fang,
-	Grendle_Tusk,
-	Karth_Claw,
-	Hollow_Skull,
-	Vex_Ear,
-	Morrow_Fang,
-	Ghurn_Tusk,
-	Sable_Claw,
-	Uldrath_Skull,
-	Pike_Ear,
-	Grix_Fang,
-	Bruundor_Tusk,
-	Vozgar_Claw,
-	Krenn_Skull,
-}
+// An index into ITEMS, resolved once (at content load, or wherever content.json
+// names an item) and cheap to carry around after that. Like Creature_Kind (see
+// creatures.odin), it's only meaningful for the run that resolved it: a save file
+// or the ranking list stores the item's `id` string instead. See DESIGN_DATA_DRIVEN.md.
+Item_Kind :: int
 
 Item_Category :: enum u8 {
 	Gold,
@@ -76,8 +43,10 @@ Armor_Weight :: enum u8 {
 }
 
 Item_Definition :: struct {
+	id:           string, // matches content.json and what quests, shops etc. refer to it by
 	name:         string,
 	category:     Item_Category,
+	icon_column:  int,    // which 16 x 16 column of assets/item_icons.png is its icon
 	flavor:       string, // a short line for the tooltip
 	damage_dice:  Dice,   // weapons
 	weight:       Weapon_Weight, // weapons
@@ -87,44 +56,29 @@ Item_Definition :: struct {
 	sound:        Weapon_Sound, // weapons: how swinging and hitting with it sounds
 }
 
-ITEMS := [Item_Kind]Item_Definition {
-	.Gold           = {name = "Gold", category = .Gold, flavor = "Goblins love it. So do you."},
-	.Healing_Potion = {name = "Healing potion", category = .Potion, heal_dice = {count = 2, sides = 4, bonus = 2}, flavor = "Tastes of cherries and iron."},
-	.Short_Sword    = {name = "Short sword", category = .Weapon, damage_dice = {count = 1, sides = 6, bonus = 1}, weight = .Medium, sound = .Blade, flavor = "Plain and reliable."},
-	.Goblin_Dagger  = {name = "Goblin dagger", category = .Weapon, damage_dice = {count = 2, sides = 3}, weight = .Light, sound = .Light, flavor = "Crude, but it bites."},
-	.Spiked_Club    = {name = "Spiked club", category = .Weapon, damage_dice = {count = 2, sides = 4, bonus = 1}, weight = .Heavy, sound = .Heavy, flavor = "Pried from an ogre's fingers."},
-	.Longsword      = {name = "Longsword", category = .Weapon, damage_dice = {count = 1, sides = 8, bonus = 2}, weight = .Medium, sound = .Blade, flavor = "Balanced, keen, old."},
-	.Leather_Armor  = {name = "Leather armor", category = .Armor, armor = 1, armor_weight = .Light, flavor = "Stiff, but it turns a blade."},
-	.Chain_Shirt    = {name = "Chain shirt", category = .Armor, armor = 2, armor_weight = .Medium, flavor = "Heavy rings, carefully mended."},
-	.Town_Portal_Scroll = {name = "Scroll of Town Portal", category = .Scroll, flavor = "The ink is still faintly warm."},
+// Filled from assets/content.json at startup (see content.odin).
+ITEMS: [dynamic]Item_Definition
+item_index_by_id: map[string]Item_Kind
 
-	// Trophies: proof of a slain named creature, handed to whoever wanted it dead.
-	// No use otherwise (see Item_Category.Quest_Item in use_backpack_item).
-	.Skreel_Ear    = {name = "Skreel's ear",             category = .Quest_Item, flavor = "Still warm. Someone will want proof."},
-	.Dunmarr_Fang  = {name = "Dunmarr's fang",           category = .Quest_Item, flavor = "Yellowed and cracked, but unmistakably his."},
-	.Ashka_Tusk    = {name = "Ashka's tusk",             category = .Quest_Item, flavor = "Carved with crude, boastful runes."},
-	.Blackmaw_Claw = {name = "Blackmaw's claw",          category = .Quest_Item, flavor = "Long enough to open a man from throat to belt."},
-	.Threk_Skull   = {name = "Threk's skull",            category = .Quest_Item, flavor = "Heavier than it looks. So was he."},
-	.Rusk_Ear      = {name = "Rusk's ear",               category = .Quest_Item, flavor = "Notched from a hundred old fights."},
-	.Gnarl_Fang    = {name = "Gnarl's fang",             category = .Quest_Item, flavor = "Rimmed black with old poison."},
-	.Kroll_Tusk    = {name = "Kroll's tusk",             category = .Quest_Item, flavor = "Chipped where it met the anvil."},
-	.Fenrik_Claw   = {name = "Fenrik's claw",            category = .Quest_Item, flavor = "Iron-hard, and just as sharp."},
-	.Molgar_Skull  = {name = "Molgar's skull",           category = .Quest_Item, flavor = "The jaw alone could crush a shield."},
-	.Snitch_Ear    = {name = "Snitch's ear",             category = .Quest_Item, flavor = "Pierced with a dozen stolen rings."},
-	.Marrow_Fang   = {name = "Marrow's fang",            category = .Quest_Item, flavor = "Filed to a wicked point."},
-	.Grendle_Tusk  = {name = "Grendle's tusk",           category = .Quest_Item, flavor = "Slick with bog-water, even now."},
-	.Karth_Claw    = {name = "Karth's claw",             category = .Quest_Item, flavor = "Still stained dark at the tip."},
-	.Hollow_Skull  = {name = "The Hollow Fang's skull",  category = .Quest_Item, flavor = "Its eye sockets never seem to close."},
-	.Vex_Ear       = {name = "Vex's ear",                category = .Quest_Item, flavor = "A cursed sigil is scratched behind it."},
-	.Morrow_Fang   = {name = "Morrow's fang",            category = .Quest_Item, flavor = "Cold to the touch, even in your pocket."},
-	.Ghurn_Tusk    = {name = "Ghurn's tusk",             category = .Quest_Item, flavor = "Blighted black at the root."},
-	.Sable_Claw    = {name = "Sable's claw",             category = .Quest_Item, flavor = "Darker than any natural shadow."},
-	.Uldrath_Skull = {name = "Uldrath's skull",          category = .Quest_Item, flavor = "It seems to watch you from the backpack."},
-	.Pike_Ear      = {name = "Pike's ear",                category = .Quest_Item, flavor = "A thief's mark is tattooed on it."},
-	.Grix_Fang     = {name = "Grix's fang",              category = .Quest_Item, flavor = "Bloodied from one blow too many."},
-	.Bruundor_Tusk = {name = "Bruundor's tusk",          category = .Quest_Item, flavor = "Thick enough to use as a club itself."},
-	.Vozgar_Claw   = {name = "Vozgar's claw",            category = .Quest_Item, flavor = "Curved like a reaper's blade."},
-	.Krenn_Skull   = {name = "Warlord Krenn's skull",    category = .Quest_Item, flavor = "Crowned still with a dented iron circlet."},
+// The handful of items the game itself refers to by name, resolved once right after
+// content loads (see resolve_known_content in content.odin): the player's starting
+// kit, and chest loot that isn't tied to any one creature.
+GOLD, HEALING_POTION, TOWN_PORTAL_SCROLL, SHORT_SWORD: Item_Kind
+LEATHER_ARMOR, LONGSWORD, CHAIN_SHIRT, GOBLIN_DAGGER: Item_Kind
+
+item_kind_named :: proc(id: string) -> (kind: Item_Kind, found: bool) {
+	kind, found = item_index_by_id[id]
+	return
+}
+
+// One entry of a creature's loot table (see Creature_Definition.loot in creatures.odin
+// and roll_creature_loot below). Rolled independently: a creature can drop several.
+Loot_Table_Entry :: struct {
+	item:          Item_Kind,
+	chance:        f32, // 0..1
+	min:           int, // Gold only: the lowest amount
+	max:           int, // Gold only: the highest amount at depth 0
+	max_per_depth: int, // Gold only: how much the top end grows per dungeon depth
 }
 
 // Punching with bare hands, when no weapon is wielded: a fist is Light, same as a dagger.
@@ -178,7 +132,7 @@ Inventory :: struct {
 
 // Puts items into the inventory. Returns false if the backpack has no room.
 add_to_inventory :: proc(inventory: ^Inventory, stack: Item_Stack) -> bool {
-	if stack.kind == .Gold {
+	if ITEMS[stack.kind].category == .Gold {
 		inventory.gold += stack.count
 		inventory.gold_collected += stack.count
 		return true
@@ -310,39 +264,42 @@ random_between :: proc(lowest, highest: int, generator: runtime.Random_Generator
 	return lowest + rand.int_max(highest - lowest + 1, generator)
 }
 
+// Every entry in the creature's own loot table (see Creature_Definition.loot) is
+// rolled independently, so a creature can drop several things at once.
 roll_creature_loot :: proc(kind: Creature_Kind, depth: int, loot: ^[dynamic]Item_Stack) {
 	generator := context.random_generator
-	#partial switch kind {
-	case .Goblin:
-		if rand.float32(generator) < 0.6 do append(loot, Item_Stack{.Gold, random_between(2, 8 + depth, generator)})
-		if rand.float32(generator) < 0.25 do append(loot, Item_Stack{.Healing_Potion, 1})
-		if rand.float32(generator) < 0.15 do append(loot, Item_Stack{.Goblin_Dagger, 1})
-	case .Ogre:
-		append(loot, Item_Stack{.Gold, random_between(10, 25 + depth * 2, generator)})
-		if rand.float32(generator) < 0.5 do append(loot, Item_Stack{.Healing_Potion, 1})
-		if rand.float32(generator) < 0.4 do append(loot, Item_Stack{.Spiked_Club, 1})
+	for entry in CREATURES[kind].loot {
+		if rand.float32(generator) >= entry.chance do continue
+		count := 1
+		if ITEMS[entry.item].category == .Gold {
+			count = random_between(entry.min, entry.max + entry.max_per_depth * depth, generator)
+		}
+		append(loot, Item_Stack{entry.item, count})
 	}
 }
 
 // Chests are filled while the level is generated, with the level's own random
 // generator, so the same seed always hides the same treasure.
 roll_chest_loot :: proc(depth: int, generator: runtime.Random_Generator, loot: ^[dynamic]Item_Stack) {
-	append(loot, Item_Stack{.Gold, random_between(5, 15 + depth * 3, generator)})
+	append(loot, Item_Stack{GOLD, random_between(5, 15 + depth * 3, generator)})
 	roll := rand.float32(generator)
 	switch {
-	case roll < 0.40:                 append(loot, Item_Stack{.Healing_Potion, 1})
-	case roll < 0.60:                 append(loot, Item_Stack{.Leather_Armor, 1})
-	case roll < 0.75:                 append(loot, Item_Stack{.Longsword, 1})
-	case roll < 0.85 && depth >= 2:   append(loot, Item_Stack{.Chain_Shirt, 1})
-	case:                             append(loot, Item_Stack{.Goblin_Dagger, 1})
+	case roll < 0.40:                 append(loot, Item_Stack{HEALING_POTION, 1})
+	case roll < 0.60:                 append(loot, Item_Stack{LEATHER_ARMOR, 1})
+	case roll < 0.75:                 append(loot, Item_Stack{LONGSWORD, 1})
+	case roll < 0.85 && depth >= 2:   append(loot, Item_Stack{CHAIN_SHIRT, 1})
+	case:                             append(loot, Item_Stack{GOBLIN_DAGGER, 1})
 	}
-	if rand.float32(generator) < 0.3 do append(loot, Item_Stack{.Healing_Potion, 1})
+	if rand.float32(generator) < 0.3 do append(loot, Item_Stack{HEALING_POTION, 1})
 }
 
 // ---------------------------------------------------------------------------
 // Containers: corpses and chests
 // ---------------------------------------------------------------------------
 
+// Corpse art is still hand-drawn and hand-placed in assets/objects.png, so unlike
+// creatures and items it stays a small closed enum: a creature just names which of
+// these existing silhouettes it leaves (see Creature_Definition.corpse).
 Container_Kind :: enum u8 {
 	Goblin_Corpse,
 	Adventurer_Corpse,
@@ -379,15 +336,6 @@ container_name :: proc(kind: Container_Kind) -> string {
 	case .Dropped_Items:     return "Dropped items"
 	}
 	return ""
-}
-
-corpse_kind_for :: proc(creature: Creature_Kind) -> Container_Kind {
-	switch creature {
-	case .Adventurer: return .Adventurer_Corpse
-	case .Goblin:     return .Goblin_Corpse
-	case .Ogre:       return .Ogre_Corpse
-	}
-	return .Goblin_Corpse
 }
 
 // You can walk over corpses and dropped things, but not through a chest.
@@ -492,7 +440,7 @@ footprint_for_container :: proc(kind: Container_Kind) -> []hexgrid.Hex {
 
 leave_corpse :: proc(scene: ^Scene, creature: ^Actor) {
 	corpse := Container {
-		kind       = corpse_kind_for(creature.kind),
+		kind       = CREATURES[creature.kind].corpse,
 		anchor_hex = creature.hex,
 		footprint  = actor_footprint(creature),
 	}

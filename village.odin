@@ -312,7 +312,7 @@ complete_quest :: proc(scene: ^Scene, id: Quest_Id) {
 			return
 		}
 	}
-	add_to_inventory(inventory, Item_Stack{.Gold, quest.reward_gold})
+	add_to_inventory(inventory, Item_Stack{GOLD, quest.reward_gold})
 	scene.quest_states[id] = .Done
 	set_message(scene, "Quest complete: %s.", quest.title)
 }
@@ -447,5 +447,6 @@ draw_npc :: proc(scene: ^Scene, npc: ^Npc, camera: rl.Camera3D, light: f32) {
 	column := sprite_frame_for(npc.facing, camera)
 	source := rl.Rectangle{f32(column) * frame_size.x, 0, frame_size.x, frame_size.y}
 	size := rl.Vector2{frame_size.x, frame_size.y * upright_stretch(camera)}
-	rl.DrawBillboardPro(camera, scene.creature_sprites[.Adventurer], source, feet, {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(NPCS[npc.role].tint, light))
+	adventurer_sheet := scene.creature_sprites[CREATURES[ADVENTURER].sprite_sheet]
+	rl.DrawBillboardPro(camera, adventurer_sheet, source, feet, {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(NPCS[npc.role].tint, light))
 }

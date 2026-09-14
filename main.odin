@@ -33,6 +33,7 @@ package main
 import "core:fmt"
 import "core:math"
 import "core:math/rand"
+import "core:os"
 import "core:slice"
 import rl "vendor:raylib"
 import "hexgrid"
@@ -77,7 +78,32 @@ PORTAL_PNG           :: #load("assets/portal.png") // a Scroll of Town Portal's 
 // Each sprite sheet has six columns (directions, in hexgrid.Direction order as seen
 // on screen: right, back-right, back-left, left, front-left, front-right)
 // and five rows (poses: idle, walk A, walk B, attack wind-up, strike).
-// Frames are 16 x 24 for the adventurer and goblin, 40 x 48 for the ogre.
+// A creature names its own sheet in content.json (Creature_Definition.sprite_sheet):
+// built-in ones are compiled in below and shared by name; anything else is read from
+// assets/ next to the program at startup, so a new creature can bring its own art
+// without a recompile. See DESIGN_DATA_DRIVEN.md.
+Builtin_Sheet :: struct { name: string, bytes: []u8 }
+BUILTIN_CREATURE_SHEETS := [?]Builtin_Sheet {
+	{"adventurer_sheet.png", ADVENTURER_SHEET_PNG},
+	{"goblin_sheet.png",     GOBLIN_SHEET_PNG},
+	{"ogre_sheet.png",       OGRE_SHEET_PNG},
+}
+
+load_creature_sprite_sheet :: proc(name: string) -> rl.Texture2D {
+	for sheet in BUILTIN_CREATURE_SHEETS {
+		if sheet.name == name do return load_embedded_png_texture(sheet.bytes)
+	}
+	path := fmt.tprintf("%sassets/%s", rl.GetApplicationDirectory(), name)
+	if data, read_error := os.read_entire_file(path, context.temp_allocator); read_error == nil {
+		return load_embedded_png_texture(data)
+	}
+	fmt.eprintfln("Couldn't load sprite sheet \"%s\"; drawing it as a blank square instead.", name)
+	image := rl.GenImageColor(16, 24, rl.MAGENTA)
+	defer rl.UnloadImage(image)
+	texture := rl.LoadTextureFromImage(image)
+	rl.SetTextureFilter(texture, .POINT)
+	return texture
+}
 
 // A tiny shader for sprites. Normally even fully see-through pixels hide whatever is
 // drawn behind them later (the graphics card still records their depth), which would
@@ -129,7 +155,7 @@ Scene :: struct {
 	travel_adjacent_only:   bool,               // stop next to travel_destination (an NPC or chest) instead of walking onto it
 
 	// Things only needed for drawing
-	creature_sprites:          [Creature_Kind]rl.Texture2D,
+	creature_sprites:          map[string]rl.Texture2D, // keyed by sprite_sheet file name, shared across kinds that use the same one
 	item_icons:                rl.Texture2D,
 	object_sprites:            rl.Texture2D, // corpses and chests
 	tree_sprites:              rl.Texture2D, // trees and bushes
@@ -167,7 +193,7 @@ main :: proc() {
 	rl.SetExitKey(.KEY_NULL) // Esc opens the menu instead of closing the window
 	install_click_catcher()  // so quick trackpad taps count as clicks
 
-	load_content() // villagers, quests and named creatures, from assets/content.json
+	load_content() // creatures, items, villagers, quests and named creatures, from assets/content.json
 
 	scene: Scene
 	init_sound_system(&scene.sound)
@@ -181,12 +207,16 @@ main :: proc() {
 		delete_effects(&scene.effects)
 	}
 
-	scene.creature_sprites = {
-		.Adventurer = load_embedded_png_texture(ADVENTURER_SHEET_PNG),
-		.Goblin     = load_embedded_png_texture(GOBLIN_SHEET_PNG),
-		.Ogre       = load_embedded_png_texture(OGRE_SHEET_PNG),
+	scene.creature_sprites = make(map[string]rl.Texture2D)
+	for definition in CREATURES {
+		if definition.sprite_sheet not_in scene.creature_sprites {
+			scene.creature_sprites[definition.sprite_sheet] = load_creature_sprite_sheet(definition.sprite_sheet)
+		}
 	}
-	defer for sprite_sheet in scene.creature_sprites do rl.UnloadTexture(sprite_sheet)
+	defer {
+		for _, sprite_sheet in scene.creature_sprites do rl.UnloadTexture(sprite_sheet)
+		delete(scene.creature_sprites)
+	}
 	scene.item_icons = load_embedded_png_texture(ITEM_ICONS_PNG)
 	scene.object_sprites = load_embedded_png_texture(OBJECTS_PNG)
 	scene.tree_sprites = load_embedded_png_texture(TREES_PNG)
@@ -562,7 +592,7 @@ draw_container :: proc(scene: ^Scene, container: ^Container, camera: rl.Camera3D
 		// A pile of dropped things is drawn as the icon of whatever lies on top.
 		if len(container.items) == 0 do return
 		texture = scene.item_icons
-		source.x = f32(container.items[len(container.items) - 1].kind) * 16
+		source.x = f32(ITEMS[container.items[len(container.items) - 1].kind].icon_column) * 16
 	}
 	size := rl.Vector2{source.width, source.height * upright_stretch(camera)}
 

@@ -70,6 +70,14 @@ TILES_PNG            :: #load("assets/tiles.png")
 ADVENTURER_SHEET_PNG :: #load("assets/adventurer_sheet.png")
 GOBLIN_SHEET_PNG     :: #load("assets/goblin_sheet.png")
 OGRE_SHEET_PNG       :: #load("assets/ogre_sheet.png")
+RAT_SHEET_PNG        :: #load("assets/rat_sheet.png")
+BAT_SHEET_PNG        :: #load("assets/bat_sheet.png")
+SPIDER_SHEET_PNG     :: #load("assets/spider_sheet.png")
+SLIME_SHEET_PNG      :: #load("assets/slime_sheet.png")
+MUSHROOM_SHEET_PNG   :: #load("assets/mushroom_sheet.png")
+SKELETON_SHEET_PNG   :: #load("assets/skeleton_sheet.png")
+TROLL_SHEET_PNG      :: #load("assets/troll_sheet.png")
+GOLEM_SHEET_PNG      :: #load("assets/golem_sheet.png")
 ITEM_ICONS_PNG       :: #load("assets/item_icons.png")
 OBJECTS_PNG          :: #load("assets/objects.png") // corpses and chests
 TREES_PNG            :: #load("assets/trees.png") // trees and bushes on forest tiles
@@ -81,12 +89,22 @@ PORTAL_PNG           :: #load("assets/portal.png") // a Scroll of Town Portal's 
 // A creature names its own sheet in content.json (Creature_Definition.sprite_sheet):
 // built-in ones are compiled in below and shared by name; anything else is read from
 // assets/ next to the program at startup, so a new creature can bring its own art
-// without a recompile. See DESIGN_DATA_DRIVEN.md.
+// without a recompile. See DESIGN_DATA_DRIVEN.md. Everything the game ships with is
+// built in, the same as every other piece of art and sound (release builds are one
+// self-contained executable, see release.yml) — assets/ is for what's added later.
 Builtin_Sheet :: struct { name: string, bytes: []u8 }
 BUILTIN_CREATURE_SHEETS := [?]Builtin_Sheet {
 	{"adventurer_sheet.png", ADVENTURER_SHEET_PNG},
 	{"goblin_sheet.png",     GOBLIN_SHEET_PNG},
 	{"ogre_sheet.png",       OGRE_SHEET_PNG},
+	{"rat_sheet.png",        RAT_SHEET_PNG},
+	{"bat_sheet.png",        BAT_SHEET_PNG},
+	{"spider_sheet.png",     SPIDER_SHEET_PNG},
+	{"slime_sheet.png",      SLIME_SHEET_PNG},
+	{"mushroom_sheet.png",   MUSHROOM_SHEET_PNG},
+	{"skeleton_sheet.png",   SKELETON_SHEET_PNG},
+	{"troll_sheet.png",      TROLL_SHEET_PNG},
+	{"golem_sheet.png",      GOLEM_SHEET_PNG},
 }
 
 load_creature_sprite_sheet :: proc(name: string) -> rl.Texture2D {

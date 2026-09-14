@@ -76,8 +76,10 @@ Content_Behaviour :: struct {
 }
 
 // One entry of Creature_Definition.loot (see Loot_Table_Entry in items.odin).
+// Either `item` or `choices` is set, never both.
 Content_Loot_Entry :: struct {
 	item:          string,
+	choices:       []string,
 	chance:        f32,
 	min:           int,
 	max:           int,
@@ -268,14 +270,26 @@ apply_content :: proc(data: []u8) -> (ok: bool) {
 
 		loot := make([dynamic]Loot_Table_Entry)
 		for listed in entry.loot {
-			item := find_item(listed.item, "loot item") or_continue
-			append(&loot, Loot_Table_Entry {
-				item          = item,
+			table_entry := Loot_Table_Entry {
 				chance        = listed.chance,
 				min           = listed.min,
 				max           = listed.max,
 				max_per_depth = listed.max_per_depth,
-			})
+			}
+			if len(listed.choices) > 0 {
+				choices := make([dynamic]Item_Kind)
+				all_found := true
+				for choice_id in listed.choices {
+					choice, found := find_item(choice_id, "loot choice")
+					if !found { all_found = false; break }
+					append(&choices, choice)
+				}
+				if !all_found do continue
+				table_entry.choices = choices[:]
+			} else {
+				table_entry.item = find_item(listed.item, "loot item") or_continue
+			}
+			append(&loot, table_entry)
 		}
 		definition.loot = loot[:]
 
@@ -363,6 +377,14 @@ resolve_known_content :: proc() {
 	ADVENTURER = find_creature("Adventurer", "creature id") or_else 0
 	GOBLIN     = find_creature("Goblin", "creature id") or_else 0
 	OGRE       = find_creature("Ogre", "creature id") or_else 0
+	RAT        = find_creature("Rat", "creature id") or_else 0
+	BAT        = find_creature("Bat", "creature id") or_else 0
+	SPIDER     = find_creature("Spider", "creature id") or_else 0
+	SLIME      = find_creature("Slime", "creature id") or_else 0
+	MUSHROOM   = find_creature("Mushroom", "creature id") or_else 0
+	SKELETON   = find_creature("Skeleton", "creature id") or_else 0
+	TROLL      = find_creature("Troll", "creature id") or_else 0
+	GOLEM      = find_creature("Golem", "creature id") or_else 0
 
 	GOLD               = find_item("Gold", "item id") or_else 0
 	HEALING_POTION     = find_item("Healing_Potion", "item id") or_else 0
@@ -372,6 +394,13 @@ resolve_known_content :: proc() {
 	LONGSWORD          = find_item("Longsword", "item id") or_else 0
 	CHAIN_SHIRT        = find_item("Chain_Shirt", "item id") or_else 0
 	GOBLIN_DAGGER      = find_item("Goblin_Dagger", "item id") or_else 0
+	HAND_AXE           = find_item("Hand_Axe", "item id") or_else 0
+	MACE               = find_item("Mace", "item id") or_else 0
+	WAR_HAMMER         = find_item("War_Hammer", "item id") or_else 0
+	SPEAR              = find_item("Spear", "item id") or_else 0
+	RAPIER             = find_item("Rapier", "item id") or_else 0
+	WOODEN_SHIELD      = find_item("Wooden_Shield", "item id") or_else 0
+	HELMET             = find_item("Helmet", "item id") or_else 0
 }
 
 // Copies a string out of the temporary JSON data, so it stays valid for the whole run.

@@ -198,6 +198,580 @@
      "max_per_depth": 0
     }
    ]
+  },
+  {
+   "id": "Rat",
+   "name": "giant rat",
+   "article": "a rat",
+   "sprite_sheet": "rat_sheet.png",
+   "corpse": "Rat_Corpse",
+   "attack_verb": "bites",
+   "frame_size": [
+    20,
+    16
+   ],
+   "footprint": "single",
+   "shadow_radius": 5,
+   "blood_color": [
+    140,
+    60,
+    40,
+    255
+   ],
+   "damage_dice": {
+    "count": 1,
+    "sides": 2,
+    "bonus": 0
+   },
+   "armor": 0,
+   "max_hit_points": 4,
+   "strength": 6,
+   "dexterity": 14,
+   "constitution": 6,
+   "default_stance": "Aggressive",
+   "weapon_weight": "Light",
+   "armor_weight": "Light",
+   "walk_seconds": 0.25,
+   "attack_seconds": 0.35,
+   "knockback_distance": 2,
+   "turns_between_actions": 1,
+   "shakes_screen_on_hit": false,
+   "weapon_sound": "Light",
+   "hurt_sound": "Hurt_Goblin",
+   "death_sound": "Death_Goblin",
+   "behaviours": [
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 8
+    },
+    {
+     "kind": "Wander",
+     "chance": 0.5
+    }
+   ],
+   "loot": [
+    {
+     "item": "Gold",
+     "choices": [],
+     "chance": 0.3,
+     "min": 1,
+     "max": 3,
+     "max_per_depth": 0
+    }
+   ]
+  },
+  {
+   "id": "Bat",
+   "name": "cave bat",
+   "article": "a bat",
+   "sprite_sheet": "bat_sheet.png",
+   "corpse": "Bat_Corpse",
+   "attack_verb": "bites",
+   "frame_size": [
+    18,
+    16
+   ],
+   "footprint": "single",
+   "shadow_radius": 5,
+   "blood_color": [
+    110,
+    60,
+    90,
+    255
+   ],
+   "damage_dice": {
+    "count": 1,
+    "sides": 3,
+    "bonus": 0
+   },
+   "armor": 0,
+   "max_hit_points": 6,
+   "strength": 6,
+   "dexterity": 16,
+   "constitution": 6,
+   "default_stance": "Neutral",
+   "weapon_weight": "Light",
+   "armor_weight": "Light",
+   "walk_seconds": 0.2,
+   "attack_seconds": 0.3,
+   "knockback_distance": 3,
+   "turns_between_actions": 1,
+   "shakes_screen_on_hit": false,
+   "weapon_sound": "Light",
+   "hurt_sound": "Hurt_Goblin",
+   "death_sound": "Death_Goblin",
+   "behaviours": [
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 9
+    },
+    {
+     "kind": "Wander",
+     "chance": 0.6
+    }
+   ],
+   "loot": [
+    {
+     "item": "Gold",
+     "choices": [],
+     "chance": 0.3,
+     "min": 1,
+     "max": 4,
+     "max_per_depth": 0
+    }
+   ]
+  },
+  {
+   "id": "Spider",
+   "name": "cave spider",
+   "article": "a spider",
+   "sprite_sheet": "spider_sheet.png",
+   "corpse": "Spider_Corpse",
+   "attack_verb": "bites",
+   "frame_size": [
+    22,
+    18
+   ],
+   "footprint": "single",
+   "shadow_radius": 6,
+   "blood_color": [
+    70,
+    55,
+    95,
+    255
+   ],
+   "damage_dice": {
+    "count": 1,
+    "sides": 6,
+    "bonus": 0
+   },
+   "armor": 0,
+   "max_hit_points": 8,
+   "strength": 9,
+   "dexterity": 16,
+   "constitution": 8,
+   "default_stance": "Aggressive",
+   "weapon_weight": "Light",
+   "armor_weight": "Light",
+   "walk_seconds": 0.3,
+   "attack_seconds": 0.4,
+   "knockback_distance": 3,
+   "turns_between_actions": 1,
+   "shakes_screen_on_hit": false,
+   "weapon_sound": "Light",
+   "hurt_sound": "Hurt_Goblin",
+   "death_sound": "Death_Goblin",
+   "behaviours": [
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 6
+    },
+    {
+     "kind": "Wander",
+     "chance": 0.3
+    }
+   ],
+   "loot": [
+    {
+     "item": "Gold",
+     "choices": [],
+     "chance": 0.4,
+     "min": 2,
+     "max": 6,
+     "max_per_depth": 1
+    },
+    {
+     "item": "Antidote",
+     "choices": [],
+     "chance": 0.15,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    }
+   ]
+  },
+  {
+   "id": "Slime",
+   "name": "slime",
+   "article": "a slime",
+   "sprite_sheet": "slime_sheet.png",
+   "corpse": "Slime_Corpse",
+   "attack_verb": "engulfs",
+   "frame_size": [
+    18,
+    14
+   ],
+   "footprint": "single",
+   "shadow_radius": 7,
+   "blood_color": [
+    90,
+    190,
+    120,
+    255
+   ],
+   "damage_dice": {
+    "count": 1,
+    "sides": 4,
+    "bonus": 1
+   },
+   "armor": 1,
+   "max_hit_points": 14,
+   "strength": 10,
+   "dexterity": 6,
+   "constitution": 14,
+   "default_stance": "Defensive",
+   "weapon_weight": "Medium",
+   "armor_weight": "Heavy",
+   "walk_seconds": 0.5,
+   "attack_seconds": 0.6,
+   "knockback_distance": 1,
+   "turns_between_actions": 2,
+   "shakes_screen_on_hit": false,
+   "weapon_sound": "Heavy",
+   "hurt_sound": "Hurt_Goblin",
+   "death_sound": "Death_Goblin",
+   "behaviours": [
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 4
+    },
+    {
+     "kind": "Wander",
+     "chance": 0.2
+    }
+   ],
+   "loot": [
+    {
+     "item": "Gold",
+     "choices": [],
+     "chance": 0.5,
+     "min": 3,
+     "max": 8,
+     "max_per_depth": 1
+    }
+   ]
+  },
+  {
+   "id": "Mushroom",
+   "name": "mushroom walker",
+   "article": "a mushroom",
+   "sprite_sheet": "mushroom_sheet.png",
+   "corpse": "Mushroom_Corpse",
+   "attack_verb": "lashes",
+   "frame_size": [
+    16,
+    22
+   ],
+   "footprint": "single",
+   "shadow_radius": 6,
+   "blood_color": [
+    200,
+    180,
+    140,
+    255
+   ],
+   "damage_dice": {
+    "count": 1,
+    "sides": 6,
+    "bonus": 0
+   },
+   "armor": 0,
+   "max_hit_points": 10,
+   "strength": 8,
+   "dexterity": 8,
+   "constitution": 12,
+   "default_stance": "Neutral",
+   "weapon_weight": "Medium",
+   "armor_weight": "Medium",
+   "walk_seconds": 0.4,
+   "attack_seconds": 0.5,
+   "knockback_distance": 2,
+   "turns_between_actions": 1,
+   "shakes_screen_on_hit": false,
+   "weapon_sound": "Light",
+   "hurt_sound": "Hurt_Goblin",
+   "death_sound": "Death_Goblin",
+   "behaviours": [
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 2
+    },
+    {
+     "kind": "Wander",
+     "chance": 0.05
+    }
+   ],
+   "loot": [
+    {
+     "item": "Healing_Potion",
+     "choices": [],
+     "chance": 0.35,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    },
+    {
+     "item": "Antidote",
+     "choices": [],
+     "chance": 0.2,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    }
+   ]
+  },
+  {
+   "id": "Skeleton",
+   "name": "skeleton",
+   "article": "a skeleton",
+   "sprite_sheet": "skeleton_sheet.png",
+   "corpse": "Skeleton_Corpse",
+   "attack_verb": "slashes",
+   "frame_size": [
+    16,
+    24
+   ],
+   "footprint": "single",
+   "shadow_radius": 6,
+   "blood_color": [
+    210,
+    205,
+    190,
+    255
+   ],
+   "damage_dice": {
+    "count": 1,
+    "sides": 6,
+    "bonus": 1
+   },
+   "armor": 1,
+   "max_hit_points": 14,
+   "strength": 13,
+   "dexterity": 12,
+   "constitution": 10,
+   "default_stance": "Neutral",
+   "weapon_weight": "Medium",
+   "armor_weight": "Medium",
+   "walk_seconds": 0.3,
+   "attack_seconds": 0.5,
+   "knockback_distance": 3,
+   "turns_between_actions": 1,
+   "shakes_screen_on_hit": false,
+   "weapon_sound": "Blade",
+   "hurt_sound": "Hurt_Goblin",
+   "death_sound": "Death_Goblin",
+   "behaviours": [
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 7
+    }
+   ],
+   "loot": [
+    {
+     "item": "Gold",
+     "choices": [],
+     "chance": 1.0,
+     "min": 4,
+     "max": 10,
+     "max_per_depth": 1
+    },
+    {
+     "item": "",
+     "choices": [
+      "Hand_Axe",
+      "Spear",
+      "Rapier"
+     ],
+     "chance": 0.2,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    },
+    {
+     "item": "",
+     "choices": [
+      "Wooden_Shield",
+      "Helmet"
+     ],
+     "chance": 0.15,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    }
+   ]
+  },
+  {
+   "id": "Troll",
+   "name": "cave troll",
+   "article": "a troll",
+   "sprite_sheet": "troll_sheet.png",
+   "corpse": "Troll_Corpse",
+   "attack_verb": "claws",
+   "frame_size": [
+    40,
+    52
+   ],
+   "footprint": "triangle",
+   "shadow_radius": 16,
+   "blood_color": [
+    90,
+    110,
+    60,
+    255
+   ],
+   "damage_dice": {
+    "count": 2,
+    "sides": 6,
+    "bonus": 0
+   },
+   "armor": 0,
+   "max_hit_points": 30,
+   "strength": 20,
+   "dexterity": 8,
+   "constitution": 18,
+   "default_stance": "Aggressive",
+   "weapon_weight": "Heavy",
+   "armor_weight": "Heavy",
+   "walk_seconds": 0.4,
+   "attack_seconds": 0.7,
+   "knockback_distance": 2,
+   "turns_between_actions": 2,
+   "shakes_screen_on_hit": true,
+   "weapon_sound": "Heavy",
+   "hurt_sound": "Hurt_Ogre",
+   "death_sound": "Death_Ogre",
+   "behaviours": [
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 8
+    }
+   ],
+   "loot": [
+    {
+     "item": "Gold",
+     "choices": [],
+     "chance": 1.0,
+     "min": 15,
+     "max": 30,
+     "max_per_depth": 2
+    },
+    {
+     "item": "Healing_Potion",
+     "choices": [],
+     "chance": 0.4,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    },
+    {
+     "item": "",
+     "choices": [
+      "War_Hammer",
+      "Mace"
+     ],
+     "chance": 0.3,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    }
+   ]
+  },
+  {
+   "id": "Golem",
+   "name": "stone golem",
+   "article": "a golem",
+   "sprite_sheet": "golem_sheet.png",
+   "corpse": "Golem_Corpse",
+   "attack_verb": "crushes",
+   "frame_size": [
+    44,
+    54
+   ],
+   "footprint": "triangle",
+   "shadow_radius": 17,
+   "blood_color": [
+    150,
+    148,
+    140,
+    255
+   ],
+   "damage_dice": {
+    "count": 2,
+    "sides": 6,
+    "bonus": 2
+   },
+   "armor": 3,
+   "max_hit_points": 40,
+   "strength": 20,
+   "dexterity": 4,
+   "constitution": 20,
+   "default_stance": "Neutral",
+   "weapon_weight": "Heavy",
+   "armor_weight": "Heavy",
+   "walk_seconds": 0.55,
+   "attack_seconds": 0.9,
+   "knockback_distance": 1,
+   "turns_between_actions": 3,
+   "shakes_screen_on_hit": true,
+   "weapon_sound": "Heavy",
+   "hurt_sound": "Hurt_Ogre",
+   "death_sound": "Death_Ogre",
+   "behaviours": [
+    {
+     "kind": "Melee_Attack"
+    },
+    {
+     "kind": "Chase_Player",
+     "notice_distance": 5
+    }
+   ],
+   "loot": [
+    {
+     "item": "Gold",
+     "choices": [],
+     "chance": 1.0,
+     "min": 20,
+     "max": 40,
+     "max_per_depth": 2
+    },
+    {
+     "item": "War_Hammer",
+     "choices": [],
+     "chance": 0.3,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    },
+    {
+     "item": "Helmet",
+     "choices": [],
+     "chance": 0.25,
+     "min": 0,
+     "max": 0,
+     "max_per_depth": 0
+    }
+   ]
   }
  ],
  "named_creatures": [
@@ -1008,6 +1582,156 @@
     {
      "kind": "Gold",
      "count": 33
+    }
+   ]
+  },
+  {
+   "id": "Korrath",
+   "name": "Korrath",
+   "title": "the Unbroken",
+   "kind": "Golem",
+   "depth": 29,
+   "max_hit_points": 92,
+   "damage_dice": {
+    "count": 3,
+    "sides": 4,
+    "bonus": 6
+   },
+   "armor": 5,
+   "tint": [
+    180,
+    200,
+    160,
+    255
+   ],
+   "trophy": [
+    {
+     "kind": "Korrath_Charm",
+     "count": 1
+    },
+    {
+     "kind": "Gold",
+     "count": 34
+    }
+   ]
+  },
+  {
+   "id": "Vaelor",
+   "name": "Vaelor",
+   "title": "the Deathless",
+   "kind": "Skeleton",
+   "depth": 30,
+   "max_hit_points": 95,
+   "damage_dice": {
+    "count": 3,
+    "sides": 4,
+    "bonus": 7
+   },
+   "armor": 6,
+   "tint": [
+    190,
+    210,
+    255,
+    255
+   ],
+   "trophy": [
+    {
+     "kind": "Vaelor_Charm",
+     "count": 1
+    },
+    {
+     "kind": "Gold",
+     "count": 35
+    }
+   ]
+  },
+  {
+   "id": "Mossback",
+   "name": "Mossback",
+   "title": "the Ancient",
+   "kind": "Troll",
+   "depth": 31,
+   "max_hit_points": 98,
+   "damage_dice": {
+    "count": 3,
+    "sides": 4,
+    "bonus": 7
+   },
+   "armor": 6,
+   "tint": [
+    140,
+    190,
+    110,
+    255
+   ],
+   "trophy": [
+    {
+     "kind": "Mossback_Charm",
+     "count": 1
+    },
+    {
+     "kind": "Gold",
+     "count": 36
+    }
+   ]
+  },
+  {
+   "id": "Sorrow",
+   "name": "Sorrow",
+   "title": "the Whispering Dead",
+   "kind": "Skeleton",
+   "depth": 32,
+   "max_hit_points": 101,
+   "damage_dice": {
+    "count": 3,
+    "sides": 4,
+    "bonus": 8
+   },
+   "armor": 6,
+   "tint": [
+    225,
+    210,
+    255,
+    255
+   ],
+   "trophy": [
+    {
+     "kind": "Sorrow_Charm",
+     "count": 1
+    },
+    {
+     "kind": "Gold",
+     "count": 37
+    }
+   ]
+  },
+  {
+   "id": "Aurek",
+   "name": "Aurek",
+   "title": "the Last Sentinel",
+   "kind": "Golem",
+   "depth": 33,
+   "max_hit_points": 104,
+   "damage_dice": {
+    "count": 3,
+    "sides": 4,
+    "bonus": 8
+   },
+   "armor": 7,
+   "tint": [
+    150,
+    140,
+    150,
+    255
+   ],
+   "trophy": [
+    {
+     "kind": "Aurek_Charm",
+     "count": 1
+    },
+    {
+     "kind": "Gold",
+     "count": 38
     }
    ]
   }
@@ -1881,6 +2605,101 @@
     "Krenn down. One less name on my list.",
     "Bounty's yours, paid in full."
    ]
+  },
+  {
+   "id": "Slay_Korrath",
+   "giver": "Elder",
+   "title": "Slay Korrath (depth 29)",
+   "requires": "Slay_Threk",
+   "wanted_item": "Korrath_Charm",
+   "reward_gold": 136,
+   "offer": [
+    "A golem has woken in the deep dark,",
+    "depth 29, stone given cruel purpose.",
+    "End it, and the village will finally",
+    "believe the depths can be tamed."
+   ],
+   "reminder": "Korrath still stands, depth 29. Stone doesn't tire.",
+   "thanks": [
+    "Korrath, broken at last. Rubble now.",
+    "You've more than earned this, truly."
+   ]
+  },
+  {
+   "id": "Slay_Vaelor",
+   "giver": "Smith",
+   "title": "Slay Vaelor (depth 30)",
+   "requires": "Slay_Molgar",
+   "wanted_item": "Vaelor_Charm",
+   "reward_gold": 140,
+   "offer": [
+    "Vaelor was a smith too, once, before",
+    "the depths remade him into bone and",
+    "rust at depth 30. Put him down, and",
+    "bring back what's left of his craft."
+   ],
+   "reminder": "Vaelor waits at depth 30, still swinging that ruined blade.",
+   "thanks": [
+    "So the old smith finally rests. Good.",
+    "Take this. He'd have wanted you to."
+   ]
+  },
+  {
+   "id": "Slay_Mossback",
+   "giver": "Hunter",
+   "title": "Slay Mossback (depth 31)",
+   "requires": "Slay_Hollow",
+   "wanted_item": "Mossback_Charm",
+   "reward_gold": 144,
+   "offer": [
+    "Mossback has haunted depth 31 longer",
+    "than I've hunted. Moss-backed, ancient,",
+    "and mean. Bring it down, and I'll call",
+    "my hunting done for good."
+   ],
+   "reminder": "Mossback's still out there, depth 31. Old and vicious.",
+   "thanks": [
+    "Ha! The old beast finally fell.",
+    "This is the last bounty I'll ever pay."
+   ]
+  },
+  {
+   "id": "Slay_Sorrow",
+   "giver": "Priestess",
+   "title": "Slay Sorrow (depth 32)",
+   "requires": "Slay_Uldrath",
+   "wanted_item": "Sorrow_Charm",
+   "reward_gold": 148,
+   "offer": [
+    "Something grieves at depth 32, and its",
+    "grief has teeth. Sorrow, the whispering",
+    "dead call it. Silence it, and bring",
+    "back proof so it may finally rest."
+   ],
+   "reminder": "Sorrow still weeps and kills at depth 32. It must be silenced.",
+   "thanks": [
+    "Sorrow is quiet now. At peace, I hope.",
+    "Take this. The Light remembers kindness."
+   ]
+  },
+  {
+   "id": "Slay_Aurek",
+   "giver": "Guard_Captain",
+   "title": "Slay Aurek (depth 33)",
+   "requires": "Slay_Krenn",
+   "wanted_item": "Aurek_Charm",
+   "reward_gold": 152,
+   "offer": [
+    "Aurek, the Last Sentinel, guards depth",
+    "33 for a war long since lost. It will",
+    "kill anything that passes. End it, and",
+    "the bounty's the largest I've ever posted."
+   ],
+   "reminder": "Aurek still guards depth 33. Biggest bounty on my board.",
+   "thanks": [
+    "Aurek down. I didn't think anyone could.",
+    "Full bounty, and my respect besides."
+   ]
   }
  ],
  "items": [
@@ -2583,6 +3402,279 @@
    "category": "Quest_Item",
    "icon_column": 33,
    "flavor": "Crowned still with a dented iron circlet.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Hand_Axe",
+   "name": "Hand axe",
+   "category": "Weapon",
+   "icon_column": 34,
+   "flavor": "A woodsman's axe, better suited to war than wood.",
+   "damage_dice": {
+    "count": 1,
+    "sides": 8,
+    "bonus": 0
+   },
+   "weight": "Medium",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": "Blade"
+  },
+  {
+   "id": "Mace",
+   "name": "Mace",
+   "category": "Weapon",
+   "icon_column": 35,
+   "flavor": "Blunt, honest, and hard to parry.",
+   "damage_dice": {
+    "count": 1,
+    "sides": 6,
+    "bonus": 2
+   },
+   "weight": "Medium",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": "Heavy"
+  },
+  {
+   "id": "War_Hammer",
+   "name": "War hammer",
+   "category": "Weapon",
+   "icon_column": 36,
+   "flavor": "Two hands, one devastating idea.",
+   "damage_dice": {
+    "count": 2,
+    "sides": 6,
+    "bonus": 0
+   },
+   "weight": "Heavy",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": "Heavy"
+  },
+  {
+   "id": "Spear",
+   "name": "Spear",
+   "category": "Weapon",
+   "icon_column": 37,
+   "flavor": "Keeps something dangerous at a distance.",
+   "damage_dice": {
+    "count": 1,
+    "sides": 8,
+    "bonus": 1
+   },
+   "weight": "Medium",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": "Blade"
+  },
+  {
+   "id": "Rapier",
+   "name": "Rapier",
+   "category": "Weapon",
+   "icon_column": 38,
+   "flavor": "Quick, precise, made for the riposte.",
+   "damage_dice": {
+    "count": 1,
+    "sides": 6,
+    "bonus": 1
+   },
+   "weight": "Light",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": "Blade"
+  },
+  {
+   "id": "Wooden_Shield",
+   "name": "Wooden shield",
+   "category": "Armor",
+   "icon_column": 39,
+   "flavor": "A merchant's leftover stock, better than nothing.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 1,
+   "armor_weight": "Light",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Helmet",
+   "name": "Helmet",
+   "category": "Armor",
+   "icon_column": 40,
+   "flavor": "Iron over your skull; the rest you trust to speed.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 2,
+   "armor_weight": "Light",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Antidote",
+   "name": "Antidote",
+   "category": "Potion",
+   "icon_column": 41,
+   "flavor": "Bitter and medicinal. Steadies whatever ails you.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 1,
+    "sides": 8,
+    "bonus": 2
+   },
+   "sound": ""
+  },
+  {
+   "id": "Korrath_Charm",
+   "name": "Korrath's charm",
+   "category": "Quest_Item",
+   "icon_column": 42,
+   "flavor": "Carved bone, still warm from the stone that wore it.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Vaelor_Charm",
+   "name": "Vaelor's charm",
+   "category": "Quest_Item",
+   "icon_column": 43,
+   "flavor": "Strung on old cord, the knots tied by a smith's hands.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Mossback_Charm",
+   "name": "Mossback's charm",
+   "category": "Quest_Item",
+   "icon_column": 44,
+   "flavor": "Slick with moss, ancient long before you were born.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Sorrow_Charm",
+   "name": "Sorrow's charm",
+   "category": "Quest_Item",
+   "icon_column": 45,
+   "flavor": "It doesn't feel like bone anymore. It feels like grief.",
+   "damage_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "weight": "",
+   "armor": 0,
+   "armor_weight": "",
+   "heal_dice": {
+    "count": 0,
+    "sides": 0,
+    "bonus": 0
+   },
+   "sound": ""
+  },
+  {
+   "id": "Aurek_Charm",
+   "name": "Aurek's charm",
+   "category": "Quest_Item",
+   "icon_column": 46,
+   "flavor": "The rune on it is still faintly warm to the touch.",
    "damage_dice": {
     "count": 0,
     "sides": 0,

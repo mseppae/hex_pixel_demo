@@ -306,9 +306,27 @@ place_monsters :: proc(scene: ^Scene, level: ^Level, depth: int, generator: runt
 	// Big creatures first, while there's still room for their footprint.
 	ogre_count := (depth + 1) / 2
 	goblin_count := min(1 + depth, 6)
+	// The rest of the difficulty curve: weak filler early, tougher kinds cut in as
+	// the depth grows, the two biggest (triangle-footprint, like the ogre) rarest.
+	troll_count := max(0, (depth - 8) / 4)
+	golem_count := max(0, (depth - 15) / 6)
+	skeleton_count := max(0, (depth - 3) / 2)
+	spider_count := min(1 + depth / 3, 4)
+	slime_count := min(depth / 3, 3)
+	mushroom_count := min(depth / 3, 3)
+	bat_count := min(depth / 2, 4)
+	rat_count := min(1 + depth / 2, 5)
 	kinds_to_place := make([dynamic]Creature_Kind, context.temp_allocator)
+	for _ in 0 ..< golem_count do append(&kinds_to_place, GOLEM)
+	for _ in 0 ..< troll_count do append(&kinds_to_place, TROLL)
 	for _ in 0 ..< ogre_count do append(&kinds_to_place, OGRE)
+	for _ in 0 ..< skeleton_count do append(&kinds_to_place, SKELETON)
 	for _ in 0 ..< goblin_count do append(&kinds_to_place, GOBLIN)
+	for _ in 0 ..< spider_count do append(&kinds_to_place, SPIDER)
+	for _ in 0 ..< slime_count do append(&kinds_to_place, SLIME)
+	for _ in 0 ..< mushroom_count do append(&kinds_to_place, MUSHROOM)
+	for _ in 0 ..< bat_count do append(&kinds_to_place, BAT)
+	for _ in 0 ..< rat_count do append(&kinds_to_place, RAT)
 
 	// A named creature lives on its own depth, unless it has already been slain.
 	for named in Named_Creature {

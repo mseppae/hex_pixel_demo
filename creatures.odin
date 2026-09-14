@@ -59,7 +59,10 @@ creature_index_by_id: map[string]Creature_Kind
 // The handful of creatures the game itself refers to by name, resolved once right
 // after content loads (see resolve_known_content in content.odin). A missing one means
 // the built-in content.json itself is broken, which load_content already warns about.
+// (The depth-based spawn counts in level.odin are the reason the newer kinds are here
+// too — not because anything about them is special.)
 ADVENTURER, GOBLIN, OGRE: Creature_Kind
+RAT, BAT, SPIDER, SLIME, MUSHROOM, SKELETON, TROLL, GOLEM: Creature_Kind
 
 // Looks up a creature by its content.json id. Used both for the few kinds the code
 // itself needs to name (see above) and, at content-load time, for anything that

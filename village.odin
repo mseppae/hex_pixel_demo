@@ -40,6 +40,14 @@ Named_Creature :: enum u8 {
 	Bruundor,
 	Vozgar,
 	Krenn,
+
+	// A second wave, deeper still, giving each villager one more bounty and putting
+	// the new creature kinds to use as bosses (appended at the end: see save.odin).
+	Korrath,
+	Vaelor,
+	Mossback,
+	Sorrow,
+	Aurek,
 }
 
 Named_Creature_Definition :: struct {
@@ -254,6 +262,13 @@ Quest_Id :: enum u8 {
 	Slay_Bruundor,
 	Slay_Vozgar,
 	Slay_Krenn,
+
+	// One more bounty per villager, deeper still (appended at the end: see save.odin).
+	Slay_Korrath,
+	Slay_Vaelor,
+	Slay_Mossback,
+	Slay_Sorrow,
+	Slay_Aurek,
 }
 
 Quest_State :: enum u8 {

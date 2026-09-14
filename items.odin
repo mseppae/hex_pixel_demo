@@ -65,6 +65,8 @@ item_index_by_id: map[string]Item_Kind
 // kit, and chest loot that isn't tied to any one creature.
 GOLD, HEALING_POTION, TOWN_PORTAL_SCROLL, SHORT_SWORD: Item_Kind
 LEATHER_ARMOR, LONGSWORD, CHAIN_SHIRT, GOBLIN_DAGGER: Item_Kind
+HAND_AXE, MACE, WAR_HAMMER, SPEAR, RAPIER: Item_Kind
+WOODEN_SHIELD, HELMET: Item_Kind
 
 item_kind_named :: proc(id: string) -> (kind: Item_Kind, found: bool) {
 	kind, found = item_index_by_id[id]
@@ -73,8 +75,11 @@ item_kind_named :: proc(id: string) -> (kind: Item_Kind, found: bool) {
 
 // One entry of a creature's loot table (see Creature_Definition.loot in creatures.odin
 // and roll_creature_loot below). Rolled independently: a creature can drop several.
+// Either `item` names what drops, or `choices` picks one at random among several
+// (a skeleton's weapon: an axe, a spear, or a rapier) — never both.
 Loot_Table_Entry :: struct {
 	item:          Item_Kind,
+	choices:       []Item_Kind,
 	chance:        f32, // 0..1
 	min:           int, // Gold only: the lowest amount
 	max:           int, // Gold only: the highest amount at depth 0
@@ -270,12 +275,18 @@ roll_creature_loot :: proc(kind: Creature_Kind, depth: int, loot: ^[dynamic]Item
 	generator := context.random_generator
 	for entry in CREATURES[kind].loot {
 		if rand.float32(generator) >= entry.chance do continue
+		item := random_item_from(entry.choices, generator) if len(entry.choices) > 0 else entry.item
 		count := 1
-		if ITEMS[entry.item].category == .Gold {
+		if ITEMS[item].category == .Gold {
 			count = random_between(entry.min, entry.max + entry.max_per_depth * depth, generator)
 		}
-		append(loot, Item_Stack{entry.item, count})
+		append(loot, Item_Stack{item, count})
 	}
+}
+
+// Picks one item from a short list, with the level's own generator.
+random_item_from :: proc(choices: []Item_Kind, generator: runtime.Random_Generator) -> Item_Kind {
+	return choices[random_between(0, len(choices) - 1, generator)]
 }
 
 // Chests are filled while the level is generated, with the level's own random
@@ -291,6 +302,12 @@ roll_chest_loot :: proc(depth: int, generator: runtime.Random_Generator, loot: ^
 	case:                             append(loot, Item_Stack{GOBLIN_DAGGER, 1})
 	}
 	if rand.float32(generator) < 0.3 do append(loot, Item_Stack{HEALING_POTION, 1})
+	if depth >= 3 && rand.float32(generator) < 0.2 {
+		append(loot, Item_Stack{random_item_from({HAND_AXE, MACE, WAR_HAMMER, SPEAR, RAPIER}, generator), 1})
+	}
+	if depth >= 4 && rand.float32(generator) < 0.15 {
+		append(loot, Item_Stack{random_item_from({WOODEN_SHIELD, HELMET}, generator), 1})
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -306,6 +323,17 @@ Container_Kind :: enum u8 {
 	Ogre_Corpse,
 	Chest,
 	Dropped_Items, // things you put down; drawn as the icon of what's on top
+	// The newer creatures have no corpse art of their own yet, so each reuses whichever
+	// existing silhouette is closest in size (single-hex or the ogre's triangle). Only
+	// the name shown in the loot panel is really theirs.
+	Rat_Corpse,
+	Bat_Corpse,
+	Spider_Corpse,
+	Slime_Corpse,
+	Mushroom_Corpse,
+	Skeleton_Corpse,
+	Troll_Corpse,
+	Golem_Corpse,
 }
 
 Container :: struct {
@@ -324,6 +352,16 @@ CONTAINER_SPRITE_REGIONS := [Container_Kind]rl.Rectangle {
 	.Ogre_Corpse       = {48, 0, 48, 24},
 	.Chest             = {0, 24, 20, 18}, // closed
 	.Dropped_Items     = {0, 0, 16, 16},  // the item's own icon, from item_icons.png
+	// Reused silhouettes (see the comment on Container_Kind): single-hex creatures
+	// borrow the goblin's corpse, the two big ones borrow the ogre's.
+	.Rat_Corpse        = {0, 0, 24, 12},
+	.Bat_Corpse        = {0, 0, 24, 12},
+	.Spider_Corpse     = {0, 0, 24, 12},
+	.Slime_Corpse      = {0, 0, 24, 12},
+	.Mushroom_Corpse   = {0, 0, 24, 12},
+	.Skeleton_Corpse   = {0, 0, 24, 12},
+	.Troll_Corpse      = {48, 0, 48, 24},
+	.Golem_Corpse      = {48, 0, 48, 24},
 }
 OPEN_CHEST_SPRITE_REGION :: rl.Rectangle{20, 24, 20, 18}
 
@@ -334,6 +372,14 @@ container_name :: proc(kind: Container_Kind) -> string {
 	case .Ogre_Corpse:       return "Ogre corpse"
 	case .Chest:             return "Chest"
 	case .Dropped_Items:     return "Dropped items"
+	case .Rat_Corpse:        return "Rat corpse"
+	case .Bat_Corpse:        return "Bat corpse"
+	case .Spider_Corpse:     return "Spider corpse"
+	case .Slime_Corpse:      return "Slime corpse"
+	case .Mushroom_Corpse:   return "Mushroom corpse"
+	case .Skeleton_Corpse:   return "Skeleton corpse"
+	case .Troll_Corpse:      return "Troll corpse"
+	case .Golem_Corpse:      return "Golem corpse"
 	}
 	return ""
 }
@@ -435,7 +481,8 @@ container_indices_at :: proc(level: ^Level, hex: hexgrid.Hex) -> [dynamic]int {
 }
 
 footprint_for_container :: proc(kind: Container_Kind) -> []hexgrid.Hex {
-	return TRIANGLE_FOOTPRINT[:] if kind == .Ogre_Corpse else SINGLE_HEX_FOOTPRINT[:]
+	is_triangle := kind == .Ogre_Corpse || kind == .Troll_Corpse || kind == .Golem_Corpse
+	return TRIANGLE_FOOTPRINT[:] if is_triangle else SINGLE_HEX_FOOTPRINT[:]
 }
 
 leave_corpse :: proc(scene: ^Scene, creature: ^Actor) {

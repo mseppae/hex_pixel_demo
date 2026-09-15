@@ -372,7 +372,7 @@ note_named_death :: proc(scene: ^Scene, creature: ^Actor) {
 // The dialogue panel
 // ---------------------------------------------------------------------------
 
-DIALOGUE_PANEL         :: rl.Rectangle{63, 52, 300, 132}
+DIALOGUE_PANEL         :: rl.Rectangle{10, 24, 300, 132}
 DIALOGUE_ACTION_BUTTON :: rl.Rectangle{DIALOGUE_PANEL.x + 8, DIALOGUE_PANEL.y + DIALOGUE_PANEL.height - 22, 110, 16}
 DIALOGUE_CLOSE_BUTTON  :: rl.Rectangle{DIALOGUE_PANEL.x + DIALOGUE_PANEL.width - 66, DIALOGUE_PANEL.y + DIALOGUE_PANEL.height - 22, 58, 16}
 

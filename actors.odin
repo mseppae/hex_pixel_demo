@@ -21,18 +21,6 @@ ATTACK_IMPACT             :: 0.6
 ATTACK_FOLLOW_THROUGH_END :: 0.85
 ATTACK_LUNGE_DISTANCE     :: 8.0 // world units = art pixels
 
-// Rows of the sprite sheet. Columns are the six directions.
-Pose :: enum {
-	Idle           = 0,
-	Walk_A         = 1,
-	Walk_B         = 2,
-	Attack_Wind_Up = 3,
-	Strike         = 4,
-}
-
-// Two steps per hex: left foot, stand, right foot, stand.
-WALK_CYCLE := [4]Pose{.Walk_A, .Idle, .Walk_B, .Idle}
-
 // Which hexes a creature covers, relative to its anchor hex (the `hex` field).
 SINGLE_HEX_FOOTPRINT := [1]hexgrid.Hex{{q = 0, r = 0}}
 // Three hexes in a triangle: the anchor, its east neighbor and its south-east neighbor.
@@ -95,6 +83,7 @@ Actor :: struct {
 	hurt_seconds_left:   f32,         // counts down after being hit
 	knockback_direction: rl.Vector3,  // which way the last hit pushed us
 	death_seconds:       f32,         // time since dying
+	visual_seconds:      f32,         // continuous clock for looping idle animation
 }
 
 // ---------------------------------------------------------------------------
@@ -172,6 +161,7 @@ start_attack :: proc(attacker, target: ^Actor, is_riposte := false) {
 
 update_actor :: proc(scene: ^Scene, actor: ^Actor, frame_seconds: f32) {
 	definition := CREATURES[actor.kind]
+	actor.visual_seconds += frame_seconds
 	actor.hurt_seconds_left = max(0, actor.hurt_seconds_left - frame_seconds)
 	if actor.is_dead {
 		actor.death_seconds += frame_seconds
@@ -204,7 +194,7 @@ update_actor :: proc(scene: ^Scene, actor: ^Actor, frame_seconds: f32) {
 
 // True while anything about this actor is still moving on screen.
 actor_is_animating :: proc(actor: ^Actor) -> bool {
-	still_dying := actor.is_dead && actor.death_seconds < DEATH_SECONDS
+	still_dying := actor.is_dead && actor.death_seconds < death_animation_seconds(&CREATURES[actor.kind])
 	return actor.action != .None || actor.hurt_seconds_left > 0 || still_dying
 }
 
@@ -249,19 +239,48 @@ attack_lunge_offset :: proc(progress: f32) -> f32 {
 	return ATTACK_LUNGE_DISTANCE * (1 - recover_progress)
 }
 
-actor_pose :: proc(actor: ^Actor) -> Pose {
-	definition := CREATURES[actor.kind]
-	switch actor.action {
-	case .None:
-	case .Walking:
-		progress := clamp(actor.action_seconds / definition.walk_seconds, 0, 0.999)
-		return WALK_CYCLE[int(progress * len(WALK_CYCLE))]
-	case .Attacking:
-		progress := actor.action_seconds / definition.attack_seconds
-		if progress < ATTACK_WIND_UP_END do return .Attack_Wind_Up
-		if progress < ATTACK_FOLLOW_THROUGH_END do return .Strike
+actor_animation_state :: proc(actor: ^Actor) -> Sprite_Animation_State {
+	if actor.is_dead do return .Death
+	if actor.hurt_seconds_left > 0 do return .Hurt
+	#partial switch actor.action {
+	case .Walking:   return .Walk
+	case .Attacking: return .Attack
 	}
 	return .Idle
+}
+
+actor_animation_seconds :: proc(actor: ^Actor) -> f32 {
+	if actor.is_dead do return actor.death_seconds
+	if actor.hurt_seconds_left > 0 do return HURT_SECONDS - actor.hurt_seconds_left
+	if actor.action != .None do return actor.action_seconds
+	return actor.visual_seconds
+}
+
+// A non-looping death sequence remains visible long enough for all its frames. The
+// legacy fade duration is retained as a minimum while old art is being migrated.
+death_animation_seconds :: proc(definition: ^Creature_Definition) -> f32 {
+	animation := definition.animations[.Death]
+	frame_count := len(animation.directions[0])
+	if !animation.loop && animation.fps > 0 && frame_count > 0 {
+		return max(DEATH_SECONDS, f32(frame_count) / animation.fps)
+	}
+	return DEATH_SECONDS
+}
+
+actor_sprite_frame :: proc(actor: ^Actor, direction: int) -> Sprite_Frame {
+	definition := &CREATURES[actor.kind]
+	animation := &definition.animations[actor_animation_state(actor)]
+	frames := animation.directions[direction]
+	// Content loading fills missing states from the legacy layout, so this guard only
+	// protects a malformed hot-loaded content file.
+	if len(frames) == 0 do return sprite_frame_at(0, 0, definition.frame_size.x, definition.frame_size.y)
+	frame_index := int(actor_animation_seconds(actor) * animation.fps)
+	if animation.loop {
+		frame_index %= len(frames)
+	} else {
+		frame_index = min(frame_index, len(frames) - 1)
+	}
+	return frames[frame_index]
 }
 
 // ---------------------------------------------------------------------------
@@ -283,7 +302,7 @@ draw_actor :: proc(scene: ^Scene, actor: ^Actor, camera: rl.Camera3D, light: f32
 	opacity: f32 = 1
 
 	if actor.is_dead {
-		death_progress := clamp(actor.death_seconds / DEATH_SECONDS, 0, 1)
+		death_progress := clamp(actor.death_seconds / death_animation_seconds(&definition), 0, 1)
 		if death_progress >= 1 do return
 		opacity = 1 - death_progress
 		feet_position.y -= 8 * death_progress // sinks into the floor while fading
@@ -298,20 +317,19 @@ draw_actor :: proc(scene: ^Scene, actor: ^Actor, camera: rl.Camera3D, light: f32
 	// so it's stretched taller by exactly that amount and the pixels come out square.
 	// (Leaning sprites back to face the camera also gives square pixels, but then a
 	// tall sprite's top reaches backward into any wall standing behind it.)
-	stretched_size := rl.Vector2{definition.frame_size.x, definition.frame_size.y * upright_stretch(camera)}
 	world_up := rl.Vector3{0, 1, 0}
 
 	column := sprite_frame_for(actor.facing, camera)
-	row := int(actor_pose(actor))
-	frame_in_sheet := rl.Rectangle {
-		f32(column) * definition.frame_size.x,
-		f32(row) * definition.frame_size.y,
-		definition.frame_size.x,
-		definition.frame_size.y,
+	frame_in_sheet := actor_sprite_frame(actor, column).source
+	stretched_size := rl.Vector2{frame_in_sheet.width, frame_in_sheet.height * upright_stretch(camera)}
+	// Raylib measures billboard origins from the bottom-left. Metadata measures the
+	// ground anchor from the canvas's upper-left, which is friendlier for artists.
+	ground_anchor := rl.Vector2{
+		definition.sprite_anchor.x,
+		stretched_size.y - definition.sprite_anchor.y * upright_stretch(camera),
 	}
-	bottom_center := rl.Vector2{stretched_size.x / 2, 0} // the feet touch feet_position
 
-	rl.DrawBillboardPro(camera, sprite_sheet, frame_in_sheet, feet_position, world_up, stretched_size, bottom_center, 0, rl.Fade(shade(actor.tint, light), opacity))
+	rl.DrawBillboardPro(camera, sprite_sheet, frame_in_sheet, feet_position, world_up, stretched_size, ground_anchor, 0, rl.Fade(shade(actor.tint, light), opacity))
 
 	// Hit flash: draw the same sprite again with additive blending, which adds its
 	// colors on top of themselves and pushes them toward white. No shader needed.
@@ -319,7 +337,7 @@ draw_actor :: proc(scene: ^Scene, actor: ^Actor, camera: rl.Camera3D, light: f32
 		flash_strength := actor.hurt_seconds_left / HURT_SECONDS
 		rl.BeginBlendMode(.ADDITIVE)
 		for _ in 0 ..< 2 {
-			rl.DrawBillboardPro(camera, sprite_sheet, frame_in_sheet, feet_position, world_up, stretched_size, bottom_center, 0, rl.Fade(rl.WHITE, flash_strength))
+			rl.DrawBillboardPro(camera, sprite_sheet, frame_in_sheet, feet_position, world_up, stretched_size, ground_anchor, 0, rl.Fade(rl.WHITE, flash_strength))
 		}
 		rl.EndBlendMode()
 	}

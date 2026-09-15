@@ -190,7 +190,7 @@ use_backpack_item :: proc(scene: ^Scene, slot_index: int) -> (used_a_turn: bool)
 		player.hit_points += healed
 		inventory.backpack[slot_index].count -= 1
 		if inventory.backpack[slot_index].count == 0 do ordered_remove(&inventory.backpack, slot_index)
-		add_floating_number(&scene.effects, footprint_center(player, player.hex), CREATURES[player.kind].frame_size.y + 16, healed, rl.GREEN, is_heal = true)
+		add_floating_number(&scene.effects, footprint_center(player, player.hex), sprite_height_above_ground(CREATURES[player.kind]) + 16, healed, rl.GREEN, is_heal = true)
 		set_message(scene, "You drink the %s and heal %d.", definition.name, healed)
 		return true
 	case .Weapon:

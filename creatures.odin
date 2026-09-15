@@ -15,6 +15,27 @@ import "hexgrid"
 // ranking list) stores the creature's `id` string instead — see save.odin.
 Creature_Kind :: int
 
+// Sprite directions are stored in hexgrid.Direction order: east, north-east,
+// north-west, west, south-west, south-east. A frame rectangle is measured in
+// texture pixels, so an atlas can pack frames independently of gameplay.
+Sprite_Frame :: struct {
+	source: rl.Rectangle,
+}
+
+Sprite_Animation :: struct {
+	fps:        f32,
+	loop:       bool,
+	directions: [6][dynamic]Sprite_Frame,
+}
+
+Sprite_Animation_State :: enum {
+	Idle,
+	Walk,
+	Attack,
+	Hurt,
+	Death,
+}
+
 Creature_Definition :: struct {
 	id:                    string, // matches content.json and what level tables, quests etc. refer to it by
 	name:                  string,
@@ -23,6 +44,10 @@ Creature_Definition :: struct {
 	corpse:                Container_Kind, // which existing corpse silhouette it leaves (see items.odin)
 	attack_verb:           string,
 	frame_size:            rl.Vector2,
+	// Anchor is in canvas pixels from the upper-left. It is the world/ground point,
+	// not necessarily the bottom-centre of transparent padding around the artwork.
+	sprite_anchor:         rl.Vector2,
+	animations:            [Sprite_Animation_State]Sprite_Animation,
 	footprint:             []hexgrid.Hex,
 	shadow_radius:         f32,
 	blood_color:           rl.Color,
@@ -70,6 +95,11 @@ RAT, BAT, SPIDER, SLIME, MUSHROOM, SKELETON, TROLL, GOLEM: Creature_Kind
 creature_kind_named :: proc(id: string) -> (kind: Creature_Kind, found: bool) {
 	kind, found = creature_index_by_id[id]
 	return
+}
+
+// Canvas padding below the feet must not make gameplay labels or effects float.
+sprite_height_above_ground :: proc(definition: Creature_Definition) -> f32 {
+	return definition.sprite_anchor.y
 }
 
 make_creature :: proc(kind: Creature_Kind, hex: hexgrid.Hex) -> Actor {

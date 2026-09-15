@@ -1,7 +1,7 @@
 package main
 
 // The inventory and loot panels. They're drawn into the same small image as the
-// game (426 x 240), so icons and text get the same big pixels as everything else.
+// game (320 x 180), so icons and text get the same big pixels as everything else.
 // All positions here are in that small image's pixels.
 
 import "core:fmt"
@@ -29,9 +29,11 @@ TEXT_COLOR        :: rl.Color{236, 230, 214, 255}
 DIM_TEXT_COLOR    :: rl.Color{150, 144, 130, 255}
 GOLD_TEXT_COLOR   :: rl.Color{248, 226, 122, 255}
 
-INVENTORY_PANEL  :: rl.Rectangle{83, 40, 260, 176} // 20px taller than before, for the attributes/stance lines
-LOOT_PANEL       :: rl.Rectangle{83, 52, 260, 128}
-QUEST_LOG_PANEL  :: rl.Rectangle{63, 30, 300, 200}
+// Keep existing panel content and type size, but place it within the 320 x 180
+// canvas. The quest log is intentionally viewport-height limited for now.
+INVENTORY_PANEL  :: rl.Rectangle{30, 2, 260, 176}
+LOOT_PANEL       :: rl.Rectangle{30, 28, 260, 128}
+QUEST_LOG_PANEL  :: rl.Rectangle{10, 2, 300, 176}
 BAG_BUTTON       :: rl.Rectangle{LOW_RES_WIDTH - 64, LOW_RES_HEIGHT - 20, 60, 16}
 QUEST_LOG_BUTTON :: rl.Rectangle{LOW_RES_WIDTH - 132, LOW_RES_HEIGHT - 20, 64, 16}
 TAKE_ALL_BUTTON  :: rl.Rectangle{LOOT_PANEL.x + 8, LOOT_PANEL.y + LOOT_PANEL.height - 22, 60, 16}

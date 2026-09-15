@@ -94,6 +94,11 @@ Content_Creature :: struct {
 	corpse:                string, // a Container_Kind name: which existing corpse art it leaves
 	attack_verb:           string,
 	frame_size:            [2]f32,
+	// Optional new sprite metadata. If animations is absent, the original 6 x 5
+	// grid is synthesized so existing content remains usable.
+	sprite_anchor:         [2]f32,
+	sprite_columns:        [6]int,
+	animations:            []Content_Sprite_Animation,
 	footprint:             string, // "single" or "triangle"
 	shadow_radius:         f32,
 	blood_color:           [4]u8,
@@ -116,6 +121,22 @@ Content_Creature :: struct {
 	death_sound:           string,
 	behaviours:            []Content_Behaviour,
 	loot:                  []Content_Loot_Entry,
+}
+
+Content_Sprite_Frame :: struct {
+	// x, y, width, height in the sprite sheet. This allows irregular atlas packing.
+	source: [4]f32,
+}
+
+Content_Sprite_Animation :: struct {
+	state:      string, // Idle, Walk, Attack, Hurt, Death
+	fps:        f32,
+	loop:       bool,
+	// Grid shorthand: each entry is a row and is expanded for all six directions.
+	frame_rows: []int,
+	// Optional explicit frames: six arrays in hexgrid.Direction order. When present,
+	// this overrides frame_rows and supports arbitrary atlas rectangles.
+	directions: [][]Content_Sprite_Frame,
 }
 
 Content_Item :: struct {
@@ -143,6 +164,76 @@ Content_File :: struct {
 
 content_path :: proc() -> string {
 	return fmt.tprintf("%sassets/content.json", rl.GetApplicationDirectory())
+}
+
+sprite_frame_at :: proc(x, y, width, height: f32) -> Sprite_Frame {
+	return {source = {x, y, width, height}}
+}
+
+add_grid_sprite_animation :: proc(definition: ^Creature_Definition, state: Sprite_Animation_State, fps: f32, loop: bool, rows: []int, columns: [6]int) {
+	animation := &definition.animations[state]
+	animation.fps = fps
+	animation.loop = loop
+	for column in 0 ..< 6 {
+		for row in rows {
+			append(&animation.directions[column], sprite_frame_at(
+				f32(columns[column]) * definition.frame_size.x,
+				f32(row) * definition.frame_size.y,
+				definition.frame_size.x,
+				definition.frame_size.y,
+			))
+		}
+	}
+}
+
+// Old sheets were a 6-direction grid with five pose rows. Keep that convention only
+// here, at the compatibility boundary; rendering itself only sees frame rectangles.
+add_legacy_sprite_animations :: proc(definition: ^Creature_Definition) {
+	columns := [6]int{0, 1, 2, 3, 4, 5}
+	add_grid_sprite_animation(definition, .Idle,   2,  true,  []int{0},          columns)
+	add_grid_sprite_animation(definition, .Walk,   12, true,  []int{1, 0, 2, 0}, columns)
+	add_grid_sprite_animation(definition, .Attack, 4,  false, []int{3, 4},       columns)
+	add_grid_sprite_animation(definition, .Hurt,   1,  false, []int{0},          columns)
+	add_grid_sprite_animation(definition, .Death,  1,  false, []int{0},          columns)
+}
+
+add_configured_sprite_animations :: proc(definition: ^Creature_Definition, entries: []Content_Sprite_Animation, columns: [6]int) {
+	for entry in entries {
+		state, found := from_name(Sprite_Animation_State, entry.state, "sprite animation state")
+		if !found do continue
+		fps := entry.fps
+		if fps <= 0 {
+			fmt.eprintfln("content.json: sprite animation %s has invalid fps; using 1", entry.state)
+			fps = 1
+		}
+		if len(entry.directions) > 0 {
+			if len(entry.directions) != 6 {
+				fmt.eprintfln("content.json: sprite animation %s needs six direction lists", entry.state)
+				continue
+			}
+			animation := &definition.animations[state]
+			animation.fps = fps
+			animation.loop = entry.loop
+			for frames, direction in entry.directions {
+				for frame in frames {
+					if frame.source[2] <= 0 || frame.source[3] <= 0 do continue
+					append(&animation.directions[direction], sprite_frame_at(
+						frame.source[0], frame.source[1], frame.source[2], frame.source[3],
+					))
+				}
+			}
+		} else if len(entry.frame_rows) > 0 {
+			add_grid_sprite_animation(definition, state, fps, entry.loop, entry.frame_rows, columns)
+		}
+	}
+	// A partial new definition is useful while art is being migrated. Fill missing
+	// states with legacy locations, but never replace explicitly supplied frames.
+	legacy: Creature_Definition
+	legacy.frame_size = definition.frame_size
+	add_legacy_sprite_animations(&legacy)
+	for state in Sprite_Animation_State {
+		if len(definition.animations[state].directions[0]) == 0 do definition.animations[state] = legacy.animations[state]
+	}
 }
 
 // Reads the content into the tables in creatures.odin, items.odin and village.odin.
@@ -243,6 +334,23 @@ apply_content :: proc(data: []u8) -> (ok: bool) {
 			knockback_distance    = entry.knockback_distance,
 			turns_between_actions = entry.turns_between_actions,
 			shakes_screen_on_hit  = entry.shakes_screen_on_hit,
+		}
+		if definition.frame_size.x <= 0 || definition.frame_size.y <= 0 {
+			fmt.eprintfln("content.json: creature %s has invalid frame_size; skipping it", entry.id)
+			continue
+		}
+		definition.sprite_anchor = {entry.sprite_anchor[0], entry.sprite_anchor[1]}
+		if definition.sprite_anchor == {} do definition.sprite_anchor = {definition.frame_size.x * 0.5, definition.frame_size.y}
+		if len(entry.animations) == 0 {
+			add_legacy_sprite_animations(&definition)
+		} else {
+			columns := entry.sprite_columns
+			all_zero := true
+			for column in columns {
+				if column != 0 do all_zero = false
+			}
+			if all_zero do columns = {0, 1, 2, 3, 4, 5}
+			add_configured_sprite_animations(&definition, entry.animations, columns)
 		}
 		if sound, found := from_name(Weapon_Sound, entry.weapon_sound, "weapon sound"); found do definition.weapon_sound = sound
 		if sound, found := from_name(Sound_Id, entry.hurt_sound, "sound"); found do definition.hurt_sound = sound

@@ -604,7 +604,7 @@ resolve_attack_impact :: proc(scene: ^Scene, attacker, target: ^Actor) {
 
 	// Halfway up the (stretched) upright sprite, so the spray starts at the chest
 	// of the drawing rather than at its knees.
-	chest_height := target_center + {0, target_definition.frame_size.y * 0.5 / scene.camera_up.y, 0}
+	chest_height := target_center + {0, sprite_height_above_ground(target_definition) * 0.5 / scene.camera_up.y, 0}
 	spawn_blood_spray(&scene.effects, chest_height, away_from_attacker, target_definition.blood_color, 10 + damage * 4)
 
 	// The impact, and the victim's cry: a death cry if this blow kills.
@@ -613,7 +613,7 @@ resolve_attack_impact :: proc(scene: ^Scene, attacker, target: ^Actor) {
 
 	target_is_player := target == &scene.player
 	number_color := rl.RED if target_is_player else rl.WHITE
-	add_floating_number(&scene.effects, target_center, target_definition.frame_size.y + 16, damage, number_color) // above the health bar
+	add_floating_number(&scene.effects, target_center, sprite_height_above_ground(target_definition) + 16, damage, number_color) // above the health bar
 
 	switch {
 	case attacker.is_riposte && attacker == &scene.player:

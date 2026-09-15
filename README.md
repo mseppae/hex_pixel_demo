@@ -2,7 +2,7 @@
 
 A prototype roguelike on a hex grid: pixel-art tiles and sprites drawn as 3D
 meshes and billboards, seen through an orthographic camera, rendered at
-426x240 and scaled up so every pixel stays square.
+320x180 and scaled up so every pixel stays square.
 
 ![The village](screenshots/20_village_quest_offer.png)
 
@@ -58,6 +58,38 @@ from any folder. `saves/` is created next to the program.
   with numpy, scipy and Pillow).
 - `sounds_guide.png`, `atlas_layout_guide.png`, `sprite_sheet_guide.png` and
   `items_and_objects_guide.png` show how each asset file is laid out.
+
+## Pixel-art rendering and creature sprites
+
+The game renders to a **320×180** internal image (16:9) and presents it with
+nearest-neighbor filtering. It chooses the largest integer scale that fits the
+window and letterboxes any remaining space: 1280×720 is 4×, 1920×1080 is 6×,
+and 2560×1440 is 8×. A smaller window may use 1× rather than blur the image.
+World and hex geometry are still measured in art/world units and do not change
+when a creature's canvas changes.
+
+Creature sprite metadata lives beside creature data in `assets/content.json`:
+
+- `frame_size` is the default canvas size. Ordinary new humanoid art should
+  generally be around 32×32, but this is an art guideline, not an engine limit.
+  Small creatures, large creatures, and bosses can use any canvas size.
+- `sprite_anchor` is `[x, y]` from the canvas's upper-left. It is the feet/ground
+  point placed on the creature's logical hex; transparent padding, ears, weapons,
+  and tall poses can extend outside that hex.
+- `sprite_columns` maps the six direction slots to columns. Direction order is
+  `East, North_East, North_West, West, South_West, South_East` (the same order as
+  `hexgrid.Direction`).
+- Each `animations` entry selects `Idle`, `Walk`, `Attack`, `Hurt`, or `Death`,
+  with `fps`, `loop`, and either `frame_rows` for a regular grid or six explicit
+  `directions` lists. An explicit frame is `{"source": [x, y, width, height]}`;
+  this supports irregular atlas packing and frame sizes without gameplay changes.
+
+The existing compiled-in sheets retain their old six-column/five-row layout when
+this metadata is absent. The goblin demonstrates the new metadata with a ground
+anchor and independently timed, variable-length sequences. This refactor does
+not replace the legacy 16×24 artwork; new 32px-class player/goblin art is the next
+visual-production step. Source generators in `art_source/` remain the source-art
+to generated-asset workflow.
 
 ## Status and honest caveats
 

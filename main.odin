@@ -44,8 +44,8 @@ FLOOR_HEIGHT :: 4.0  // matches the 4-pixel-tall floor side art
 WALL_HEIGHT  :: 24.0 // matches the 24-pixel-tall wall side art
 
 // The size of the small image the scene is drawn into before scaling up.
-LOW_RES_WIDTH  :: 426
-LOW_RES_HEIGHT :: 240
+LOW_RES_WIDTH  :: 320
+LOW_RES_HEIGHT :: 180
 
 // How far the camera sits from what it looks at. With an orthographic camera this
 // does not change the size of anything. It must be far enough that the stretched
@@ -83,10 +83,9 @@ OBJECTS_PNG          :: #load("assets/objects.png") // corpses and chests
 TREES_PNG            :: #load("assets/trees.png") // trees and bushes on forest tiles
 PORTAL_PNG           :: #load("assets/portal.png") // a Scroll of Town Portal's rift
 
-// Each sprite sheet has six columns (directions, in hexgrid.Direction order as seen
-// on screen: right, back-right, back-left, left, front-left, front-right)
-// and five rows (poses: idle, walk A, walk B, attack wind-up, strike).
 // A creature names its own sheet in content.json (Creature_Definition.sprite_sheet):
+// its frame rectangles, anchors, direction columns, and animations are metadata too.
+// Legacy sheets still use the original six-column/five-row convention as a fallback.
 // built-in ones are compiled in below and shared by name; anything else is read from
 // assets/ next to the program at startup, so a new creature can bring its own art
 // without a recompile. See DESIGN_DATA_DRIVEN.md. Everything the game ships with is
@@ -428,7 +427,7 @@ orbit_camera :: proc(yaw_degrees, pitch_degrees: f32, focus: rl.Vector3) -> rl.C
 		target     = focus,
 		up         = {0, 1, 0},
 		// For an orthographic camera, fovy is the height of the view in world units.
-		// 240 units on a 240-pixel-tall image means one art pixel = one screen pixel.
+		// 180 units on a 180-pixel-tall image means one art pixel = one screen pixel.
 		fovy       = LOW_RES_HEIGHT,
 		projection = .ORTHOGRAPHIC,
 	}
@@ -553,7 +552,7 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 	draw_order := make([dynamic]Draw_Order_Entry, context.temp_allocator)
 	append(&draw_order, Draw_Order_Entry{drawable = &scene.player, light = 1, distance_to_camera = rl.Vector3Distance(camera.position, actor_visual_position(&scene.player))})
 	for &monster in level.monsters {
-		if monster.is_dead && monster.death_seconds >= DEATH_SECONDS do continue
+		if monster.is_dead && monster.death_seconds >= death_animation_seconds(&CREATURES[monster.kind]) do continue
 		light := light_on_actor(scene, &monster)
 		if light == 0 do continue // out of sight
 		append(&draw_order, Draw_Order_Entry{drawable = &monster, light = light, distance_to_camera = rl.Vector3Distance(camera.position, actor_visual_position(&monster))})
@@ -662,7 +661,7 @@ draw_hit_point_bar :: proc(actor: ^Actor, camera: rl.Camera3D) {
 	if actor.is_dead || actor.hit_points == actor.max_hit_points do return
 	definition := CREATURES[actor.kind]
 	bar_width := i32(definition.frame_size.x * 0.75)
-	above_head := actor_visual_position(actor) + camera_up_direction(camera) * (definition.frame_size.y + 3)
+	above_head := actor_visual_position(actor) + camera_up_direction(camera) * (sprite_height_above_ground(definition) + 3)
 	screen_position := rl.GetWorldToScreenEx(above_head, camera, LOW_RES_WIDTH, LOW_RES_HEIGHT)
 	bar_left := i32(screen_position.x) - bar_width / 2
 	bar_top := i32(screen_position.y)

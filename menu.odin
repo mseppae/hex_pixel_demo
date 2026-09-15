@@ -1,7 +1,7 @@
 package main
 
 // The start menu, the in-game menu (Esc), and the lists of save slots.
-// Like the other panels, these are drawn into the small 426 x 240 image.
+// Like the other panels, these are drawn into the small 320 x 180 image.
 
 import "core:fmt"
 import rl "vendor:raylib"
@@ -20,9 +20,9 @@ Menu :: enum {
 	Ranking,    // the Hall of the Fallen, from the start menu or after dying
 }
 
-START_MENU_PANEL :: rl.Rectangle{103, 44, 220, 144}
-GAME_MENU_PANEL  :: rl.Rectangle{103, 40, 220, 170} // one more button, and a note under them
-SLOTS_PANEL      :: rl.Rectangle{83, 36, 260, 166}
+START_MENU_PANEL :: rl.Rectangle{50, 18, 220, 144}
+GAME_MENU_PANEL  :: rl.Rectangle{50, 5, 220, 170} // one more button, and a note under them
+SLOTS_PANEL      :: rl.Rectangle{30, 7, 260, 166}
 MENU_BUTTON_SIZE :: rl.Vector2{160, 16}
 
 menu_panel :: proc(scene: ^Scene) -> rl.Rectangle {

@@ -13,6 +13,7 @@ Open_Panel :: enum {
 	Loot,
 	Dialogue,  // talking to a villager (see village.odin)
 	Quest_Log, // every quest currently active (see village.odin)
+	Debug,     // developer tools; keyboard-only (see debug.odin)
 }
 
 UI_FONT_SIZE    :: 10 // raylib's built-in font is pixel-exact at size 10
@@ -76,6 +77,7 @@ mouse_is_over_ui :: proc(scene: ^Scene) -> bool {
 	case .Loot:      return mouse_is_over(scene, LOOT_PANEL)
 	case .Dialogue:  return mouse_is_over(scene, DIALOGUE_PANEL)
 	case .Quest_Log: return mouse_is_over(scene, QUEST_LOG_PANEL)
+	case .Debug:     return true
 	}
 	return false
 }
@@ -210,6 +212,8 @@ handle_ui_click :: proc(scene: ^Scene) -> bool {
 		}
 		return true
 
+	case .Debug:
+		return true
 	}
 	return false
 }
@@ -256,6 +260,7 @@ draw_ui :: proc(scene: ^Scene) {
 	case .Loot:      draw_loot_panel(scene)
 	case .Dialogue:  draw_dialogue_panel(scene)
 	case .Quest_Log: draw_quest_log_panel(scene)
+	case .Debug:     draw_debug_panel(scene)
 	}
 }
 

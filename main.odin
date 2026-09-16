@@ -202,6 +202,9 @@ Scene :: struct {
 	mouse_is_over_map:         bool,
 	mouse_in_low_res:          rl.Vector2, // the mouse in the small image's pixels, for the panels
 	open_panel:                Open_Panel,
+	debug_item_index:          int, // indexes the live content tables; see debug.odin
+	debug_creature_index:      int,
+	debug_depth:               int,
 	open_container_indices:    [dynamic]int, // the containers the loot panel shows (a pile can hold several)
 	message:                   string,
 	message_buffer:            [128]u8,
@@ -290,6 +293,14 @@ main :: proc() {
 		// ---- Keys for the panels and menus -------------------------------------------
 
 		if rl.IsKeyPressed(.ESCAPE) do handle_escape_key(&scene)
+		if rl.IsKeyPressed(.F1) && scene.screen == .Playing && scene.menu == .None {
+			if scene.open_panel == .Debug {
+				scene.open_panel = .None
+			} else if scene.open_panel == .None {
+				open_debug_panel(&scene)
+			}
+		}
+		handle_debug_keys(&scene)
 		if rl.IsKeyPressed(.M) {
 			scene.sound.muted = !scene.sound.muted
 			set_message(&scene, "Sound off." if scene.sound.muted else "Sound on.")
@@ -448,7 +459,7 @@ main :: proc() {
 		if scene.screen == .Playing && scene.menu == .None { 	// menus cover the whole view
 			player := &scene.player
 			rl.DrawText(
-				"Q/E: turn   W/S: tilt   I: items   L: quests   T: stance   M: sound   Esc: menu   Click: walk, attack, loot, stairs",
+				"Q/E: turn   W/S: tilt   I: items   L: quests   T: stance   F1: debug   M: sound   Esc: menu   Click: walk, attack, loot, stairs",
 				16,
 				16,
 				20,

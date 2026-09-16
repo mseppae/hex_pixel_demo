@@ -33,6 +33,12 @@ from any folder. `saves/` is created next to the program.
 
 ## Controls
 
+Press **F1** during an adventure to open the developer tools. The panel selects
+from the live `assets/content.json` registries: Up/Down and Enter add an item,
+Left/Right and Space spawn a monster on nearby valid ground, H fully heals, and
+`[`/`]` select a target depth while G jumps there. It only accepts actions while
+the player is choosing a turn.
+
 | | |
 |---|---|
 | Click | walk, attack, loot, talk, take stairs |
@@ -40,6 +46,7 @@ from any folder. `saves/` is created next to the program.
 | Q / E | turn the camera 60 degrees |
 | W / S | tilt the camera |
 | I | inventory |
+| F1 | developer tools |
 | M | sound on/off |
 | Esc | menu / close a panel |
 

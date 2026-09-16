@@ -1,0 +1,18 @@
+{
+  "sheet_size": [240, 432],
+  "frame_size": [40, 48],
+  "grid": [6, 9],
+  "anchor": [20, 46],
+  "columns": ["right", "back-right", "back-left", "left", "front-left", "front-right"],
+  "rows": [
+    "idle",
+    "walk_a",
+    "walk_b",
+    "attack_windup",
+    "attack_strike",
+    "idle_b",
+    "hurt_recoil",
+    "death_start",
+    "death_down"
+  ]
+}

@@ -1,3713 +1,3437 @@
 {
- "version": 1,
- "_comment": "Creatures, villagers, quests and named creatures. Edit this file to change names, dialogue, rewards, monster strength and what monsters do; no recompiling needed. The game reads assets/content.json next to the program if it exists, otherwise the copy built into it. The ids (Goblin, Elder, Slay_Grishnak, ...) must match the enums in the source; each creature's 'behaviours' are tried in the order listed, and each name is a capability implemented in behaviour.odin.",
- "creatures": [
-  {
-   "id": "Adventurer",
-   "name": "adventurer",
-   "article": "another adventurer",
-   "sprite_sheet": "adventurer_sheet.png",
-   "corpse": "Adventurer_Corpse",
-   "attack_verb": "hits",
-   "frame_size": [
-    16,
-    24
-   ],
-   "footprint": "single",
-   "shadow_radius": 6,
-   "blood_color": [
-    200,
-    30,
-    30,
-    255
-   ],
-   "damage_dice": {
-    "count": 1,
-    "sides": 6,
-    "bonus": 1
-   },
-   "armor": 0,
-   "max_hit_points": 20,
-   "strength": 12,
-   "dexterity": 12,
-   "constitution": 12,
-   "default_stance": "Neutral",
-   "weapon_weight": "Light",
-   "armor_weight": "Light",
-   "walk_seconds": 0.3,
-   "attack_seconds": 0.5,
-   "knockback_distance": 4,
-   "turns_between_actions": 1,
-   "shakes_screen_on_hit": false,
-   "weapon_sound": "Light",
-   "hurt_sound": "Hurt_Player",
-   "death_sound": "Death_Player",
-   "behaviours": [],
-   "loot": []
-  },
-  {
-   "id": "Goblin",
-   "name": "goblin",
-   "article": "a goblin",
-   "sprite_sheet": "goblin_sheet.png",
-   "corpse": "Goblin_Corpse",
-   "attack_verb": "stabs",
-   "frame_size": [
-    16,
-    24
-   ],
-   "sprite_anchor": [
-    8,
-    22
-   ],
-   "sprite_columns": [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5
-   ],
-   "animations": [
-    {"state": "Idle", "fps": 2, "loop": true, "frame_rows": [0]},
-    {"state": "Walk", "fps": 10, "loop": true, "frame_rows": [1, 0, 2, 0]},
-    {"state": "Attack", "fps": 4, "loop": false, "frame_rows": [3, 4]},
-    {"state": "Hurt", "fps": 1, "loop": false, "frame_rows": [0]},
-    {"state": "Death", "fps": 1, "loop": false, "frame_rows": [0]}
-   ],
-   "footprint": "single",
-   "shadow_radius": 6,
-   "blood_color": [
-    150,
-    20,
-    20,
-    255
-   ],
-   "damage_dice": {
-    "count": 1,
-    "sides": 4,
-    "bonus": 0
-   },
-   "armor": 0,
-   "max_hit_points": 10,
-   "strength": 8,
-   "dexterity": 14,
-   "constitution": 8,
-   "default_stance": "Neutral",
-   "weapon_weight": "Light",
-   "armor_weight": "Light",
-   "walk_seconds": 0.3,
-   "attack_seconds": 0.5,
-   "knockback_distance": 4,
-   "turns_between_actions": 1,
-   "shakes_screen_on_hit": false,
-   "weapon_sound": "Light",
-   "hurt_sound": "Hurt_Goblin",
-   "death_sound": "Death_Goblin",
-   "behaviours": [
+  "version": 1,
+  "_comment": "Creatures, villagers, quests and named creatures. Edit this file to change names, dialogue, rewards, monster strength and what monsters do; no recompiling needed. The game reads assets/content.json next to the program if it exists, otherwise the copy built into it. The ids (Goblin, Elder, Slay_Grishnak, ...) must match the enums in the source; each creature's 'behaviours' are tried in the order listed, and each name is a capability implemented in behaviour.odin.",
+  "creatures": [
     {
-     "kind": "Flee_When_Hurt",
-     "below": 0.25
+      "id": "Adventurer",
+      "name": "adventurer",
+      "article": "another adventurer",
+      "sprite_sheet": "adventurer_sheet.png",
+      "corpse": "Adventurer_Corpse",
+      "attack_verb": "hits",
+      "frame_size": [32, 32],
+      "sprite_anchor": [16, 30],
+      "sprite_columns": [0, 1, 2, 3, 4, 5],
+      "animations": [
+        { "state": "Idle", "fps": 2, "loop": true, "frame_rows": [0, 5] },
+        { "state": "Walk", "fps": 12, "loop": true, "frame_rows": [1, 0, 2, 0] },
+        { "state": "Attack", "fps": 4, "loop": false, "frame_rows": [3, 4] },
+        { "state": "Hurt", "fps": 3, "loop": false, "frame_rows": [6] },
+        { "state": "Death", "fps": 2, "loop": false, "frame_rows": [7, 8] }
+      ],
+      "footprint": "single",
+      "shadow_radius": 6,
+      "blood_color": [200, 30, 30, 255],
+      "damage_dice": {
+        "count": 1,
+        "sides": 6,
+        "bonus": 1
+      },
+      "armor": 0,
+      "max_hit_points": 20,
+      "strength": 12,
+      "dexterity": 12,
+      "constitution": 12,
+      "default_stance": "Neutral",
+      "weapon_weight": "Light",
+      "armor_weight": "Light",
+      "walk_seconds": 0.3,
+      "attack_seconds": 0.5,
+      "knockback_distance": 4,
+      "turns_between_actions": 1,
+      "shakes_screen_on_hit": false,
+      "weapon_sound": "Light",
+      "hurt_sound": "Hurt_Player",
+      "death_sound": "Death_Player",
+      "behaviours": [],
+      "loot": []
     },
     {
-     "kind": "Melee_Attack"
+      "id": "Goblin",
+      "name": "goblin",
+      "article": "a goblin",
+      "sprite_sheet": "goblin_sheet.png",
+      "corpse": "Goblin_Corpse",
+      "attack_verb": "stabs",
+      "frame_size": [32, 32],
+      "sprite_anchor": [16, 30],
+      "sprite_columns": [0, 1, 2, 3, 4, 5],
+      "animations": [
+        { "state": "Idle", "fps": 2, "loop": true, "frame_rows": [0, 5] },
+        {
+          "state": "Walk",
+          "fps": 10,
+          "loop": true,
+          "frame_rows": [1, 0, 2, 0]
+        },
+        { "state": "Attack", "fps": 4, "loop": false, "frame_rows": [3, 4] },
+        { "state": "Hurt", "fps": 3, "loop": false, "frame_rows": [6] },
+        { "state": "Death", "fps": 2, "loop": false, "frame_rows": [7, 8] }
+      ],
+      "footprint": "single",
+      "shadow_radius": 6,
+      "blood_color": [150, 20, 20, 255],
+      "damage_dice": {
+        "count": 1,
+        "sides": 4,
+        "bonus": 0
+      },
+      "armor": 0,
+      "max_hit_points": 10,
+      "strength": 8,
+      "dexterity": 14,
+      "constitution": 8,
+      "default_stance": "Neutral",
+      "weapon_weight": "Light",
+      "armor_weight": "Light",
+      "walk_seconds": 0.3,
+      "attack_seconds": 0.5,
+      "knockback_distance": 4,
+      "turns_between_actions": 1,
+      "shakes_screen_on_hit": false,
+      "weapon_sound": "Light",
+      "hurt_sound": "Hurt_Goblin",
+      "death_sound": "Death_Goblin",
+      "behaviours": [
+        {
+          "kind": "Flee_When_Hurt",
+          "below": 0.25
+        },
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 7
+        },
+        {
+          "kind": "Wander",
+          "chance": 0.4
+        }
+      ],
+      "loot": [
+        {
+          "item": "Gold",
+          "chance": 0.6,
+          "min": 2,
+          "max": 8,
+          "max_per_depth": 1
+        },
+        {
+          "item": "Healing_Potion",
+          "chance": 0.25,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        },
+        {
+          "item": "Goblin_Dagger",
+          "chance": 0.15,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        }
+      ]
     },
     {
-     "kind": "Chase_Player",
-     "notice_distance": 7
+      "id": "Ogre",
+      "name": "ogre",
+      "article": "an ogre",
+      "sprite_sheet": "ogre_sheet.png",
+      "corpse": "Ogre_Corpse",
+      "attack_verb": "smashes",
+      "frame_size": [40, 48],
+      "sprite_anchor": [20, 46],
+      "sprite_columns": [0, 1, 2, 3, 4, 5],
+      "animations": [
+        { "state": "Idle", "fps": 2, "loop": true, "frame_rows": [0, 5] },
+        { "state": "Walk", "fps": 8, "loop": true, "frame_rows": [1, 0, 2, 0] },
+        { "state": "Attack", "fps": 4, "loop": false, "frame_rows": [3, 4] },
+        { "state": "Hurt", "fps": 3, "loop": false, "frame_rows": [6] },
+        { "state": "Death", "fps": 2, "loop": false, "frame_rows": [7, 8] }
+      ],
+      "footprint": "triangle",
+      "shadow_radius": 15,
+      "blood_color": [120, 25, 15, 255],
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 0
+      },
+      "armor": 0,
+      "max_hit_points": 18,
+      "strength": 18,
+      "dexterity": 6,
+      "constitution": 16,
+      "default_stance": "Aggressive",
+      "weapon_weight": "Heavy",
+      "armor_weight": "Heavy",
+      "walk_seconds": 0.45,
+      "attack_seconds": 0.8,
+      "knockback_distance": 1.5,
+      "turns_between_actions": 2,
+      "shakes_screen_on_hit": true,
+      "weapon_sound": "Heavy",
+      "hurt_sound": "Hurt_Ogre",
+      "death_sound": "Death_Ogre",
+      "behaviours": [
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 8
+        }
+      ],
+      "loot": [
+        {
+          "item": "Gold",
+          "chance": 1.0,
+          "min": 10,
+          "max": 25,
+          "max_per_depth": 2
+        },
+        {
+          "item": "Healing_Potion",
+          "chance": 0.5,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        },
+        {
+          "item": "Spiked_Club",
+          "chance": 0.4,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        }
+      ]
     },
     {
-     "kind": "Wander",
-     "chance": 0.4
+      "id": "Rat",
+      "name": "giant rat",
+      "article": "a rat",
+      "sprite_sheet": "rat_sheet.png",
+      "corpse": "Rat_Corpse",
+      "attack_verb": "bites",
+      "frame_size": [32, 32],
+      "sprite_anchor": [16, 30],
+      "footprint": "single",
+      "shadow_radius": 5,
+      "blood_color": [140, 60, 40, 255],
+      "damage_dice": {
+        "count": 1,
+        "sides": 2,
+        "bonus": 0
+      },
+      "armor": 0,
+      "max_hit_points": 4,
+      "strength": 6,
+      "dexterity": 14,
+      "constitution": 6,
+      "default_stance": "Aggressive",
+      "weapon_weight": "Light",
+      "armor_weight": "Light",
+      "walk_seconds": 0.25,
+      "attack_seconds": 0.35,
+      "knockback_distance": 2,
+      "turns_between_actions": 1,
+      "shakes_screen_on_hit": false,
+      "weapon_sound": "Light",
+      "hurt_sound": "Hurt_Goblin",
+      "death_sound": "Death_Goblin",
+      "behaviours": [
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 8
+        },
+        {
+          "kind": "Wander",
+          "chance": 0.5
+        }
+      ],
+      "loot": [
+        {
+          "item": "Gold",
+          "choices": [],
+          "chance": 0.3,
+          "min": 1,
+          "max": 3,
+          "max_per_depth": 0
+        }
+      ]
+    },
+    {
+      "id": "Bat",
+      "name": "cave bat",
+      "article": "a bat",
+      "sprite_sheet": "bat_sheet.png",
+      "corpse": "Bat_Corpse",
+      "attack_verb": "bites",
+      "frame_size": [32, 32],
+      "sprite_anchor": [16, 30],
+      "footprint": "single",
+      "shadow_radius": 5,
+      "blood_color": [110, 60, 90, 255],
+      "damage_dice": {
+        "count": 1,
+        "sides": 3,
+        "bonus": 0
+      },
+      "armor": 0,
+      "max_hit_points": 6,
+      "strength": 6,
+      "dexterity": 16,
+      "constitution": 6,
+      "default_stance": "Neutral",
+      "weapon_weight": "Light",
+      "armor_weight": "Light",
+      "walk_seconds": 0.2,
+      "attack_seconds": 0.3,
+      "knockback_distance": 3,
+      "turns_between_actions": 1,
+      "shakes_screen_on_hit": false,
+      "weapon_sound": "Light",
+      "hurt_sound": "Hurt_Goblin",
+      "death_sound": "Death_Goblin",
+      "behaviours": [
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 9
+        },
+        {
+          "kind": "Wander",
+          "chance": 0.6
+        }
+      ],
+      "loot": [
+        {
+          "item": "Gold",
+          "choices": [],
+          "chance": 0.3,
+          "min": 1,
+          "max": 4,
+          "max_per_depth": 0
+        }
+      ]
+    },
+    {
+      "id": "Spider",
+      "name": "cave spider",
+      "article": "a spider",
+      "sprite_sheet": "spider_sheet.png",
+      "corpse": "Spider_Corpse",
+      "attack_verb": "bites",
+      "frame_size": [32, 32],
+      "sprite_anchor": [16, 30],
+      "footprint": "single",
+      "shadow_radius": 6,
+      "blood_color": [70, 55, 95, 255],
+      "damage_dice": {
+        "count": 1,
+        "sides": 6,
+        "bonus": 0
+      },
+      "armor": 0,
+      "max_hit_points": 8,
+      "strength": 9,
+      "dexterity": 16,
+      "constitution": 8,
+      "default_stance": "Aggressive",
+      "weapon_weight": "Light",
+      "armor_weight": "Light",
+      "walk_seconds": 0.3,
+      "attack_seconds": 0.4,
+      "knockback_distance": 3,
+      "turns_between_actions": 1,
+      "shakes_screen_on_hit": false,
+      "weapon_sound": "Light",
+      "hurt_sound": "Hurt_Goblin",
+      "death_sound": "Death_Goblin",
+      "behaviours": [
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 6
+        },
+        {
+          "kind": "Wander",
+          "chance": 0.3
+        }
+      ],
+      "loot": [
+        {
+          "item": "Gold",
+          "choices": [],
+          "chance": 0.4,
+          "min": 2,
+          "max": 6,
+          "max_per_depth": 1
+        },
+        {
+          "item": "Antidote",
+          "choices": [],
+          "chance": 0.15,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        }
+      ]
+    },
+    {
+      "id": "Slime",
+      "name": "slime",
+      "article": "a slime",
+      "sprite_sheet": "slime_sheet.png",
+      "corpse": "Slime_Corpse",
+      "attack_verb": "engulfs",
+      "frame_size": [32, 32],
+      "sprite_anchor": [16, 30],
+      "footprint": "single",
+      "shadow_radius": 7,
+      "blood_color": [90, 190, 120, 255],
+      "damage_dice": {
+        "count": 1,
+        "sides": 4,
+        "bonus": 1
+      },
+      "armor": 1,
+      "max_hit_points": 14,
+      "strength": 10,
+      "dexterity": 6,
+      "constitution": 14,
+      "default_stance": "Defensive",
+      "weapon_weight": "Medium",
+      "armor_weight": "Heavy",
+      "walk_seconds": 0.5,
+      "attack_seconds": 0.6,
+      "knockback_distance": 1,
+      "turns_between_actions": 2,
+      "shakes_screen_on_hit": false,
+      "weapon_sound": "Heavy",
+      "hurt_sound": "Hurt_Goblin",
+      "death_sound": "Death_Goblin",
+      "behaviours": [
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 4
+        },
+        {
+          "kind": "Wander",
+          "chance": 0.2
+        }
+      ],
+      "loot": [
+        {
+          "item": "Gold",
+          "choices": [],
+          "chance": 0.5,
+          "min": 3,
+          "max": 8,
+          "max_per_depth": 1
+        }
+      ]
+    },
+    {
+      "id": "Mushroom",
+      "name": "mushroom walker",
+      "article": "a mushroom",
+      "sprite_sheet": "mushroom_sheet.png",
+      "corpse": "Mushroom_Corpse",
+      "attack_verb": "lashes",
+      "frame_size": [32, 32],
+      "sprite_anchor": [16, 30],
+      "footprint": "single",
+      "shadow_radius": 6,
+      "blood_color": [200, 180, 140, 255],
+      "damage_dice": {
+        "count": 1,
+        "sides": 6,
+        "bonus": 0
+      },
+      "armor": 0,
+      "max_hit_points": 10,
+      "strength": 8,
+      "dexterity": 8,
+      "constitution": 12,
+      "default_stance": "Neutral",
+      "weapon_weight": "Medium",
+      "armor_weight": "Medium",
+      "walk_seconds": 0.4,
+      "attack_seconds": 0.5,
+      "knockback_distance": 2,
+      "turns_between_actions": 1,
+      "shakes_screen_on_hit": false,
+      "weapon_sound": "Light",
+      "hurt_sound": "Hurt_Goblin",
+      "death_sound": "Death_Goblin",
+      "behaviours": [
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 2
+        },
+        {
+          "kind": "Wander",
+          "chance": 0.05
+        }
+      ],
+      "loot": [
+        {
+          "item": "Healing_Potion",
+          "choices": [],
+          "chance": 0.35,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        },
+        {
+          "item": "Antidote",
+          "choices": [],
+          "chance": 0.2,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        }
+      ]
+    },
+    {
+      "id": "Skeleton",
+      "name": "skeleton",
+      "article": "a skeleton",
+      "sprite_sheet": "skeleton_sheet.png",
+      "corpse": "Skeleton_Corpse",
+      "attack_verb": "slashes",
+      "frame_size": [32, 32],
+      "sprite_anchor": [16, 30],
+      "footprint": "single",
+      "shadow_radius": 6,
+      "blood_color": [210, 205, 190, 255],
+      "damage_dice": {
+        "count": 1,
+        "sides": 6,
+        "bonus": 1
+      },
+      "armor": 1,
+      "max_hit_points": 14,
+      "strength": 13,
+      "dexterity": 12,
+      "constitution": 10,
+      "default_stance": "Neutral",
+      "weapon_weight": "Medium",
+      "armor_weight": "Medium",
+      "walk_seconds": 0.3,
+      "attack_seconds": 0.5,
+      "knockback_distance": 3,
+      "turns_between_actions": 1,
+      "shakes_screen_on_hit": false,
+      "weapon_sound": "Blade",
+      "hurt_sound": "Hurt_Goblin",
+      "death_sound": "Death_Goblin",
+      "behaviours": [
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 7
+        }
+      ],
+      "loot": [
+        {
+          "item": "Gold",
+          "choices": [],
+          "chance": 1.0,
+          "min": 4,
+          "max": 10,
+          "max_per_depth": 1
+        },
+        {
+          "item": "",
+          "choices": ["Hand_Axe", "Spear", "Rapier"],
+          "chance": 0.2,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        },
+        {
+          "item": "",
+          "choices": ["Wooden_Shield", "Helmet"],
+          "chance": 0.15,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        }
+      ]
+    },
+    {
+      "id": "Troll",
+      "name": "cave troll",
+      "article": "a troll",
+      "sprite_sheet": "troll_sheet.png",
+      "corpse": "Troll_Corpse",
+      "attack_verb": "claws",
+      "frame_size": [48, 64],
+      "sprite_anchor": [24, 60],
+      "footprint": "triangle",
+      "shadow_radius": 16,
+      "blood_color": [90, 110, 60, 255],
+      "damage_dice": {
+        "count": 2,
+        "sides": 6,
+        "bonus": 0
+      },
+      "armor": 0,
+      "max_hit_points": 30,
+      "strength": 20,
+      "dexterity": 8,
+      "constitution": 18,
+      "default_stance": "Aggressive",
+      "weapon_weight": "Heavy",
+      "armor_weight": "Heavy",
+      "walk_seconds": 0.4,
+      "attack_seconds": 0.7,
+      "knockback_distance": 2,
+      "turns_between_actions": 2,
+      "shakes_screen_on_hit": true,
+      "weapon_sound": "Heavy",
+      "hurt_sound": "Hurt_Ogre",
+      "death_sound": "Death_Ogre",
+      "behaviours": [
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 8
+        }
+      ],
+      "loot": [
+        {
+          "item": "Gold",
+          "choices": [],
+          "chance": 1.0,
+          "min": 15,
+          "max": 30,
+          "max_per_depth": 2
+        },
+        {
+          "item": "Healing_Potion",
+          "choices": [],
+          "chance": 0.4,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        },
+        {
+          "item": "",
+          "choices": ["War_Hammer", "Mace"],
+          "chance": 0.3,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        }
+      ]
+    },
+    {
+      "id": "Golem",
+      "name": "stone golem",
+      "article": "a golem",
+      "sprite_sheet": "golem_sheet.png",
+      "corpse": "Golem_Corpse",
+      "attack_verb": "crushes",
+      "frame_size": [48, 64],
+      "sprite_anchor": [24, 60],
+      "footprint": "triangle",
+      "shadow_radius": 17,
+      "blood_color": [150, 148, 140, 255],
+      "damage_dice": {
+        "count": 2,
+        "sides": 6,
+        "bonus": 2
+      },
+      "armor": 3,
+      "max_hit_points": 40,
+      "strength": 20,
+      "dexterity": 4,
+      "constitution": 20,
+      "default_stance": "Neutral",
+      "weapon_weight": "Heavy",
+      "armor_weight": "Heavy",
+      "walk_seconds": 0.55,
+      "attack_seconds": 0.9,
+      "knockback_distance": 1,
+      "turns_between_actions": 3,
+      "shakes_screen_on_hit": true,
+      "weapon_sound": "Heavy",
+      "hurt_sound": "Hurt_Ogre",
+      "death_sound": "Death_Ogre",
+      "behaviours": [
+        {
+          "kind": "Melee_Attack"
+        },
+        {
+          "kind": "Chase_Player",
+          "notice_distance": 5
+        }
+      ],
+      "loot": [
+        {
+          "item": "Gold",
+          "choices": [],
+          "chance": 1.0,
+          "min": 20,
+          "max": 40,
+          "max_per_depth": 2
+        },
+        {
+          "item": "War_Hammer",
+          "choices": [],
+          "chance": 0.3,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        },
+        {
+          "item": "Helmet",
+          "choices": [],
+          "chance": 0.25,
+          "min": 0,
+          "max": 0,
+          "max_per_depth": 0
+        }
+      ]
     }
-   ],
-   "loot": [
+  ],
+  "named_creatures": [
     {
-     "item": "Gold",
-     "chance": 0.6,
-     "min": 2,
-     "max": 8,
-     "max_per_depth": 1
+      "id": "Grishnak",
+      "name": "Grishnak",
+      "title": "the Goblin Warlord",
+      "kind": "Goblin",
+      "depth": 2,
+      "max_hit_points": 26,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 1
+      },
+      "armor": 1,
+      "tint": [255, 130, 120, 255],
+      "trophy": [
+        {
+          "kind": "Gold",
+          "count": 40
+        },
+        {
+          "kind": "Healing_Potion",
+          "count": 1
+        }
+      ]
     },
     {
-     "item": "Healing_Potion",
-     "chance": 0.25,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
+      "id": "Gorluk",
+      "name": "Gorluk",
+      "title": "the Ogre Chieftain",
+      "kind": "Ogre",
+      "depth": 4,
+      "max_hit_points": 45,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 2
+      },
+      "armor": 2,
+      "tint": [190, 150, 255, 255],
+      "trophy": [
+        {
+          "kind": "Gold",
+          "count": 90
+        },
+        {
+          "kind": "Healing_Potion",
+          "count": 2
+        }
+      ]
     },
     {
-     "item": "Goblin_Dagger",
-     "chance": 0.15,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
+      "id": "Skreel",
+      "name": "Skreel",
+      "title": "the Ashclaw",
+      "kind": "Goblin",
+      "depth": 3,
+      "max_hit_points": 14,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 0
+      },
+      "armor": 0,
+      "tint": [242, 125, 109, 255],
+      "trophy": [
+        {
+          "kind": "Skreel_Ear",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "id": "Dunmarr",
+      "name": "Dunmarr",
+      "title": "the Rootbreaker",
+      "kind": "Ogre",
+      "depth": 9,
+      "max_hit_points": 42,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 2
+      },
+      "armor": 2,
+      "tint": [242, 172, 109, 255],
+      "trophy": [
+        {
+          "kind": "Dunmarr_Fang",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 14
+        }
+      ]
+    },
+    {
+      "id": "Ashka",
+      "name": "Ashka",
+      "title": "Nine-Fingers",
+      "kind": "Goblin",
+      "depth": 14,
+      "max_hit_points": 31,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 2
+      },
+      "armor": 1,
+      "tint": [242, 220, 109, 255],
+      "trophy": [
+        {
+          "kind": "Ashka_Tusk",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 19
+        }
+      ]
+    },
+    {
+      "id": "Blackmaw",
+      "name": "Blackmaw",
+      "title": "the Ravager",
+      "kind": "Ogre",
+      "depth": 19,
+      "max_hit_points": 68,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 4
+      },
+      "armor": 4,
+      "tint": [215, 242, 109, 255],
+      "trophy": [
+        {
+          "kind": "Blackmaw_Claw",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 24
+        }
+      ]
+    },
+    {
+      "id": "Threk",
+      "name": "Threk",
+      "title": "the Elder's Bane",
+      "kind": "Ogre",
+      "depth": 24,
+      "max_hit_points": 80,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 5
+      },
+      "armor": 5,
+      "tint": [167, 242, 109, 255],
+      "trophy": [
+        {
+          "kind": "Threk_Skull",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 29
+        }
+      ]
+    },
+    {
+      "id": "Rusk",
+      "name": "Rusk",
+      "title": "the Notch-Blade",
+      "kind": "Goblin",
+      "depth": 5,
+      "max_hit_points": 18,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 1
+      },
+      "armor": 0,
+      "tint": [119, 242, 109, 255],
+      "trophy": [
+        {
+          "kind": "Rusk_Ear",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 10
+        }
+      ]
+    },
+    {
+      "id": "Gnarl",
+      "name": "Gnarl",
+      "title": "Coalfist",
+      "kind": "Goblin",
+      "depth": 10,
+      "max_hit_points": 25,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 2
+      },
+      "armor": 1,
+      "tint": [109, 242, 146, 255],
+      "trophy": [
+        {
+          "kind": "Gnarl_Fang",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 15
+        }
+      ]
+    },
+    {
+      "id": "Kroll",
+      "name": "Kroll",
+      "title": "the Anvil-Breaker",
+      "kind": "Ogre",
+      "depth": 15,
+      "max_hit_points": 58,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 4
+      },
+      "armor": 3,
+      "tint": [109, 242, 194, 255],
+      "trophy": [
+        {
+          "kind": "Kroll_Tusk",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 20
+        }
+      ]
+    },
+    {
+      "id": "Fenrik",
+      "name": "Fenrik",
+      "title": "Ironhide",
+      "kind": "Ogre",
+      "depth": 20,
+      "max_hit_points": 70,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 5
+      },
+      "armor": 4,
+      "tint": [109, 242, 242, 255],
+      "trophy": [
+        {
+          "kind": "Fenrik_Claw",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 25
+        }
+      ]
+    },
+    {
+      "id": "Molgar",
+      "name": "Molgar",
+      "title": "the Forgestealer",
+      "kind": "Ogre",
+      "depth": 25,
+      "max_hit_points": 82,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 6
+      },
+      "armor": 5,
+      "tint": [109, 194, 242, 255],
+      "trophy": [
+        {
+          "kind": "Molgar_Skull",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 30
+        }
+      ]
+    },
+    {
+      "id": "Snitch",
+      "name": "Snitch",
+      "title": "the Quickfang",
+      "kind": "Goblin",
+      "depth": 6,
+      "max_hit_points": 19,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 1
+      },
+      "armor": 0,
+      "tint": [109, 146, 242, 255],
+      "trophy": [
+        {
+          "kind": "Snitch_Ear",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 11
+        }
+      ]
+    },
+    {
+      "id": "Marrow",
+      "name": "Marrow",
+      "title": "the Skulker",
+      "kind": "Goblin",
+      "depth": 11,
+      "max_hit_points": 26,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 2
+      },
+      "armor": 1,
+      "tint": [119, 109, 242, 255],
+      "trophy": [
+        {
+          "kind": "Marrow_Fang",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "Grendle",
+      "name": "Grendle",
+      "title": "Bogmaw",
+      "kind": "Ogre",
+      "depth": 16,
+      "max_hit_points": 60,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 4
+      },
+      "armor": 3,
+      "tint": [167, 109, 242, 255],
+      "trophy": [
+        {
+          "kind": "Grendle_Tusk",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 21
+        }
+      ]
+    },
+    {
+      "id": "Karth",
+      "name": "Karth",
+      "title": "the Widowmaker",
+      "kind": "Ogre",
+      "depth": 21,
+      "max_hit_points": 72,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 5
+      },
+      "armor": 4,
+      "tint": [215, 109, 242, 255],
+      "trophy": [
+        {
+          "kind": "Karth_Claw",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 26
+        }
+      ]
+    },
+    {
+      "id": "Hollow",
+      "name": "Hollow",
+      "title": "the Hollow Fang",
+      "kind": "Ogre",
+      "depth": 26,
+      "max_hit_points": 85,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 6
+      },
+      "armor": 5,
+      "tint": [242, 109, 220, 255],
+      "trophy": [
+        {
+          "kind": "Hollow_Skull",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 31
+        }
+      ]
+    },
+    {
+      "id": "Vex",
+      "name": "Vex",
+      "title": "the Hexbound",
+      "kind": "Goblin",
+      "depth": 7,
+      "max_hit_points": 20,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 1
+      },
+      "armor": 0,
+      "tint": [242, 109, 172, 255],
+      "trophy": [
+        {
+          "kind": "Vex_Ear",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "id": "Morrow",
+      "name": "Morrow",
+      "title": "Palehand",
+      "kind": "Goblin",
+      "depth": 12,
+      "max_hit_points": 28,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 2
+      },
+      "armor": 1,
+      "tint": [242, 109, 125, 255],
+      "trophy": [
+        {
+          "kind": "Morrow_Fang",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 17
+        }
+      ]
+    },
+    {
+      "id": "Ghurn",
+      "name": "Ghurn",
+      "title": "the Blightborn",
+      "kind": "Ogre",
+      "depth": 17,
+      "max_hit_points": 62,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 4
+      },
+      "armor": 3,
+      "tint": [242, 144, 109, 255],
+      "trophy": [
+        {
+          "kind": "Ghurn_Tusk",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 22
+        }
+      ]
+    },
+    {
+      "id": "Sable",
+      "name": "Sable",
+      "title": "the Night Warden",
+      "kind": "Ogre",
+      "depth": 22,
+      "max_hit_points": 75,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 5
+      },
+      "armor": 4,
+      "tint": [242, 192, 109, 255],
+      "trophy": [
+        {
+          "kind": "Sable_Claw",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 27
+        }
+      ]
+    },
+    {
+      "id": "Uldrath",
+      "name": "Uldrath",
+      "title": "the Forsaken",
+      "kind": "Ogre",
+      "depth": 27,
+      "max_hit_points": 88,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 6
+      },
+      "armor": 5,
+      "tint": [242, 240, 109, 255],
+      "trophy": [
+        {
+          "kind": "Uldrath_Skull",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 32
+        }
+      ]
+    },
+    {
+      "id": "Pike",
+      "name": "Pike",
+      "title": "the Cutthroat",
+      "kind": "Goblin",
+      "depth": 8,
+      "max_hit_points": 22,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 1
+      },
+      "armor": 1,
+      "tint": [195, 242, 109, 255],
+      "trophy": [
+        {
+          "kind": "Pike_Ear",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 13
+        }
+      ]
+    },
+    {
+      "id": "Grix",
+      "name": "Grix",
+      "title": "the Backstabber",
+      "kind": "Goblin",
+      "depth": 13,
+      "max_hit_points": 30,
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 2
+      },
+      "armor": 1,
+      "tint": [147, 242, 109, 255],
+      "trophy": [
+        {
+          "kind": "Grix_Fang",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "id": "Bruundor",
+      "name": "Bruundor",
+      "title": "the Wall-Smasher",
+      "kind": "Ogre",
+      "depth": 18,
+      "max_hit_points": 65,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 4
+      },
+      "armor": 4,
+      "tint": [109, 242, 118, 255],
+      "trophy": [
+        {
+          "kind": "Bruundor_Tusk",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 23
+        }
+      ]
+    },
+    {
+      "id": "Vozgar",
+      "name": "Vozgar",
+      "title": "the Unyielding",
+      "kind": "Ogre",
+      "depth": 23,
+      "max_hit_points": 78,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 5
+      },
+      "armor": 4,
+      "tint": [109, 242, 166, 255],
+      "trophy": [
+        {
+          "kind": "Vozgar_Claw",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 28
+        }
+      ]
+    },
+    {
+      "id": "Krenn",
+      "name": "Krenn",
+      "title": "the Warlord",
+      "kind": "Ogre",
+      "depth": 28,
+      "max_hit_points": 90,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 6
+      },
+      "armor": 5,
+      "tint": [109, 242, 214, 255],
+      "trophy": [
+        {
+          "kind": "Krenn_Skull",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 33
+        }
+      ]
+    },
+    {
+      "id": "Korrath",
+      "name": "Korrath",
+      "title": "the Unbroken",
+      "kind": "Golem",
+      "depth": 29,
+      "max_hit_points": 92,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 6
+      },
+      "armor": 5,
+      "tint": [180, 200, 160, 255],
+      "trophy": [
+        {
+          "kind": "Korrath_Charm",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 34
+        }
+      ]
+    },
+    {
+      "id": "Vaelor",
+      "name": "Vaelor",
+      "title": "the Deathless",
+      "kind": "Skeleton",
+      "depth": 30,
+      "max_hit_points": 95,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 7
+      },
+      "armor": 6,
+      "tint": [190, 210, 255, 255],
+      "trophy": [
+        {
+          "kind": "Vaelor_Charm",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 35
+        }
+      ]
+    },
+    {
+      "id": "Mossback",
+      "name": "Mossback",
+      "title": "the Ancient",
+      "kind": "Troll",
+      "depth": 31,
+      "max_hit_points": 98,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 7
+      },
+      "armor": 6,
+      "tint": [140, 190, 110, 255],
+      "trophy": [
+        {
+          "kind": "Mossback_Charm",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 36
+        }
+      ]
+    },
+    {
+      "id": "Sorrow",
+      "name": "Sorrow",
+      "title": "the Whispering Dead",
+      "kind": "Skeleton",
+      "depth": 32,
+      "max_hit_points": 101,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 8
+      },
+      "armor": 6,
+      "tint": [225, 210, 255, 255],
+      "trophy": [
+        {
+          "kind": "Sorrow_Charm",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 37
+        }
+      ]
+    },
+    {
+      "id": "Aurek",
+      "name": "Aurek",
+      "title": "the Last Sentinel",
+      "kind": "Golem",
+      "depth": 33,
+      "max_hit_points": 104,
+      "damage_dice": {
+        "count": 3,
+        "sides": 4,
+        "bonus": 8
+      },
+      "armor": 7,
+      "tint": [150, 140, 150, 255],
+      "trophy": [
+        {
+          "kind": "Aurek_Charm",
+          "count": 1
+        },
+        {
+          "kind": "Gold",
+          "count": 38
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "Ogre",
-   "name": "ogre",
-   "article": "an ogre",
-   "sprite_sheet": "ogre_sheet.png",
-   "corpse": "Ogre_Corpse",
-   "attack_verb": "smashes",
-   "frame_size": [
-    40,
-    48
-   ],
-   "footprint": "triangle",
-   "shadow_radius": 15,
-   "blood_color": [
-    120,
-    25,
-    15,
-    255
-   ],
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 0
-   },
-   "armor": 0,
-   "max_hit_points": 18,
-   "strength": 18,
-   "dexterity": 6,
-   "constitution": 16,
-   "default_stance": "Aggressive",
-   "weapon_weight": "Heavy",
-   "armor_weight": "Heavy",
-   "walk_seconds": 0.45,
-   "attack_seconds": 0.8,
-   "knockback_distance": 1.5,
-   "turns_between_actions": 2,
-   "shakes_screen_on_hit": true,
-   "weapon_sound": "Heavy",
-   "hurt_sound": "Hurt_Ogre",
-   "death_sound": "Death_Ogre",
-   "behaviours": [
+  ],
+  "npcs": [
     {
-     "kind": "Melee_Attack"
+      "id": "Elder",
+      "name": "Elder Mara",
+      "tint": [210, 170, 255, 255],
+      "offset": {
+        "q": 1,
+        "r": -2
+      },
+      "idle_line": "You have done more than enough. Rest a while."
     },
     {
-     "kind": "Chase_Player",
-     "notice_distance": 8
+      "id": "Smith",
+      "name": "Tomas the smith",
+      "tint": [255, 190, 140, 255],
+      "offset": {
+        "q": -4,
+        "r": 2
+      },
+      "idle_line": "The forge is hot, but I've nothing for you now."
+    },
+    {
+      "id": "Merchant",
+      "name": "Old Kessa",
+      "tint": [170, 220, 190, 255],
+      "offset": {
+        "q": 4,
+        "r": -1
+      },
+      "idle_line": "Careful down there.",
+      "sells": "Town_Portal_Scroll",
+      "price": 40
+    },
+    {
+      "id": "Hunter",
+      "name": "Yara the hunter",
+      "tint": [140, 170, 90, 255],
+      "offset": {
+        "q": -3,
+        "r": -3
+      },
+      "idle_line": "The deep places have their own laws. Learn them, or die."
+    },
+    {
+      "id": "Priestess",
+      "name": "Sister Wren",
+      "tint": [235, 225, 190, 255],
+      "offset": {
+        "q": 0,
+        "r": 3
+      },
+      "idle_line": "The Light does not reach past the third depth. Carry a torch, and faith."
+    },
+    {
+      "id": "Guard_Captain",
+      "name": "Captain Aldric",
+      "tint": [120, 150, 190, 255],
+      "offset": {
+        "q": 5,
+        "r": 1
+      },
+      "idle_line": "Keep the road clear, and I'll keep the gate open."
     }
-   ],
-   "loot": [
+  ],
+  "quests": [
     {
-     "item": "Gold",
-     "chance": 1.0,
-     "min": 10,
-     "max": 25,
-     "max_per_depth": 2
+      "id": "Slay_Grishnak",
+      "giver": "Elder",
+      "title": "Slay Grishnak (depth 2)",
+      "target": "Grishnak",
+      "reward_gold": 60,
+      "reward_item": "Chain_Shirt",
+      "offer": [
+        "Grishnak, a goblin warlord, raids us from",
+        "the second depth. Our fields burn.",
+        "Slay him, and you'll have gold, and",
+        "the chain shirt my son once wore."
+      ],
+      "reminder": "Grishnak still lives. Depth 2, adventurer.",
+      "thanks": [
+        "Grishnak is dead? The village owes you.",
+        "Take these, as promised."
+      ]
     },
     {
-     "item": "Healing_Potion",
-     "chance": 0.5,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
+      "id": "Smiths_Club",
+      "giver": "Smith",
+      "title": "Bring Tomas a spiked club",
+      "wanted_item": "Spiked_Club",
+      "reward_gold": 20,
+      "reward_item": "Longsword",
+      "offer": [
+        "Ogres carry clubs studded with old iron.",
+        "Bring me one in your backpack, and I'll",
+        "reforge the nails into a proper blade."
+      ],
+      "reminder": "No club yet? The ogres below carry them.",
+      "thanks": [
+        "Ha! Good iron under all that rust.",
+        "Here: a longsword, as promised."
+      ]
     },
     {
-     "item": "Spiked_Club",
-     "chance": 0.4,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
+      "id": "Slay_Gorluk",
+      "giver": "Elder",
+      "title": "Slay Gorluk (depth 4)",
+      "target": "Gorluk",
+      "reward_gold": 150,
+      "requires": "Slay_Grishnak",
+      "offer": [
+        "With Grishnak gone, Gorluk the ogre",
+        "chieftain gathers the tribes at depth 4.",
+        "End him, and songs will be sung of you."
+      ],
+      "reminder": "Gorluk waits at depth 4.",
+      "thanks": [
+        "Gorluk is dead. The songs begin tonight.",
+        "This is all the gold we could gather."
+      ]
+    },
+    {
+      "id": "Elders_Potions",
+      "giver": "Elder",
+      "title": "Bring the elder a healing potion",
+      "wanted_item": "Healing_Potion",
+      "reward_gold": 15,
+      "offer": [
+        "The village stores run thin on healing potion.",
+        "If you find one down there, bring it back",
+        "and we'll see you're rewarded for it."
+      ],
+      "reminder": "Still need that healing potion, if you find one.",
+      "thanks": [
+        "That'll do nicely, thank you.",
+        "Please, take this for your trouble."
+      ]
+    },
+    {
+      "id": "Elders_Longsword",
+      "giver": "Elder",
+      "title": "Bring the elder a longsword",
+      "wanted_item": "Longsword",
+      "reward_gold": 25,
+      "offer": [
+        "The village stores run thin on longsword.",
+        "If you find one down there, bring it back",
+        "and we'll see you're rewarded for it."
+      ],
+      "reminder": "Still need that longsword, if you find one.",
+      "thanks": [
+        "That'll do nicely, thank you.",
+        "Please, take this for your trouble."
+      ],
+      "reward_item": "Chain_Shirt"
+    },
+    {
+      "id": "Elders_Chainmail",
+      "giver": "Elder",
+      "title": "Bring the elder a chain shirt",
+      "wanted_item": "Chain_Shirt",
+      "reward_gold": 35,
+      "offer": [
+        "The village stores run thin on chain shirt.",
+        "If you find one down there, bring it back",
+        "and we'll see you're rewarded for it."
+      ],
+      "reminder": "Still need that chain shirt, if you find one.",
+      "thanks": [
+        "That'll do nicely, thank you.",
+        "Please, take this for your trouble."
+      ]
+    },
+    {
+      "id": "Slay_Skreel",
+      "giver": "Elder",
+      "title": "Slay Skreel (depth 3)",
+      "wanted_item": "Skreel_Ear",
+      "reward_gold": 32,
+      "offer": [
+        "Skreel the Ashclaw has made a den of the",
+        "depth 3 tunnels, and raids grow bolder.",
+        "Slay the creature and bring back proof,",
+        "and the village will remember your name."
+      ],
+      "reminder": "Skreel still lives, at depth 3. The village waits.",
+      "thanks": [
+        "Skreel is truly dead? Then we can breathe.",
+        "Take this, with the village's thanks."
+      ]
+    },
+    {
+      "id": "Slay_Dunmarr",
+      "giver": "Elder",
+      "title": "Slay Dunmarr (depth 9)",
+      "wanted_item": "Dunmarr_Fang",
+      "reward_gold": 56,
+      "offer": [
+        "Dunmarr the Rootbreaker has made a den of the",
+        "depth 9 tunnels, and raids grow bolder.",
+        "Slay the creature and bring back proof,",
+        "and the village will remember your name."
+      ],
+      "reminder": "Dunmarr still lives, at depth 9. The village waits.",
+      "thanks": [
+        "Dunmarr is truly dead? Then we can breathe.",
+        "Take this, with the village's thanks."
+      ],
+      "reward_item": "Longsword"
+    },
+    {
+      "id": "Slay_Ashka",
+      "giver": "Elder",
+      "title": "Slay Ashka (depth 14)",
+      "wanted_item": "Ashka_Tusk",
+      "reward_gold": 76,
+      "offer": [
+        "Ashka Nine-Fingers has made a den of the",
+        "depth 14 tunnels, and raids grow bolder.",
+        "Slay the creature and bring back proof,",
+        "and the village will remember your name."
+      ],
+      "reminder": "Ashka still lives, at depth 14. The village waits.",
+      "thanks": [
+        "Ashka is truly dead? Then we can breathe.",
+        "Take this, with the village's thanks."
+      ]
+    },
+    {
+      "id": "Slay_Blackmaw",
+      "giver": "Elder",
+      "title": "Slay Blackmaw (depth 19)",
+      "wanted_item": "Blackmaw_Claw",
+      "reward_gold": 96,
+      "offer": [
+        "Blackmaw the Ravager has made a den of the",
+        "depth 19 tunnels, and raids grow bolder.",
+        "Slay the creature and bring back proof,",
+        "and the village will remember your name."
+      ],
+      "reminder": "Blackmaw still lives, at depth 19. The village waits.",
+      "thanks": [
+        "Blackmaw is truly dead? Then we can breathe.",
+        "Take this, with the village's thanks."
+      ],
+      "reward_item": "Leather_Armor"
+    },
+    {
+      "id": "Slay_Threk",
+      "giver": "Elder",
+      "title": "Slay Threk (depth 24)",
+      "wanted_item": "Threk_Skull",
+      "reward_gold": 116,
+      "offer": [
+        "Threk the Elder's Bane has made a den of the",
+        "depth 24 tunnels, and raids grow bolder.",
+        "Slay the creature and bring back proof,",
+        "and the village will remember your name."
+      ],
+      "reminder": "Threk still lives, at depth 24. The village waits.",
+      "thanks": [
+        "Threk is truly dead? Then we can breathe.",
+        "Take this, with the village's thanks."
+      ]
+    },
+    {
+      "id": "Smiths_Dagger",
+      "giver": "Smith",
+      "title": "Bring Tomas a goblin dagger",
+      "wanted_item": "Goblin_Dagger",
+      "reward_gold": 15,
+      "offer": [
+        "Bring me a goblin dagger from the depths and",
+        "I'll see it put to good use at the forge.",
+        "Waste not, as they say."
+      ],
+      "reminder": "That goblin dagger would still be useful, if you have one.",
+      "thanks": [
+        "Good, good. This won't go to waste.",
+        "Here, for your trouble."
+      ]
+    },
+    {
+      "id": "Smiths_Leather",
+      "giver": "Smith",
+      "title": "Bring Tomas a leather armor",
+      "wanted_item": "Leather_Armor",
+      "reward_gold": 25,
+      "offer": [
+        "Bring me a leather armor from the depths and",
+        "I'll see it put to good use at the forge.",
+        "Waste not, as they say."
+      ],
+      "reminder": "That leather armor would still be useful, if you have one.",
+      "thanks": [
+        "Good, good. This won't go to waste.",
+        "Here, for your trouble."
+      ],
+      "reward_item": "Short_Sword"
+    },
+    {
+      "id": "Smiths_Potions",
+      "giver": "Smith",
+      "title": "Bring Tomas a healing potion",
+      "wanted_item": "Healing_Potion",
+      "reward_gold": 35,
+      "offer": [
+        "Bring me a healing potion from the depths and",
+        "I'll see it put to good use at the forge.",
+        "Waste not, as they say."
+      ],
+      "reminder": "That healing potion would still be useful, if you have one.",
+      "thanks": [
+        "Good, good. This won't go to waste.",
+        "Here, for your trouble."
+      ]
+    },
+    {
+      "id": "Slay_Rusk",
+      "giver": "Smith",
+      "title": "Slay Rusk (depth 5)",
+      "wanted_item": "Rusk_Ear",
+      "reward_gold": 40,
+      "offer": [
+        "Rusk the Notch-Blade carries good iron on depth 5.",
+        "Bring me proof it's dead and the metal's",
+        "mine to reforge. Fair trade, adventurer:",
+        "your risk for my craft."
+      ],
+      "reminder": "Rusk, depth 5. Bring me proof and I'll pay out.",
+      "thanks": [
+        "So Rusk's finally cold. Good iron, this.",
+        "Here's your share, fairly earned."
+      ]
+    },
+    {
+      "id": "Slay_Gnarl",
+      "giver": "Smith",
+      "title": "Slay Gnarl (depth 10)",
+      "wanted_item": "Gnarl_Fang",
+      "reward_gold": 60,
+      "offer": [
+        "Gnarl Coalfist carries good iron on depth 10.",
+        "Bring me proof it's dead and the metal's",
+        "mine to reforge. Fair trade, adventurer:",
+        "your risk for my craft."
+      ],
+      "reminder": "Gnarl, depth 10. Bring me proof and I'll pay out.",
+      "thanks": [
+        "So Gnarl's finally cold. Good iron, this.",
+        "Here's your share, fairly earned."
+      ],
+      "reward_item": "Spiked_Club"
+    },
+    {
+      "id": "Slay_Kroll",
+      "giver": "Smith",
+      "title": "Slay Kroll (depth 15)",
+      "wanted_item": "Kroll_Tusk",
+      "reward_gold": 80,
+      "offer": [
+        "Kroll the Anvil-Breaker carries good iron on depth 15.",
+        "Bring me proof it's dead and the metal's",
+        "mine to reforge. Fair trade, adventurer:",
+        "your risk for my craft."
+      ],
+      "reminder": "Kroll, depth 15. Bring me proof and I'll pay out.",
+      "thanks": [
+        "So Kroll's finally cold. Good iron, this.",
+        "Here's your share, fairly earned."
+      ]
+    },
+    {
+      "id": "Slay_Fenrik",
+      "giver": "Smith",
+      "title": "Slay Fenrik (depth 20)",
+      "wanted_item": "Fenrik_Claw",
+      "reward_gold": 100,
+      "offer": [
+        "Fenrik Ironhide carries good iron on depth 20.",
+        "Bring me proof it's dead and the metal's",
+        "mine to reforge. Fair trade, adventurer:",
+        "your risk for my craft."
+      ],
+      "reminder": "Fenrik, depth 20. Bring me proof and I'll pay out.",
+      "thanks": [
+        "So Fenrik's finally cold. Good iron, this.",
+        "Here's your share, fairly earned."
+      ],
+      "reward_item": "Goblin_Dagger"
+    },
+    {
+      "id": "Slay_Molgar",
+      "giver": "Smith",
+      "title": "Slay Molgar (depth 25)",
+      "wanted_item": "Molgar_Skull",
+      "reward_gold": 120,
+      "offer": [
+        "Molgar the Forgestealer carries good iron on depth 25.",
+        "Bring me proof it's dead and the metal's",
+        "mine to reforge. Fair trade, adventurer:",
+        "your risk for my craft."
+      ],
+      "reminder": "Molgar, depth 25. Bring me proof and I'll pay out.",
+      "thanks": [
+        "So Molgar's finally cold. Good iron, this.",
+        "Here's your share, fairly earned."
+      ]
+    },
+    {
+      "id": "Hunters_Dagger",
+      "giver": "Hunter",
+      "title": "Bring Yara a goblin dagger",
+      "wanted_item": "Goblin_Dagger",
+      "reward_gold": 15,
+      "offer": [
+        "Can't always carry enough goblin dagger on a long",
+        "hunt. Bring me one from the depths and",
+        "I'll make it worth your while."
+      ],
+      "reminder": "Still after that goblin dagger, if you come across one.",
+      "thanks": ["That'll serve well enough.", "Take this. Fair's fair."]
+    },
+    {
+      "id": "Hunters_Potions",
+      "giver": "Hunter",
+      "title": "Bring Yara a healing potion",
+      "wanted_item": "Healing_Potion",
+      "reward_gold": 25,
+      "offer": [
+        "Can't always carry enough healing potion on a long",
+        "hunt. Bring me one from the depths and",
+        "I'll make it worth your while."
+      ],
+      "reminder": "Still after that healing potion, if you come across one.",
+      "thanks": ["That'll serve well enough.", "Take this. Fair's fair."],
+      "reward_item": "Goblin_Dagger"
+    },
+    {
+      "id": "Hunters_Shortsword",
+      "giver": "Hunter",
+      "title": "Bring Yara a short sword",
+      "wanted_item": "Short_Sword",
+      "reward_gold": 35,
+      "offer": [
+        "Can't always carry enough short sword on a long",
+        "hunt. Bring me one from the depths and",
+        "I'll make it worth your while."
+      ],
+      "reminder": "Still after that short sword, if you come across one.",
+      "thanks": ["That'll serve well enough.", "Take this. Fair's fair."]
+    },
+    {
+      "id": "Slay_Snitch",
+      "giver": "Hunter",
+      "title": "Slay Snitch (depth 6)",
+      "wanted_item": "Snitch_Ear",
+      "reward_gold": 44,
+      "offer": [
+        "I've tracked Snitch the Quickfang to depth 6",
+        "and lost the trail twice. My knees aren't",
+        "what they were. Finish the hunt for me",
+        "and bring back the mark of the kill."
+      ],
+      "reminder": "Snitch's still out there, depth 6. The trail's gone cold for me.",
+      "thanks": [
+        "Ha! Snitch finally run to ground.",
+        "You've more than earned a hunter's cut."
+      ]
+    },
+    {
+      "id": "Slay_Marrow",
+      "giver": "Hunter",
+      "title": "Slay Marrow (depth 11)",
+      "wanted_item": "Marrow_Fang",
+      "reward_gold": 64,
+      "offer": [
+        "I've tracked Marrow the Skulker to depth 11",
+        "and lost the trail twice. My knees aren't",
+        "what they were. Finish the hunt for me",
+        "and bring back the mark of the kill."
+      ],
+      "reminder": "Marrow's still out there, depth 11. The trail's gone cold for me.",
+      "thanks": [
+        "Ha! Marrow finally run to ground.",
+        "You've more than earned a hunter's cut."
+      ],
+      "reward_item": "Chain_Shirt"
+    },
+    {
+      "id": "Slay_Grendle",
+      "giver": "Hunter",
+      "title": "Slay Grendle (depth 16)",
+      "wanted_item": "Grendle_Tusk",
+      "reward_gold": 84,
+      "offer": [
+        "I've tracked Grendle Bogmaw to depth 16",
+        "and lost the trail twice. My knees aren't",
+        "what they were. Finish the hunt for me",
+        "and bring back the mark of the kill."
+      ],
+      "reminder": "Grendle's still out there, depth 16. The trail's gone cold for me.",
+      "thanks": [
+        "Ha! Grendle finally run to ground.",
+        "You've more than earned a hunter's cut."
+      ]
+    },
+    {
+      "id": "Slay_Karth",
+      "giver": "Hunter",
+      "title": "Slay Karth (depth 21)",
+      "wanted_item": "Karth_Claw",
+      "reward_gold": 104,
+      "offer": [
+        "I've tracked Karth the Widowmaker to depth 21",
+        "and lost the trail twice. My knees aren't",
+        "what they were. Finish the hunt for me",
+        "and bring back the mark of the kill."
+      ],
+      "reminder": "Karth's still out there, depth 21. The trail's gone cold for me.",
+      "thanks": [
+        "Ha! Karth finally run to ground.",
+        "You've more than earned a hunter's cut."
+      ],
+      "reward_item": "Longsword"
+    },
+    {
+      "id": "Slay_Hollow",
+      "giver": "Hunter",
+      "title": "Slay Hollow (depth 26)",
+      "wanted_item": "Hollow_Skull",
+      "reward_gold": 124,
+      "offer": [
+        "I've tracked Hollow the Hollow Fang to depth 26",
+        "and lost the trail twice. My knees aren't",
+        "what they were. Finish the hunt for me",
+        "and bring back the mark of the kill."
+      ],
+      "reminder": "Hollow's still out there, depth 26. The trail's gone cold for me.",
+      "thanks": [
+        "Ha! Hollow finally run to ground.",
+        "You've more than earned a hunter's cut."
+      ]
+    },
+    {
+      "id": "Priestess_Potions",
+      "giver": "Priestess",
+      "title": "Bring Sister Wren a healing potion",
+      "wanted_item": "Healing_Potion",
+      "reward_gold": 15,
+      "offer": [
+        "We've precious little healing potion left for the",
+        "sick and the frightened. If the depths",
+        "provide one, we'd be grateful."
+      ],
+      "reminder": "We could still use that healing potion, if you find one.",
+      "thanks": [
+        "Bless you for this.",
+        "Please, let me offer something in return."
+      ]
+    },
+    {
+      "id": "Priestess_Leather",
+      "giver": "Priestess",
+      "title": "Bring Sister Wren a leather armor",
+      "wanted_item": "Leather_Armor",
+      "reward_gold": 25,
+      "offer": [
+        "We've precious little leather armor left for the",
+        "sick and the frightened. If the depths",
+        "provide one, we'd be grateful."
+      ],
+      "reminder": "We could still use that leather armor, if you find one.",
+      "thanks": [
+        "Bless you for this.",
+        "Please, let me offer something in return."
+      ],
+      "reward_item": "Leather_Armor"
+    },
+    {
+      "id": "Priestess_Chainmail",
+      "giver": "Priestess",
+      "title": "Bring Sister Wren a chain shirt",
+      "wanted_item": "Chain_Shirt",
+      "reward_gold": 35,
+      "offer": [
+        "We've precious little chain shirt left for the",
+        "sick and the frightened. If the depths",
+        "provide one, we'd be grateful."
+      ],
+      "reminder": "We could still use that chain shirt, if you find one.",
+      "thanks": [
+        "Bless you for this.",
+        "Please, let me offer something in return."
+      ]
+    },
+    {
+      "id": "Slay_Vex",
+      "giver": "Priestess",
+      "title": "Slay Vex (depth 7)",
+      "wanted_item": "Vex_Ear",
+      "reward_gold": 48,
+      "offer": [
+        "A wrongness festers around Vex the Hexbound,",
+        "depth 7 of the dark below. It must",
+        "be ended, and a token brought back so",
+        "we may bless its rest."
+      ],
+      "reminder": "Vex still corrupts depth 7. It cannot be left to fester.",
+      "thanks": [
+        "Vex's taint is lifted. The Light thanks you.",
+        "Take this small blessing in return."
+      ]
+    },
+    {
+      "id": "Slay_Morrow",
+      "giver": "Priestess",
+      "title": "Slay Morrow (depth 12)",
+      "wanted_item": "Morrow_Fang",
+      "reward_gold": 68,
+      "offer": [
+        "A wrongness festers around Morrow Palehand,",
+        "depth 12 of the dark below. It must",
+        "be ended, and a token brought back so",
+        "we may bless its rest."
+      ],
+      "reminder": "Morrow still corrupts depth 12. It cannot be left to fester.",
+      "thanks": [
+        "Morrow's taint is lifted. The Light thanks you.",
+        "Take this small blessing in return."
+      ],
+      "reward_item": "Short_Sword"
+    },
+    {
+      "id": "Slay_Ghurn",
+      "giver": "Priestess",
+      "title": "Slay Ghurn (depth 17)",
+      "wanted_item": "Ghurn_Tusk",
+      "reward_gold": 88,
+      "offer": [
+        "A wrongness festers around Ghurn the Blightborn,",
+        "depth 17 of the dark below. It must",
+        "be ended, and a token brought back so",
+        "we may bless its rest."
+      ],
+      "reminder": "Ghurn still corrupts depth 17. It cannot be left to fester.",
+      "thanks": [
+        "Ghurn's taint is lifted. The Light thanks you.",
+        "Take this small blessing in return."
+      ]
+    },
+    {
+      "id": "Slay_Sable",
+      "giver": "Priestess",
+      "title": "Slay Sable (depth 22)",
+      "wanted_item": "Sable_Claw",
+      "reward_gold": 108,
+      "offer": [
+        "A wrongness festers around Sable the Night Warden,",
+        "depth 22 of the dark below. It must",
+        "be ended, and a token brought back so",
+        "we may bless its rest."
+      ],
+      "reminder": "Sable still corrupts depth 22. It cannot be left to fester.",
+      "thanks": [
+        "Sable's taint is lifted. The Light thanks you.",
+        "Take this small blessing in return."
+      ],
+      "reward_item": "Spiked_Club"
+    },
+    {
+      "id": "Slay_Uldrath",
+      "giver": "Priestess",
+      "title": "Slay Uldrath (depth 27)",
+      "wanted_item": "Uldrath_Skull",
+      "reward_gold": 128,
+      "offer": [
+        "A wrongness festers around Uldrath the Forsaken,",
+        "depth 27 of the dark below. It must",
+        "be ended, and a token brought back so",
+        "we may bless its rest."
+      ],
+      "reminder": "Uldrath still corrupts depth 27. It cannot be left to fester.",
+      "thanks": [
+        "Uldrath's taint is lifted. The Light thanks you.",
+        "Take this small blessing in return."
+      ]
+    },
+    {
+      "id": "Guards_Shortsword",
+      "giver": "Guard_Captain",
+      "title": "Bring Captain Aldric a short sword",
+      "wanted_item": "Short_Sword",
+      "reward_gold": 15,
+      "offer": [
+        "The armory's short a short sword. Bring one up",
+        "from the depths and I'll square you",
+        "with the garrison for it."
+      ],
+      "reminder": "Armory still wants that short sword.",
+      "thanks": [
+        "That'll do for the armory.",
+        "Here. The garrison pays its debts."
+      ]
+    },
+    {
+      "id": "Guards_Chainmail",
+      "giver": "Guard_Captain",
+      "title": "Bring Captain Aldric a chain shirt",
+      "wanted_item": "Chain_Shirt",
+      "reward_gold": 25,
+      "offer": [
+        "The armory's short a chain shirt. Bring one up",
+        "from the depths and I'll square you",
+        "with the garrison for it."
+      ],
+      "reminder": "Armory still wants that chain shirt.",
+      "thanks": [
+        "That'll do for the armory.",
+        "Here. The garrison pays its debts."
+      ],
+      "reward_item": "Goblin_Dagger"
+    },
+    {
+      "id": "Guards_Club",
+      "giver": "Guard_Captain",
+      "title": "Bring Captain Aldric a spiked club",
+      "wanted_item": "Spiked_Club",
+      "reward_gold": 35,
+      "offer": [
+        "The armory's short a spiked club. Bring one up",
+        "from the depths and I'll square you",
+        "with the garrison for it."
+      ],
+      "reminder": "Armory still wants that spiked club.",
+      "thanks": [
+        "That'll do for the armory.",
+        "Here. The garrison pays its debts."
+      ]
+    },
+    {
+      "id": "Slay_Pike",
+      "giver": "Guard_Captain",
+      "title": "Slay Pike (depth 8)",
+      "wanted_item": "Pike_Ear",
+      "reward_gold": 52,
+      "offer": [
+        "Pike the Cutthroat is worth a bounty, depth 8.",
+        "Kill it, bring back proof of the kill,",
+        "and the village coffers will open for",
+        "you. Simple as that, adventurer."
+      ],
+      "reminder": "Bounty's still open on Pike, depth 8. Bring proof.",
+      "thanks": [
+        "Pike down. One less name on my list.",
+        "Bounty's yours, paid in full."
+      ]
+    },
+    {
+      "id": "Slay_Grix",
+      "giver": "Guard_Captain",
+      "title": "Slay Grix (depth 13)",
+      "wanted_item": "Grix_Fang",
+      "reward_gold": 72,
+      "offer": [
+        "Grix the Backstabber is worth a bounty, depth 13.",
+        "Kill it, bring back proof of the kill,",
+        "and the village coffers will open for",
+        "you. Simple as that, adventurer."
+      ],
+      "reminder": "Bounty's still open on Grix, depth 13. Bring proof.",
+      "thanks": [
+        "Grix down. One less name on my list.",
+        "Bounty's yours, paid in full."
+      ],
+      "reward_item": "Healing_Potion"
+    },
+    {
+      "id": "Slay_Bruundor",
+      "giver": "Guard_Captain",
+      "title": "Slay Bruundor (depth 18)",
+      "wanted_item": "Bruundor_Tusk",
+      "reward_gold": 92,
+      "offer": [
+        "Bruundor the Wall-Smasher is worth a bounty, depth 18.",
+        "Kill it, bring back proof of the kill,",
+        "and the village coffers will open for",
+        "you. Simple as that, adventurer."
+      ],
+      "reminder": "Bounty's still open on Bruundor, depth 18. Bring proof.",
+      "thanks": [
+        "Bruundor down. One less name on my list.",
+        "Bounty's yours, paid in full."
+      ]
+    },
+    {
+      "id": "Slay_Vozgar",
+      "giver": "Guard_Captain",
+      "title": "Slay Vozgar (depth 23)",
+      "wanted_item": "Vozgar_Claw",
+      "reward_gold": 112,
+      "offer": [
+        "Vozgar the Unyielding is worth a bounty, depth 23.",
+        "Kill it, bring back proof of the kill,",
+        "and the village coffers will open for",
+        "you. Simple as that, adventurer."
+      ],
+      "reminder": "Bounty's still open on Vozgar, depth 23. Bring proof.",
+      "thanks": [
+        "Vozgar down. One less name on my list.",
+        "Bounty's yours, paid in full."
+      ],
+      "reward_item": "Chain_Shirt"
+    },
+    {
+      "id": "Slay_Krenn",
+      "giver": "Guard_Captain",
+      "title": "Slay Krenn (depth 28)",
+      "wanted_item": "Krenn_Skull",
+      "reward_gold": 132,
+      "offer": [
+        "Krenn the Warlord is worth a bounty, depth 28.",
+        "Kill it, bring back proof of the kill,",
+        "and the village coffers will open for",
+        "you. Simple as that, adventurer."
+      ],
+      "reminder": "Bounty's still open on Krenn, depth 28. Bring proof.",
+      "thanks": [
+        "Krenn down. One less name on my list.",
+        "Bounty's yours, paid in full."
+      ]
+    },
+    {
+      "id": "Slay_Korrath",
+      "giver": "Elder",
+      "title": "Slay Korrath (depth 29)",
+      "requires": "Slay_Threk",
+      "wanted_item": "Korrath_Charm",
+      "reward_gold": 136,
+      "offer": [
+        "A golem has woken in the deep dark,",
+        "depth 29, stone given cruel purpose.",
+        "End it, and the village will finally",
+        "believe the depths can be tamed."
+      ],
+      "reminder": "Korrath still stands, depth 29. Stone doesn't tire.",
+      "thanks": [
+        "Korrath, broken at last. Rubble now.",
+        "You've more than earned this, truly."
+      ]
+    },
+    {
+      "id": "Slay_Vaelor",
+      "giver": "Smith",
+      "title": "Slay Vaelor (depth 30)",
+      "requires": "Slay_Molgar",
+      "wanted_item": "Vaelor_Charm",
+      "reward_gold": 140,
+      "offer": [
+        "Vaelor was a smith too, once, before",
+        "the depths remade him into bone and",
+        "rust at depth 30. Put him down, and",
+        "bring back what's left of his craft."
+      ],
+      "reminder": "Vaelor waits at depth 30, still swinging that ruined blade.",
+      "thanks": [
+        "So the old smith finally rests. Good.",
+        "Take this. He'd have wanted you to."
+      ]
+    },
+    {
+      "id": "Slay_Mossback",
+      "giver": "Hunter",
+      "title": "Slay Mossback (depth 31)",
+      "requires": "Slay_Hollow",
+      "wanted_item": "Mossback_Charm",
+      "reward_gold": 144,
+      "offer": [
+        "Mossback has haunted depth 31 longer",
+        "than I've hunted. Moss-backed, ancient,",
+        "and mean. Bring it down, and I'll call",
+        "my hunting done for good."
+      ],
+      "reminder": "Mossback's still out there, depth 31. Old and vicious.",
+      "thanks": [
+        "Ha! The old beast finally fell.",
+        "This is the last bounty I'll ever pay."
+      ]
+    },
+    {
+      "id": "Slay_Sorrow",
+      "giver": "Priestess",
+      "title": "Slay Sorrow (depth 32)",
+      "requires": "Slay_Uldrath",
+      "wanted_item": "Sorrow_Charm",
+      "reward_gold": 148,
+      "offer": [
+        "Something grieves at depth 32, and its",
+        "grief has teeth. Sorrow, the whispering",
+        "dead call it. Silence it, and bring",
+        "back proof so it may finally rest."
+      ],
+      "reminder": "Sorrow still weeps and kills at depth 32. It must be silenced.",
+      "thanks": [
+        "Sorrow is quiet now. At peace, I hope.",
+        "Take this. The Light remembers kindness."
+      ]
+    },
+    {
+      "id": "Slay_Aurek",
+      "giver": "Guard_Captain",
+      "title": "Slay Aurek (depth 33)",
+      "requires": "Slay_Krenn",
+      "wanted_item": "Aurek_Charm",
+      "reward_gold": 152,
+      "offer": [
+        "Aurek, the Last Sentinel, guards depth",
+        "33 for a war long since lost. It will",
+        "kill anything that passes. End it, and",
+        "the bounty's the largest I've ever posted."
+      ],
+      "reminder": "Aurek still guards depth 33. Biggest bounty on my board.",
+      "thanks": [
+        "Aurek down. I didn't think anyone could.",
+        "Full bounty, and my respect besides."
+      ]
     }
-   ]
-  },
-  {
-   "id": "Rat",
-   "name": "giant rat",
-   "article": "a rat",
-   "sprite_sheet": "rat_sheet.png",
-   "corpse": "Rat_Corpse",
-   "attack_verb": "bites",
-   "frame_size": [
-    20,
-    16
-   ],
-   "footprint": "single",
-   "shadow_radius": 5,
-   "blood_color": [
-    140,
-    60,
-    40,
-    255
-   ],
-   "damage_dice": {
-    "count": 1,
-    "sides": 2,
-    "bonus": 0
-   },
-   "armor": 0,
-   "max_hit_points": 4,
-   "strength": 6,
-   "dexterity": 14,
-   "constitution": 6,
-   "default_stance": "Aggressive",
-   "weapon_weight": "Light",
-   "armor_weight": "Light",
-   "walk_seconds": 0.25,
-   "attack_seconds": 0.35,
-   "knockback_distance": 2,
-   "turns_between_actions": 1,
-   "shakes_screen_on_hit": false,
-   "weapon_sound": "Light",
-   "hurt_sound": "Hurt_Goblin",
-   "death_sound": "Death_Goblin",
-   "behaviours": [
+  ],
+  "items": [
     {
-     "kind": "Melee_Attack"
+      "id": "Gold",
+      "name": "Gold",
+      "category": "Gold",
+      "icon_column": 0,
+      "flavor": "Goblins love it. So do you.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
     },
     {
-     "kind": "Chase_Player",
-     "notice_distance": 8
+      "id": "Healing_Potion",
+      "name": "Healing potion",
+      "category": "Potion",
+      "icon_column": 1,
+      "flavor": "Tastes of cherries and iron.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 2
+      },
+      "sound": ""
     },
     {
-     "kind": "Wander",
-     "chance": 0.5
+      "id": "Short_Sword",
+      "name": "Short sword",
+      "category": "Weapon",
+      "icon_column": 2,
+      "flavor": "Plain and reliable.",
+      "damage_dice": {
+        "count": 1,
+        "sides": 6,
+        "bonus": 1
+      },
+      "weight": "Medium",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": "Blade"
+    },
+    {
+      "id": "Goblin_Dagger",
+      "name": "Goblin dagger",
+      "category": "Weapon",
+      "icon_column": 3,
+      "flavor": "Crude, but it bites.",
+      "damage_dice": {
+        "count": 2,
+        "sides": 3,
+        "bonus": 0
+      },
+      "weight": "Light",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": "Light"
+    },
+    {
+      "id": "Spiked_Club",
+      "name": "Spiked club",
+      "category": "Weapon",
+      "icon_column": 4,
+      "flavor": "Pried from an ogre's fingers.",
+      "damage_dice": {
+        "count": 2,
+        "sides": 4,
+        "bonus": 1
+      },
+      "weight": "Heavy",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": "Heavy"
+    },
+    {
+      "id": "Longsword",
+      "name": "Longsword",
+      "category": "Weapon",
+      "icon_column": 5,
+      "flavor": "Balanced, keen, old.",
+      "damage_dice": {
+        "count": 1,
+        "sides": 8,
+        "bonus": 2
+      },
+      "weight": "Medium",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": "Blade"
+    },
+    {
+      "id": "Leather_Armor",
+      "name": "Leather armor",
+      "category": "Armor",
+      "icon_column": 6,
+      "flavor": "Stiff, but it turns a blade.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 1,
+      "armor_weight": "Light",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Chain_Shirt",
+      "name": "Chain shirt",
+      "category": "Armor",
+      "icon_column": 7,
+      "flavor": "Heavy rings, carefully mended.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 2,
+      "armor_weight": "Medium",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Town_Portal_Scroll",
+      "name": "Scroll of Town Portal",
+      "category": "Scroll",
+      "icon_column": 8,
+      "flavor": "The ink is still faintly warm.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Skreel_Ear",
+      "name": "Skreel's ear",
+      "category": "Quest_Item",
+      "icon_column": 9,
+      "flavor": "Still warm. Someone will want proof.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Dunmarr_Fang",
+      "name": "Dunmarr's fang",
+      "category": "Quest_Item",
+      "icon_column": 10,
+      "flavor": "Yellowed and cracked, but unmistakably his.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Ashka_Tusk",
+      "name": "Ashka's tusk",
+      "category": "Quest_Item",
+      "icon_column": 11,
+      "flavor": "Carved with crude, boastful runes.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Blackmaw_Claw",
+      "name": "Blackmaw's claw",
+      "category": "Quest_Item",
+      "icon_column": 12,
+      "flavor": "Long enough to open a man from throat to belt.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Threk_Skull",
+      "name": "Threk's skull",
+      "category": "Quest_Item",
+      "icon_column": 13,
+      "flavor": "Heavier than it looks. So was he.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Rusk_Ear",
+      "name": "Rusk's ear",
+      "category": "Quest_Item",
+      "icon_column": 14,
+      "flavor": "Notched from a hundred old fights.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Gnarl_Fang",
+      "name": "Gnarl's fang",
+      "category": "Quest_Item",
+      "icon_column": 15,
+      "flavor": "Rimmed black with old poison.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Kroll_Tusk",
+      "name": "Kroll's tusk",
+      "category": "Quest_Item",
+      "icon_column": 16,
+      "flavor": "Chipped where it met the anvil.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Fenrik_Claw",
+      "name": "Fenrik's claw",
+      "category": "Quest_Item",
+      "icon_column": 17,
+      "flavor": "Iron-hard, and just as sharp.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Molgar_Skull",
+      "name": "Molgar's skull",
+      "category": "Quest_Item",
+      "icon_column": 18,
+      "flavor": "The jaw alone could crush a shield.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Snitch_Ear",
+      "name": "Snitch's ear",
+      "category": "Quest_Item",
+      "icon_column": 19,
+      "flavor": "Pierced with a dozen stolen rings.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Marrow_Fang",
+      "name": "Marrow's fang",
+      "category": "Quest_Item",
+      "icon_column": 20,
+      "flavor": "Filed to a wicked point.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Grendle_Tusk",
+      "name": "Grendle's tusk",
+      "category": "Quest_Item",
+      "icon_column": 21,
+      "flavor": "Slick with bog-water, even now.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Karth_Claw",
+      "name": "Karth's claw",
+      "category": "Quest_Item",
+      "icon_column": 22,
+      "flavor": "Still stained dark at the tip.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Hollow_Skull",
+      "name": "The Hollow Fang's skull",
+      "category": "Quest_Item",
+      "icon_column": 23,
+      "flavor": "Its eye sockets never seem to close.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Vex_Ear",
+      "name": "Vex's ear",
+      "category": "Quest_Item",
+      "icon_column": 24,
+      "flavor": "A cursed sigil is scratched behind it.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Morrow_Fang",
+      "name": "Morrow's fang",
+      "category": "Quest_Item",
+      "icon_column": 25,
+      "flavor": "Cold to the touch, even in your pocket.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Ghurn_Tusk",
+      "name": "Ghurn's tusk",
+      "category": "Quest_Item",
+      "icon_column": 26,
+      "flavor": "Blighted black at the root.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Sable_Claw",
+      "name": "Sable's claw",
+      "category": "Quest_Item",
+      "icon_column": 27,
+      "flavor": "Darker than any natural shadow.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Uldrath_Skull",
+      "name": "Uldrath's skull",
+      "category": "Quest_Item",
+      "icon_column": 28,
+      "flavor": "It seems to watch you from the backpack.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Pike_Ear",
+      "name": "Pike's ear",
+      "category": "Quest_Item",
+      "icon_column": 29,
+      "flavor": "A thief's mark is tattooed on it.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Grix_Fang",
+      "name": "Grix's fang",
+      "category": "Quest_Item",
+      "icon_column": 30,
+      "flavor": "Bloodied from one blow too many.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Bruundor_Tusk",
+      "name": "Bruundor's tusk",
+      "category": "Quest_Item",
+      "icon_column": 31,
+      "flavor": "Thick enough to use as a club itself.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Vozgar_Claw",
+      "name": "Vozgar's claw",
+      "category": "Quest_Item",
+      "icon_column": 32,
+      "flavor": "Curved like a reaper's blade.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Krenn_Skull",
+      "name": "Warlord Krenn's skull",
+      "category": "Quest_Item",
+      "icon_column": 33,
+      "flavor": "Crowned still with a dented iron circlet.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Hand_Axe",
+      "name": "Hand axe",
+      "category": "Weapon",
+      "icon_column": 34,
+      "flavor": "A woodsman's axe, better suited to war than wood.",
+      "damage_dice": {
+        "count": 1,
+        "sides": 8,
+        "bonus": 0
+      },
+      "weight": "Medium",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": "Blade"
+    },
+    {
+      "id": "Mace",
+      "name": "Mace",
+      "category": "Weapon",
+      "icon_column": 35,
+      "flavor": "Blunt, honest, and hard to parry.",
+      "damage_dice": {
+        "count": 1,
+        "sides": 6,
+        "bonus": 2
+      },
+      "weight": "Medium",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": "Heavy"
+    },
+    {
+      "id": "War_Hammer",
+      "name": "War hammer",
+      "category": "Weapon",
+      "icon_column": 36,
+      "flavor": "Two hands, one devastating idea.",
+      "damage_dice": {
+        "count": 2,
+        "sides": 6,
+        "bonus": 0
+      },
+      "weight": "Heavy",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": "Heavy"
+    },
+    {
+      "id": "Spear",
+      "name": "Spear",
+      "category": "Weapon",
+      "icon_column": 37,
+      "flavor": "Keeps something dangerous at a distance.",
+      "damage_dice": {
+        "count": 1,
+        "sides": 8,
+        "bonus": 1
+      },
+      "weight": "Medium",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": "Blade"
+    },
+    {
+      "id": "Rapier",
+      "name": "Rapier",
+      "category": "Weapon",
+      "icon_column": 38,
+      "flavor": "Quick, precise, made for the riposte.",
+      "damage_dice": {
+        "count": 1,
+        "sides": 6,
+        "bonus": 1
+      },
+      "weight": "Light",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": "Blade"
+    },
+    {
+      "id": "Wooden_Shield",
+      "name": "Wooden shield",
+      "category": "Armor",
+      "icon_column": 39,
+      "flavor": "A merchant's leftover stock, better than nothing.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 1,
+      "armor_weight": "Light",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Helmet",
+      "name": "Helmet",
+      "category": "Armor",
+      "icon_column": 40,
+      "flavor": "Iron over your skull; the rest you trust to speed.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 2,
+      "armor_weight": "Light",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Antidote",
+      "name": "Antidote",
+      "category": "Potion",
+      "icon_column": 41,
+      "flavor": "Bitter and medicinal. Steadies whatever ails you.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 1,
+        "sides": 8,
+        "bonus": 2
+      },
+      "sound": ""
+    },
+    {
+      "id": "Korrath_Charm",
+      "name": "Korrath's charm",
+      "category": "Quest_Item",
+      "icon_column": 42,
+      "flavor": "Carved bone, still warm from the stone that wore it.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Vaelor_Charm",
+      "name": "Vaelor's charm",
+      "category": "Quest_Item",
+      "icon_column": 43,
+      "flavor": "Strung on old cord, the knots tied by a smith's hands.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Mossback_Charm",
+      "name": "Mossback's charm",
+      "category": "Quest_Item",
+      "icon_column": 44,
+      "flavor": "Slick with moss, ancient long before you were born.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Sorrow_Charm",
+      "name": "Sorrow's charm",
+      "category": "Quest_Item",
+      "icon_column": 45,
+      "flavor": "It doesn't feel like bone anymore. It feels like grief.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
+    },
+    {
+      "id": "Aurek_Charm",
+      "name": "Aurek's charm",
+      "category": "Quest_Item",
+      "icon_column": 46,
+      "flavor": "The rune on it is still faintly warm to the touch.",
+      "damage_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "weight": "",
+      "armor": 0,
+      "armor_weight": "",
+      "heal_dice": {
+        "count": 0,
+        "sides": 0,
+        "bonus": 0
+      },
+      "sound": ""
     }
-   ],
-   "loot": [
-    {
-     "item": "Gold",
-     "choices": [],
-     "chance": 0.3,
-     "min": 1,
-     "max": 3,
-     "max_per_depth": 0
-    }
-   ]
-  },
-  {
-   "id": "Bat",
-   "name": "cave bat",
-   "article": "a bat",
-   "sprite_sheet": "bat_sheet.png",
-   "corpse": "Bat_Corpse",
-   "attack_verb": "bites",
-   "frame_size": [
-    18,
-    16
-   ],
-   "footprint": "single",
-   "shadow_radius": 5,
-   "blood_color": [
-    110,
-    60,
-    90,
-    255
-   ],
-   "damage_dice": {
-    "count": 1,
-    "sides": 3,
-    "bonus": 0
-   },
-   "armor": 0,
-   "max_hit_points": 6,
-   "strength": 6,
-   "dexterity": 16,
-   "constitution": 6,
-   "default_stance": "Neutral",
-   "weapon_weight": "Light",
-   "armor_weight": "Light",
-   "walk_seconds": 0.2,
-   "attack_seconds": 0.3,
-   "knockback_distance": 3,
-   "turns_between_actions": 1,
-   "shakes_screen_on_hit": false,
-   "weapon_sound": "Light",
-   "hurt_sound": "Hurt_Goblin",
-   "death_sound": "Death_Goblin",
-   "behaviours": [
-    {
-     "kind": "Melee_Attack"
-    },
-    {
-     "kind": "Chase_Player",
-     "notice_distance": 9
-    },
-    {
-     "kind": "Wander",
-     "chance": 0.6
-    }
-   ],
-   "loot": [
-    {
-     "item": "Gold",
-     "choices": [],
-     "chance": 0.3,
-     "min": 1,
-     "max": 4,
-     "max_per_depth": 0
-    }
-   ]
-  },
-  {
-   "id": "Spider",
-   "name": "cave spider",
-   "article": "a spider",
-   "sprite_sheet": "spider_sheet.png",
-   "corpse": "Spider_Corpse",
-   "attack_verb": "bites",
-   "frame_size": [
-    22,
-    18
-   ],
-   "footprint": "single",
-   "shadow_radius": 6,
-   "blood_color": [
-    70,
-    55,
-    95,
-    255
-   ],
-   "damage_dice": {
-    "count": 1,
-    "sides": 6,
-    "bonus": 0
-   },
-   "armor": 0,
-   "max_hit_points": 8,
-   "strength": 9,
-   "dexterity": 16,
-   "constitution": 8,
-   "default_stance": "Aggressive",
-   "weapon_weight": "Light",
-   "armor_weight": "Light",
-   "walk_seconds": 0.3,
-   "attack_seconds": 0.4,
-   "knockback_distance": 3,
-   "turns_between_actions": 1,
-   "shakes_screen_on_hit": false,
-   "weapon_sound": "Light",
-   "hurt_sound": "Hurt_Goblin",
-   "death_sound": "Death_Goblin",
-   "behaviours": [
-    {
-     "kind": "Melee_Attack"
-    },
-    {
-     "kind": "Chase_Player",
-     "notice_distance": 6
-    },
-    {
-     "kind": "Wander",
-     "chance": 0.3
-    }
-   ],
-   "loot": [
-    {
-     "item": "Gold",
-     "choices": [],
-     "chance": 0.4,
-     "min": 2,
-     "max": 6,
-     "max_per_depth": 1
-    },
-    {
-     "item": "Antidote",
-     "choices": [],
-     "chance": 0.15,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
-    }
-   ]
-  },
-  {
-   "id": "Slime",
-   "name": "slime",
-   "article": "a slime",
-   "sprite_sheet": "slime_sheet.png",
-   "corpse": "Slime_Corpse",
-   "attack_verb": "engulfs",
-   "frame_size": [
-    18,
-    14
-   ],
-   "footprint": "single",
-   "shadow_radius": 7,
-   "blood_color": [
-    90,
-    190,
-    120,
-    255
-   ],
-   "damage_dice": {
-    "count": 1,
-    "sides": 4,
-    "bonus": 1
-   },
-   "armor": 1,
-   "max_hit_points": 14,
-   "strength": 10,
-   "dexterity": 6,
-   "constitution": 14,
-   "default_stance": "Defensive",
-   "weapon_weight": "Medium",
-   "armor_weight": "Heavy",
-   "walk_seconds": 0.5,
-   "attack_seconds": 0.6,
-   "knockback_distance": 1,
-   "turns_between_actions": 2,
-   "shakes_screen_on_hit": false,
-   "weapon_sound": "Heavy",
-   "hurt_sound": "Hurt_Goblin",
-   "death_sound": "Death_Goblin",
-   "behaviours": [
-    {
-     "kind": "Melee_Attack"
-    },
-    {
-     "kind": "Chase_Player",
-     "notice_distance": 4
-    },
-    {
-     "kind": "Wander",
-     "chance": 0.2
-    }
-   ],
-   "loot": [
-    {
-     "item": "Gold",
-     "choices": [],
-     "chance": 0.5,
-     "min": 3,
-     "max": 8,
-     "max_per_depth": 1
-    }
-   ]
-  },
-  {
-   "id": "Mushroom",
-   "name": "mushroom walker",
-   "article": "a mushroom",
-   "sprite_sheet": "mushroom_sheet.png",
-   "corpse": "Mushroom_Corpse",
-   "attack_verb": "lashes",
-   "frame_size": [
-    16,
-    22
-   ],
-   "footprint": "single",
-   "shadow_radius": 6,
-   "blood_color": [
-    200,
-    180,
-    140,
-    255
-   ],
-   "damage_dice": {
-    "count": 1,
-    "sides": 6,
-    "bonus": 0
-   },
-   "armor": 0,
-   "max_hit_points": 10,
-   "strength": 8,
-   "dexterity": 8,
-   "constitution": 12,
-   "default_stance": "Neutral",
-   "weapon_weight": "Medium",
-   "armor_weight": "Medium",
-   "walk_seconds": 0.4,
-   "attack_seconds": 0.5,
-   "knockback_distance": 2,
-   "turns_between_actions": 1,
-   "shakes_screen_on_hit": false,
-   "weapon_sound": "Light",
-   "hurt_sound": "Hurt_Goblin",
-   "death_sound": "Death_Goblin",
-   "behaviours": [
-    {
-     "kind": "Melee_Attack"
-    },
-    {
-     "kind": "Chase_Player",
-     "notice_distance": 2
-    },
-    {
-     "kind": "Wander",
-     "chance": 0.05
-    }
-   ],
-   "loot": [
-    {
-     "item": "Healing_Potion",
-     "choices": [],
-     "chance": 0.35,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
-    },
-    {
-     "item": "Antidote",
-     "choices": [],
-     "chance": 0.2,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
-    }
-   ]
-  },
-  {
-   "id": "Skeleton",
-   "name": "skeleton",
-   "article": "a skeleton",
-   "sprite_sheet": "skeleton_sheet.png",
-   "corpse": "Skeleton_Corpse",
-   "attack_verb": "slashes",
-   "frame_size": [
-    16,
-    24
-   ],
-   "footprint": "single",
-   "shadow_radius": 6,
-   "blood_color": [
-    210,
-    205,
-    190,
-    255
-   ],
-   "damage_dice": {
-    "count": 1,
-    "sides": 6,
-    "bonus": 1
-   },
-   "armor": 1,
-   "max_hit_points": 14,
-   "strength": 13,
-   "dexterity": 12,
-   "constitution": 10,
-   "default_stance": "Neutral",
-   "weapon_weight": "Medium",
-   "armor_weight": "Medium",
-   "walk_seconds": 0.3,
-   "attack_seconds": 0.5,
-   "knockback_distance": 3,
-   "turns_between_actions": 1,
-   "shakes_screen_on_hit": false,
-   "weapon_sound": "Blade",
-   "hurt_sound": "Hurt_Goblin",
-   "death_sound": "Death_Goblin",
-   "behaviours": [
-    {
-     "kind": "Melee_Attack"
-    },
-    {
-     "kind": "Chase_Player",
-     "notice_distance": 7
-    }
-   ],
-   "loot": [
-    {
-     "item": "Gold",
-     "choices": [],
-     "chance": 1.0,
-     "min": 4,
-     "max": 10,
-     "max_per_depth": 1
-    },
-    {
-     "item": "",
-     "choices": [
-      "Hand_Axe",
-      "Spear",
-      "Rapier"
-     ],
-     "chance": 0.2,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
-    },
-    {
-     "item": "",
-     "choices": [
-      "Wooden_Shield",
-      "Helmet"
-     ],
-     "chance": 0.15,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
-    }
-   ]
-  },
-  {
-   "id": "Troll",
-   "name": "cave troll",
-   "article": "a troll",
-   "sprite_sheet": "troll_sheet.png",
-   "corpse": "Troll_Corpse",
-   "attack_verb": "claws",
-   "frame_size": [
-    40,
-    52
-   ],
-   "footprint": "triangle",
-   "shadow_radius": 16,
-   "blood_color": [
-    90,
-    110,
-    60,
-    255
-   ],
-   "damage_dice": {
-    "count": 2,
-    "sides": 6,
-    "bonus": 0
-   },
-   "armor": 0,
-   "max_hit_points": 30,
-   "strength": 20,
-   "dexterity": 8,
-   "constitution": 18,
-   "default_stance": "Aggressive",
-   "weapon_weight": "Heavy",
-   "armor_weight": "Heavy",
-   "walk_seconds": 0.4,
-   "attack_seconds": 0.7,
-   "knockback_distance": 2,
-   "turns_between_actions": 2,
-   "shakes_screen_on_hit": true,
-   "weapon_sound": "Heavy",
-   "hurt_sound": "Hurt_Ogre",
-   "death_sound": "Death_Ogre",
-   "behaviours": [
-    {
-     "kind": "Melee_Attack"
-    },
-    {
-     "kind": "Chase_Player",
-     "notice_distance": 8
-    }
-   ],
-   "loot": [
-    {
-     "item": "Gold",
-     "choices": [],
-     "chance": 1.0,
-     "min": 15,
-     "max": 30,
-     "max_per_depth": 2
-    },
-    {
-     "item": "Healing_Potion",
-     "choices": [],
-     "chance": 0.4,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
-    },
-    {
-     "item": "",
-     "choices": [
-      "War_Hammer",
-      "Mace"
-     ],
-     "chance": 0.3,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
-    }
-   ]
-  },
-  {
-   "id": "Golem",
-   "name": "stone golem",
-   "article": "a golem",
-   "sprite_sheet": "golem_sheet.png",
-   "corpse": "Golem_Corpse",
-   "attack_verb": "crushes",
-   "frame_size": [
-    44,
-    54
-   ],
-   "footprint": "triangle",
-   "shadow_radius": 17,
-   "blood_color": [
-    150,
-    148,
-    140,
-    255
-   ],
-   "damage_dice": {
-    "count": 2,
-    "sides": 6,
-    "bonus": 2
-   },
-   "armor": 3,
-   "max_hit_points": 40,
-   "strength": 20,
-   "dexterity": 4,
-   "constitution": 20,
-   "default_stance": "Neutral",
-   "weapon_weight": "Heavy",
-   "armor_weight": "Heavy",
-   "walk_seconds": 0.55,
-   "attack_seconds": 0.9,
-   "knockback_distance": 1,
-   "turns_between_actions": 3,
-   "shakes_screen_on_hit": true,
-   "weapon_sound": "Heavy",
-   "hurt_sound": "Hurt_Ogre",
-   "death_sound": "Death_Ogre",
-   "behaviours": [
-    {
-     "kind": "Melee_Attack"
-    },
-    {
-     "kind": "Chase_Player",
-     "notice_distance": 5
-    }
-   ],
-   "loot": [
-    {
-     "item": "Gold",
-     "choices": [],
-     "chance": 1.0,
-     "min": 20,
-     "max": 40,
-     "max_per_depth": 2
-    },
-    {
-     "item": "War_Hammer",
-     "choices": [],
-     "chance": 0.3,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
-    },
-    {
-     "item": "Helmet",
-     "choices": [],
-     "chance": 0.25,
-     "min": 0,
-     "max": 0,
-     "max_per_depth": 0
-    }
-   ]
-  }
- ],
- "named_creatures": [
-  {
-   "id": "Grishnak",
-   "name": "Grishnak",
-   "title": "the Goblin Warlord",
-   "kind": "Goblin",
-   "depth": 2,
-   "max_hit_points": 26,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 1
-   },
-   "armor": 1,
-   "tint": [
-    255,
-    130,
-    120,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Gold",
-     "count": 40
-    },
-    {
-     "kind": "Healing_Potion",
-     "count": 1
-    }
-   ]
-  },
-  {
-   "id": "Gorluk",
-   "name": "Gorluk",
-   "title": "the Ogre Chieftain",
-   "kind": "Ogre",
-   "depth": 4,
-   "max_hit_points": 45,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 2
-   },
-   "armor": 2,
-   "tint": [
-    190,
-    150,
-    255,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Gold",
-     "count": 90
-    },
-    {
-     "kind": "Healing_Potion",
-     "count": 2
-    }
-   ]
-  },
-  {
-   "id": "Skreel",
-   "name": "Skreel",
-   "title": "the Ashclaw",
-   "kind": "Goblin",
-   "depth": 3,
-   "max_hit_points": 14,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 0
-   },
-   "armor": 0,
-   "tint": [
-    242,
-    125,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Skreel_Ear",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 8
-    }
-   ]
-  },
-  {
-   "id": "Dunmarr",
-   "name": "Dunmarr",
-   "title": "the Rootbreaker",
-   "kind": "Ogre",
-   "depth": 9,
-   "max_hit_points": 42,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 2
-   },
-   "armor": 2,
-   "tint": [
-    242,
-    172,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Dunmarr_Fang",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 14
-    }
-   ]
-  },
-  {
-   "id": "Ashka",
-   "name": "Ashka",
-   "title": "Nine-Fingers",
-   "kind": "Goblin",
-   "depth": 14,
-   "max_hit_points": 31,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 2
-   },
-   "armor": 1,
-   "tint": [
-    242,
-    220,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Ashka_Tusk",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 19
-    }
-   ]
-  },
-  {
-   "id": "Blackmaw",
-   "name": "Blackmaw",
-   "title": "the Ravager",
-   "kind": "Ogre",
-   "depth": 19,
-   "max_hit_points": 68,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 4
-   },
-   "armor": 4,
-   "tint": [
-    215,
-    242,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Blackmaw_Claw",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 24
-    }
-   ]
-  },
-  {
-   "id": "Threk",
-   "name": "Threk",
-   "title": "the Elder's Bane",
-   "kind": "Ogre",
-   "depth": 24,
-   "max_hit_points": 80,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 5
-   },
-   "armor": 5,
-   "tint": [
-    167,
-    242,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Threk_Skull",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 29
-    }
-   ]
-  },
-  {
-   "id": "Rusk",
-   "name": "Rusk",
-   "title": "the Notch-Blade",
-   "kind": "Goblin",
-   "depth": 5,
-   "max_hit_points": 18,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 1
-   },
-   "armor": 0,
-   "tint": [
-    119,
-    242,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Rusk_Ear",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 10
-    }
-   ]
-  },
-  {
-   "id": "Gnarl",
-   "name": "Gnarl",
-   "title": "Coalfist",
-   "kind": "Goblin",
-   "depth": 10,
-   "max_hit_points": 25,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 2
-   },
-   "armor": 1,
-   "tint": [
-    109,
-    242,
-    146,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Gnarl_Fang",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 15
-    }
-   ]
-  },
-  {
-   "id": "Kroll",
-   "name": "Kroll",
-   "title": "the Anvil-Breaker",
-   "kind": "Ogre",
-   "depth": 15,
-   "max_hit_points": 58,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 4
-   },
-   "armor": 3,
-   "tint": [
-    109,
-    242,
-    194,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Kroll_Tusk",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 20
-    }
-   ]
-  },
-  {
-   "id": "Fenrik",
-   "name": "Fenrik",
-   "title": "Ironhide",
-   "kind": "Ogre",
-   "depth": 20,
-   "max_hit_points": 70,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 5
-   },
-   "armor": 4,
-   "tint": [
-    109,
-    242,
-    242,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Fenrik_Claw",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 25
-    }
-   ]
-  },
-  {
-   "id": "Molgar",
-   "name": "Molgar",
-   "title": "the Forgestealer",
-   "kind": "Ogre",
-   "depth": 25,
-   "max_hit_points": 82,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 6
-   },
-   "armor": 5,
-   "tint": [
-    109,
-    194,
-    242,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Molgar_Skull",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 30
-    }
-   ]
-  },
-  {
-   "id": "Snitch",
-   "name": "Snitch",
-   "title": "the Quickfang",
-   "kind": "Goblin",
-   "depth": 6,
-   "max_hit_points": 19,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 1
-   },
-   "armor": 0,
-   "tint": [
-    109,
-    146,
-    242,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Snitch_Ear",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 11
-    }
-   ]
-  },
-  {
-   "id": "Marrow",
-   "name": "Marrow",
-   "title": "the Skulker",
-   "kind": "Goblin",
-   "depth": 11,
-   "max_hit_points": 26,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 2
-   },
-   "armor": 1,
-   "tint": [
-    119,
-    109,
-    242,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Marrow_Fang",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 16
-    }
-   ]
-  },
-  {
-   "id": "Grendle",
-   "name": "Grendle",
-   "title": "Bogmaw",
-   "kind": "Ogre",
-   "depth": 16,
-   "max_hit_points": 60,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 4
-   },
-   "armor": 3,
-   "tint": [
-    167,
-    109,
-    242,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Grendle_Tusk",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 21
-    }
-   ]
-  },
-  {
-   "id": "Karth",
-   "name": "Karth",
-   "title": "the Widowmaker",
-   "kind": "Ogre",
-   "depth": 21,
-   "max_hit_points": 72,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 5
-   },
-   "armor": 4,
-   "tint": [
-    215,
-    109,
-    242,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Karth_Claw",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 26
-    }
-   ]
-  },
-  {
-   "id": "Hollow",
-   "name": "Hollow",
-   "title": "the Hollow Fang",
-   "kind": "Ogre",
-   "depth": 26,
-   "max_hit_points": 85,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 6
-   },
-   "armor": 5,
-   "tint": [
-    242,
-    109,
-    220,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Hollow_Skull",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 31
-    }
-   ]
-  },
-  {
-   "id": "Vex",
-   "name": "Vex",
-   "title": "the Hexbound",
-   "kind": "Goblin",
-   "depth": 7,
-   "max_hit_points": 20,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 1
-   },
-   "armor": 0,
-   "tint": [
-    242,
-    109,
-    172,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Vex_Ear",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 12
-    }
-   ]
-  },
-  {
-   "id": "Morrow",
-   "name": "Morrow",
-   "title": "Palehand",
-   "kind": "Goblin",
-   "depth": 12,
-   "max_hit_points": 28,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 2
-   },
-   "armor": 1,
-   "tint": [
-    242,
-    109,
-    125,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Morrow_Fang",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 17
-    }
-   ]
-  },
-  {
-   "id": "Ghurn",
-   "name": "Ghurn",
-   "title": "the Blightborn",
-   "kind": "Ogre",
-   "depth": 17,
-   "max_hit_points": 62,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 4
-   },
-   "armor": 3,
-   "tint": [
-    242,
-    144,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Ghurn_Tusk",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 22
-    }
-   ]
-  },
-  {
-   "id": "Sable",
-   "name": "Sable",
-   "title": "the Night Warden",
-   "kind": "Ogre",
-   "depth": 22,
-   "max_hit_points": 75,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 5
-   },
-   "armor": 4,
-   "tint": [
-    242,
-    192,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Sable_Claw",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 27
-    }
-   ]
-  },
-  {
-   "id": "Uldrath",
-   "name": "Uldrath",
-   "title": "the Forsaken",
-   "kind": "Ogre",
-   "depth": 27,
-   "max_hit_points": 88,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 6
-   },
-   "armor": 5,
-   "tint": [
-    242,
-    240,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Uldrath_Skull",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 32
-    }
-   ]
-  },
-  {
-   "id": "Pike",
-   "name": "Pike",
-   "title": "the Cutthroat",
-   "kind": "Goblin",
-   "depth": 8,
-   "max_hit_points": 22,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 1
-   },
-   "armor": 1,
-   "tint": [
-    195,
-    242,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Pike_Ear",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 13
-    }
-   ]
-  },
-  {
-   "id": "Grix",
-   "name": "Grix",
-   "title": "the Backstabber",
-   "kind": "Goblin",
-   "depth": 13,
-   "max_hit_points": 30,
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 2
-   },
-   "armor": 1,
-   "tint": [
-    147,
-    242,
-    109,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Grix_Fang",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 18
-    }
-   ]
-  },
-  {
-   "id": "Bruundor",
-   "name": "Bruundor",
-   "title": "the Wall-Smasher",
-   "kind": "Ogre",
-   "depth": 18,
-   "max_hit_points": 65,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 4
-   },
-   "armor": 4,
-   "tint": [
-    109,
-    242,
-    118,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Bruundor_Tusk",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 23
-    }
-   ]
-  },
-  {
-   "id": "Vozgar",
-   "name": "Vozgar",
-   "title": "the Unyielding",
-   "kind": "Ogre",
-   "depth": 23,
-   "max_hit_points": 78,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 5
-   },
-   "armor": 4,
-   "tint": [
-    109,
-    242,
-    166,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Vozgar_Claw",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 28
-    }
-   ]
-  },
-  {
-   "id": "Krenn",
-   "name": "Krenn",
-   "title": "the Warlord",
-   "kind": "Ogre",
-   "depth": 28,
-   "max_hit_points": 90,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 6
-   },
-   "armor": 5,
-   "tint": [
-    109,
-    242,
-    214,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Krenn_Skull",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 33
-    }
-   ]
-  },
-  {
-   "id": "Korrath",
-   "name": "Korrath",
-   "title": "the Unbroken",
-   "kind": "Golem",
-   "depth": 29,
-   "max_hit_points": 92,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 6
-   },
-   "armor": 5,
-   "tint": [
-    180,
-    200,
-    160,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Korrath_Charm",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 34
-    }
-   ]
-  },
-  {
-   "id": "Vaelor",
-   "name": "Vaelor",
-   "title": "the Deathless",
-   "kind": "Skeleton",
-   "depth": 30,
-   "max_hit_points": 95,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 7
-   },
-   "armor": 6,
-   "tint": [
-    190,
-    210,
-    255,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Vaelor_Charm",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 35
-    }
-   ]
-  },
-  {
-   "id": "Mossback",
-   "name": "Mossback",
-   "title": "the Ancient",
-   "kind": "Troll",
-   "depth": 31,
-   "max_hit_points": 98,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 7
-   },
-   "armor": 6,
-   "tint": [
-    140,
-    190,
-    110,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Mossback_Charm",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 36
-    }
-   ]
-  },
-  {
-   "id": "Sorrow",
-   "name": "Sorrow",
-   "title": "the Whispering Dead",
-   "kind": "Skeleton",
-   "depth": 32,
-   "max_hit_points": 101,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 8
-   },
-   "armor": 6,
-   "tint": [
-    225,
-    210,
-    255,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Sorrow_Charm",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 37
-    }
-   ]
-  },
-  {
-   "id": "Aurek",
-   "name": "Aurek",
-   "title": "the Last Sentinel",
-   "kind": "Golem",
-   "depth": 33,
-   "max_hit_points": 104,
-   "damage_dice": {
-    "count": 3,
-    "sides": 4,
-    "bonus": 8
-   },
-   "armor": 7,
-   "tint": [
-    150,
-    140,
-    150,
-    255
-   ],
-   "trophy": [
-    {
-     "kind": "Aurek_Charm",
-     "count": 1
-    },
-    {
-     "kind": "Gold",
-     "count": 38
-    }
-   ]
-  }
- ],
- "npcs": [
-  {
-   "id": "Elder",
-   "name": "Elder Mara",
-   "tint": [
-    210,
-    170,
-    255,
-    255
-   ],
-   "offset": {
-    "q": 1,
-    "r": -2
-   },
-   "idle_line": "You have done more than enough. Rest a while."
-  },
-  {
-   "id": "Smith",
-   "name": "Tomas the smith",
-   "tint": [
-    255,
-    190,
-    140,
-    255
-   ],
-   "offset": {
-    "q": -4,
-    "r": 2
-   },
-   "idle_line": "The forge is hot, but I've nothing for you now."
-  },
-  {
-   "id": "Merchant",
-   "name": "Old Kessa",
-   "tint": [
-    170,
-    220,
-    190,
-    255
-   ],
-   "offset": {
-    "q": 4,
-    "r": -1
-   },
-   "idle_line": "Careful down there.",
-   "sells": "Town_Portal_Scroll",
-   "price": 40
-  },
-  {
-   "id": "Hunter",
-   "name": "Yara the hunter",
-   "tint": [
-    140,
-    170,
-    90,
-    255
-   ],
-   "offset": {
-    "q": -3,
-    "r": -3
-   },
-   "idle_line": "The deep places have their own laws. Learn them, or die."
-  },
-  {
-   "id": "Priestess",
-   "name": "Sister Wren",
-   "tint": [
-    235,
-    225,
-    190,
-    255
-   ],
-   "offset": {
-    "q": 0,
-    "r": 3
-   },
-   "idle_line": "The Light does not reach past the third depth. Carry a torch, and faith."
-  },
-  {
-   "id": "Guard_Captain",
-   "name": "Captain Aldric",
-   "tint": [
-    120,
-    150,
-    190,
-    255
-   ],
-   "offset": {
-    "q": 5,
-    "r": 1
-   },
-   "idle_line": "Keep the road clear, and I'll keep the gate open."
-  }
- ],
- "quests": [
-  {
-   "id": "Slay_Grishnak",
-   "giver": "Elder",
-   "title": "Slay Grishnak (depth 2)",
-   "target": "Grishnak",
-   "reward_gold": 60,
-   "reward_item": "Chain_Shirt",
-   "offer": [
-    "Grishnak, a goblin warlord, raids us from",
-    "the second depth. Our fields burn.",
-    "Slay him, and you'll have gold, and",
-    "the chain shirt my son once wore."
-   ],
-   "reminder": "Grishnak still lives. Depth 2, adventurer.",
-   "thanks": [
-    "Grishnak is dead? The village owes you.",
-    "Take these, as promised."
-   ]
-  },
-  {
-   "id": "Smiths_Club",
-   "giver": "Smith",
-   "title": "Bring Tomas a spiked club",
-   "wanted_item": "Spiked_Club",
-   "reward_gold": 20,
-   "reward_item": "Longsword",
-   "offer": [
-    "Ogres carry clubs studded with old iron.",
-    "Bring me one in your backpack, and I'll",
-    "reforge the nails into a proper blade."
-   ],
-   "reminder": "No club yet? The ogres below carry them.",
-   "thanks": [
-    "Ha! Good iron under all that rust.",
-    "Here: a longsword, as promised."
-   ]
-  },
-  {
-   "id": "Slay_Gorluk",
-   "giver": "Elder",
-   "title": "Slay Gorluk (depth 4)",
-   "target": "Gorluk",
-   "reward_gold": 150,
-   "requires": "Slay_Grishnak",
-   "offer": [
-    "With Grishnak gone, Gorluk the ogre",
-    "chieftain gathers the tribes at depth 4.",
-    "End him, and songs will be sung of you."
-   ],
-   "reminder": "Gorluk waits at depth 4.",
-   "thanks": [
-    "Gorluk is dead. The songs begin tonight.",
-    "This is all the gold we could gather."
-   ]
-  },
-  {
-   "id": "Elders_Potions",
-   "giver": "Elder",
-   "title": "Bring the elder a healing potion",
-   "wanted_item": "Healing_Potion",
-   "reward_gold": 15,
-   "offer": [
-    "The village stores run thin on healing potion.",
-    "If you find one down there, bring it back",
-    "and we'll see you're rewarded for it."
-   ],
-   "reminder": "Still need that healing potion, if you find one.",
-   "thanks": [
-    "That'll do nicely, thank you.",
-    "Please, take this for your trouble."
-   ]
-  },
-  {
-   "id": "Elders_Longsword",
-   "giver": "Elder",
-   "title": "Bring the elder a longsword",
-   "wanted_item": "Longsword",
-   "reward_gold": 25,
-   "offer": [
-    "The village stores run thin on longsword.",
-    "If you find one down there, bring it back",
-    "and we'll see you're rewarded for it."
-   ],
-   "reminder": "Still need that longsword, if you find one.",
-   "thanks": [
-    "That'll do nicely, thank you.",
-    "Please, take this for your trouble."
-   ],
-   "reward_item": "Chain_Shirt"
-  },
-  {
-   "id": "Elders_Chainmail",
-   "giver": "Elder",
-   "title": "Bring the elder a chain shirt",
-   "wanted_item": "Chain_Shirt",
-   "reward_gold": 35,
-   "offer": [
-    "The village stores run thin on chain shirt.",
-    "If you find one down there, bring it back",
-    "and we'll see you're rewarded for it."
-   ],
-   "reminder": "Still need that chain shirt, if you find one.",
-   "thanks": [
-    "That'll do nicely, thank you.",
-    "Please, take this for your trouble."
-   ]
-  },
-  {
-   "id": "Slay_Skreel",
-   "giver": "Elder",
-   "title": "Slay Skreel (depth 3)",
-   "wanted_item": "Skreel_Ear",
-   "reward_gold": 32,
-   "offer": [
-    "Skreel the Ashclaw has made a den of the",
-    "depth 3 tunnels, and raids grow bolder.",
-    "Slay the creature and bring back proof,",
-    "and the village will remember your name."
-   ],
-   "reminder": "Skreel still lives, at depth 3. The village waits.",
-   "thanks": [
-    "Skreel is truly dead? Then we can breathe.",
-    "Take this, with the village's thanks."
-   ]
-  },
-  {
-   "id": "Slay_Dunmarr",
-   "giver": "Elder",
-   "title": "Slay Dunmarr (depth 9)",
-   "wanted_item": "Dunmarr_Fang",
-   "reward_gold": 56,
-   "offer": [
-    "Dunmarr the Rootbreaker has made a den of the",
-    "depth 9 tunnels, and raids grow bolder.",
-    "Slay the creature and bring back proof,",
-    "and the village will remember your name."
-   ],
-   "reminder": "Dunmarr still lives, at depth 9. The village waits.",
-   "thanks": [
-    "Dunmarr is truly dead? Then we can breathe.",
-    "Take this, with the village's thanks."
-   ],
-   "reward_item": "Longsword"
-  },
-  {
-   "id": "Slay_Ashka",
-   "giver": "Elder",
-   "title": "Slay Ashka (depth 14)",
-   "wanted_item": "Ashka_Tusk",
-   "reward_gold": 76,
-   "offer": [
-    "Ashka Nine-Fingers has made a den of the",
-    "depth 14 tunnels, and raids grow bolder.",
-    "Slay the creature and bring back proof,",
-    "and the village will remember your name."
-   ],
-   "reminder": "Ashka still lives, at depth 14. The village waits.",
-   "thanks": [
-    "Ashka is truly dead? Then we can breathe.",
-    "Take this, with the village's thanks."
-   ]
-  },
-  {
-   "id": "Slay_Blackmaw",
-   "giver": "Elder",
-   "title": "Slay Blackmaw (depth 19)",
-   "wanted_item": "Blackmaw_Claw",
-   "reward_gold": 96,
-   "offer": [
-    "Blackmaw the Ravager has made a den of the",
-    "depth 19 tunnels, and raids grow bolder.",
-    "Slay the creature and bring back proof,",
-    "and the village will remember your name."
-   ],
-   "reminder": "Blackmaw still lives, at depth 19. The village waits.",
-   "thanks": [
-    "Blackmaw is truly dead? Then we can breathe.",
-    "Take this, with the village's thanks."
-   ],
-   "reward_item": "Leather_Armor"
-  },
-  {
-   "id": "Slay_Threk",
-   "giver": "Elder",
-   "title": "Slay Threk (depth 24)",
-   "wanted_item": "Threk_Skull",
-   "reward_gold": 116,
-   "offer": [
-    "Threk the Elder's Bane has made a den of the",
-    "depth 24 tunnels, and raids grow bolder.",
-    "Slay the creature and bring back proof,",
-    "and the village will remember your name."
-   ],
-   "reminder": "Threk still lives, at depth 24. The village waits.",
-   "thanks": [
-    "Threk is truly dead? Then we can breathe.",
-    "Take this, with the village's thanks."
-   ]
-  },
-  {
-   "id": "Smiths_Dagger",
-   "giver": "Smith",
-   "title": "Bring Tomas a goblin dagger",
-   "wanted_item": "Goblin_Dagger",
-   "reward_gold": 15,
-   "offer": [
-    "Bring me a goblin dagger from the depths and",
-    "I'll see it put to good use at the forge.",
-    "Waste not, as they say."
-   ],
-   "reminder": "That goblin dagger would still be useful, if you have one.",
-   "thanks": [
-    "Good, good. This won't go to waste.",
-    "Here, for your trouble."
-   ]
-  },
-  {
-   "id": "Smiths_Leather",
-   "giver": "Smith",
-   "title": "Bring Tomas a leather armor",
-   "wanted_item": "Leather_Armor",
-   "reward_gold": 25,
-   "offer": [
-    "Bring me a leather armor from the depths and",
-    "I'll see it put to good use at the forge.",
-    "Waste not, as they say."
-   ],
-   "reminder": "That leather armor would still be useful, if you have one.",
-   "thanks": [
-    "Good, good. This won't go to waste.",
-    "Here, for your trouble."
-   ],
-   "reward_item": "Short_Sword"
-  },
-  {
-   "id": "Smiths_Potions",
-   "giver": "Smith",
-   "title": "Bring Tomas a healing potion",
-   "wanted_item": "Healing_Potion",
-   "reward_gold": 35,
-   "offer": [
-    "Bring me a healing potion from the depths and",
-    "I'll see it put to good use at the forge.",
-    "Waste not, as they say."
-   ],
-   "reminder": "That healing potion would still be useful, if you have one.",
-   "thanks": [
-    "Good, good. This won't go to waste.",
-    "Here, for your trouble."
-   ]
-  },
-  {
-   "id": "Slay_Rusk",
-   "giver": "Smith",
-   "title": "Slay Rusk (depth 5)",
-   "wanted_item": "Rusk_Ear",
-   "reward_gold": 40,
-   "offer": [
-    "Rusk the Notch-Blade carries good iron on depth 5.",
-    "Bring me proof it's dead and the metal's",
-    "mine to reforge. Fair trade, adventurer:",
-    "your risk for my craft."
-   ],
-   "reminder": "Rusk, depth 5. Bring me proof and I'll pay out.",
-   "thanks": [
-    "So Rusk's finally cold. Good iron, this.",
-    "Here's your share, fairly earned."
-   ]
-  },
-  {
-   "id": "Slay_Gnarl",
-   "giver": "Smith",
-   "title": "Slay Gnarl (depth 10)",
-   "wanted_item": "Gnarl_Fang",
-   "reward_gold": 60,
-   "offer": [
-    "Gnarl Coalfist carries good iron on depth 10.",
-    "Bring me proof it's dead and the metal's",
-    "mine to reforge. Fair trade, adventurer:",
-    "your risk for my craft."
-   ],
-   "reminder": "Gnarl, depth 10. Bring me proof and I'll pay out.",
-   "thanks": [
-    "So Gnarl's finally cold. Good iron, this.",
-    "Here's your share, fairly earned."
-   ],
-   "reward_item": "Spiked_Club"
-  },
-  {
-   "id": "Slay_Kroll",
-   "giver": "Smith",
-   "title": "Slay Kroll (depth 15)",
-   "wanted_item": "Kroll_Tusk",
-   "reward_gold": 80,
-   "offer": [
-    "Kroll the Anvil-Breaker carries good iron on depth 15.",
-    "Bring me proof it's dead and the metal's",
-    "mine to reforge. Fair trade, adventurer:",
-    "your risk for my craft."
-   ],
-   "reminder": "Kroll, depth 15. Bring me proof and I'll pay out.",
-   "thanks": [
-    "So Kroll's finally cold. Good iron, this.",
-    "Here's your share, fairly earned."
-   ]
-  },
-  {
-   "id": "Slay_Fenrik",
-   "giver": "Smith",
-   "title": "Slay Fenrik (depth 20)",
-   "wanted_item": "Fenrik_Claw",
-   "reward_gold": 100,
-   "offer": [
-    "Fenrik Ironhide carries good iron on depth 20.",
-    "Bring me proof it's dead and the metal's",
-    "mine to reforge. Fair trade, adventurer:",
-    "your risk for my craft."
-   ],
-   "reminder": "Fenrik, depth 20. Bring me proof and I'll pay out.",
-   "thanks": [
-    "So Fenrik's finally cold. Good iron, this.",
-    "Here's your share, fairly earned."
-   ],
-   "reward_item": "Goblin_Dagger"
-  },
-  {
-   "id": "Slay_Molgar",
-   "giver": "Smith",
-   "title": "Slay Molgar (depth 25)",
-   "wanted_item": "Molgar_Skull",
-   "reward_gold": 120,
-   "offer": [
-    "Molgar the Forgestealer carries good iron on depth 25.",
-    "Bring me proof it's dead and the metal's",
-    "mine to reforge. Fair trade, adventurer:",
-    "your risk for my craft."
-   ],
-   "reminder": "Molgar, depth 25. Bring me proof and I'll pay out.",
-   "thanks": [
-    "So Molgar's finally cold. Good iron, this.",
-    "Here's your share, fairly earned."
-   ]
-  },
-  {
-   "id": "Hunters_Dagger",
-   "giver": "Hunter",
-   "title": "Bring Yara a goblin dagger",
-   "wanted_item": "Goblin_Dagger",
-   "reward_gold": 15,
-   "offer": [
-    "Can't always carry enough goblin dagger on a long",
-    "hunt. Bring me one from the depths and",
-    "I'll make it worth your while."
-   ],
-   "reminder": "Still after that goblin dagger, if you come across one.",
-   "thanks": [
-    "That'll serve well enough.",
-    "Take this. Fair's fair."
-   ]
-  },
-  {
-   "id": "Hunters_Potions",
-   "giver": "Hunter",
-   "title": "Bring Yara a healing potion",
-   "wanted_item": "Healing_Potion",
-   "reward_gold": 25,
-   "offer": [
-    "Can't always carry enough healing potion on a long",
-    "hunt. Bring me one from the depths and",
-    "I'll make it worth your while."
-   ],
-   "reminder": "Still after that healing potion, if you come across one.",
-   "thanks": [
-    "That'll serve well enough.",
-    "Take this. Fair's fair."
-   ],
-   "reward_item": "Goblin_Dagger"
-  },
-  {
-   "id": "Hunters_Shortsword",
-   "giver": "Hunter",
-   "title": "Bring Yara a short sword",
-   "wanted_item": "Short_Sword",
-   "reward_gold": 35,
-   "offer": [
-    "Can't always carry enough short sword on a long",
-    "hunt. Bring me one from the depths and",
-    "I'll make it worth your while."
-   ],
-   "reminder": "Still after that short sword, if you come across one.",
-   "thanks": [
-    "That'll serve well enough.",
-    "Take this. Fair's fair."
-   ]
-  },
-  {
-   "id": "Slay_Snitch",
-   "giver": "Hunter",
-   "title": "Slay Snitch (depth 6)",
-   "wanted_item": "Snitch_Ear",
-   "reward_gold": 44,
-   "offer": [
-    "I've tracked Snitch the Quickfang to depth 6",
-    "and lost the trail twice. My knees aren't",
-    "what they were. Finish the hunt for me",
-    "and bring back the mark of the kill."
-   ],
-   "reminder": "Snitch's still out there, depth 6. The trail's gone cold for me.",
-   "thanks": [
-    "Ha! Snitch finally run to ground.",
-    "You've more than earned a hunter's cut."
-   ]
-  },
-  {
-   "id": "Slay_Marrow",
-   "giver": "Hunter",
-   "title": "Slay Marrow (depth 11)",
-   "wanted_item": "Marrow_Fang",
-   "reward_gold": 64,
-   "offer": [
-    "I've tracked Marrow the Skulker to depth 11",
-    "and lost the trail twice. My knees aren't",
-    "what they were. Finish the hunt for me",
-    "and bring back the mark of the kill."
-   ],
-   "reminder": "Marrow's still out there, depth 11. The trail's gone cold for me.",
-   "thanks": [
-    "Ha! Marrow finally run to ground.",
-    "You've more than earned a hunter's cut."
-   ],
-   "reward_item": "Chain_Shirt"
-  },
-  {
-   "id": "Slay_Grendle",
-   "giver": "Hunter",
-   "title": "Slay Grendle (depth 16)",
-   "wanted_item": "Grendle_Tusk",
-   "reward_gold": 84,
-   "offer": [
-    "I've tracked Grendle Bogmaw to depth 16",
-    "and lost the trail twice. My knees aren't",
-    "what they were. Finish the hunt for me",
-    "and bring back the mark of the kill."
-   ],
-   "reminder": "Grendle's still out there, depth 16. The trail's gone cold for me.",
-   "thanks": [
-    "Ha! Grendle finally run to ground.",
-    "You've more than earned a hunter's cut."
-   ]
-  },
-  {
-   "id": "Slay_Karth",
-   "giver": "Hunter",
-   "title": "Slay Karth (depth 21)",
-   "wanted_item": "Karth_Claw",
-   "reward_gold": 104,
-   "offer": [
-    "I've tracked Karth the Widowmaker to depth 21",
-    "and lost the trail twice. My knees aren't",
-    "what they were. Finish the hunt for me",
-    "and bring back the mark of the kill."
-   ],
-   "reminder": "Karth's still out there, depth 21. The trail's gone cold for me.",
-   "thanks": [
-    "Ha! Karth finally run to ground.",
-    "You've more than earned a hunter's cut."
-   ],
-   "reward_item": "Longsword"
-  },
-  {
-   "id": "Slay_Hollow",
-   "giver": "Hunter",
-   "title": "Slay Hollow (depth 26)",
-   "wanted_item": "Hollow_Skull",
-   "reward_gold": 124,
-   "offer": [
-    "I've tracked Hollow the Hollow Fang to depth 26",
-    "and lost the trail twice. My knees aren't",
-    "what they were. Finish the hunt for me",
-    "and bring back the mark of the kill."
-   ],
-   "reminder": "Hollow's still out there, depth 26. The trail's gone cold for me.",
-   "thanks": [
-    "Ha! Hollow finally run to ground.",
-    "You've more than earned a hunter's cut."
-   ]
-  },
-  {
-   "id": "Priestess_Potions",
-   "giver": "Priestess",
-   "title": "Bring Sister Wren a healing potion",
-   "wanted_item": "Healing_Potion",
-   "reward_gold": 15,
-   "offer": [
-    "We've precious little healing potion left for the",
-    "sick and the frightened. If the depths",
-    "provide one, we'd be grateful."
-   ],
-   "reminder": "We could still use that healing potion, if you find one.",
-   "thanks": [
-    "Bless you for this.",
-    "Please, let me offer something in return."
-   ]
-  },
-  {
-   "id": "Priestess_Leather",
-   "giver": "Priestess",
-   "title": "Bring Sister Wren a leather armor",
-   "wanted_item": "Leather_Armor",
-   "reward_gold": 25,
-   "offer": [
-    "We've precious little leather armor left for the",
-    "sick and the frightened. If the depths",
-    "provide one, we'd be grateful."
-   ],
-   "reminder": "We could still use that leather armor, if you find one.",
-   "thanks": [
-    "Bless you for this.",
-    "Please, let me offer something in return."
-   ],
-   "reward_item": "Leather_Armor"
-  },
-  {
-   "id": "Priestess_Chainmail",
-   "giver": "Priestess",
-   "title": "Bring Sister Wren a chain shirt",
-   "wanted_item": "Chain_Shirt",
-   "reward_gold": 35,
-   "offer": [
-    "We've precious little chain shirt left for the",
-    "sick and the frightened. If the depths",
-    "provide one, we'd be grateful."
-   ],
-   "reminder": "We could still use that chain shirt, if you find one.",
-   "thanks": [
-    "Bless you for this.",
-    "Please, let me offer something in return."
-   ]
-  },
-  {
-   "id": "Slay_Vex",
-   "giver": "Priestess",
-   "title": "Slay Vex (depth 7)",
-   "wanted_item": "Vex_Ear",
-   "reward_gold": 48,
-   "offer": [
-    "A wrongness festers around Vex the Hexbound,",
-    "depth 7 of the dark below. It must",
-    "be ended, and a token brought back so",
-    "we may bless its rest."
-   ],
-   "reminder": "Vex still corrupts depth 7. It cannot be left to fester.",
-   "thanks": [
-    "Vex's taint is lifted. The Light thanks you.",
-    "Take this small blessing in return."
-   ]
-  },
-  {
-   "id": "Slay_Morrow",
-   "giver": "Priestess",
-   "title": "Slay Morrow (depth 12)",
-   "wanted_item": "Morrow_Fang",
-   "reward_gold": 68,
-   "offer": [
-    "A wrongness festers around Morrow Palehand,",
-    "depth 12 of the dark below. It must",
-    "be ended, and a token brought back so",
-    "we may bless its rest."
-   ],
-   "reminder": "Morrow still corrupts depth 12. It cannot be left to fester.",
-   "thanks": [
-    "Morrow's taint is lifted. The Light thanks you.",
-    "Take this small blessing in return."
-   ],
-   "reward_item": "Short_Sword"
-  },
-  {
-   "id": "Slay_Ghurn",
-   "giver": "Priestess",
-   "title": "Slay Ghurn (depth 17)",
-   "wanted_item": "Ghurn_Tusk",
-   "reward_gold": 88,
-   "offer": [
-    "A wrongness festers around Ghurn the Blightborn,",
-    "depth 17 of the dark below. It must",
-    "be ended, and a token brought back so",
-    "we may bless its rest."
-   ],
-   "reminder": "Ghurn still corrupts depth 17. It cannot be left to fester.",
-   "thanks": [
-    "Ghurn's taint is lifted. The Light thanks you.",
-    "Take this small blessing in return."
-   ]
-  },
-  {
-   "id": "Slay_Sable",
-   "giver": "Priestess",
-   "title": "Slay Sable (depth 22)",
-   "wanted_item": "Sable_Claw",
-   "reward_gold": 108,
-   "offer": [
-    "A wrongness festers around Sable the Night Warden,",
-    "depth 22 of the dark below. It must",
-    "be ended, and a token brought back so",
-    "we may bless its rest."
-   ],
-   "reminder": "Sable still corrupts depth 22. It cannot be left to fester.",
-   "thanks": [
-    "Sable's taint is lifted. The Light thanks you.",
-    "Take this small blessing in return."
-   ],
-   "reward_item": "Spiked_Club"
-  },
-  {
-   "id": "Slay_Uldrath",
-   "giver": "Priestess",
-   "title": "Slay Uldrath (depth 27)",
-   "wanted_item": "Uldrath_Skull",
-   "reward_gold": 128,
-   "offer": [
-    "A wrongness festers around Uldrath the Forsaken,",
-    "depth 27 of the dark below. It must",
-    "be ended, and a token brought back so",
-    "we may bless its rest."
-   ],
-   "reminder": "Uldrath still corrupts depth 27. It cannot be left to fester.",
-   "thanks": [
-    "Uldrath's taint is lifted. The Light thanks you.",
-    "Take this small blessing in return."
-   ]
-  },
-  {
-   "id": "Guards_Shortsword",
-   "giver": "Guard_Captain",
-   "title": "Bring Captain Aldric a short sword",
-   "wanted_item": "Short_Sword",
-   "reward_gold": 15,
-   "offer": [
-    "The armory's short a short sword. Bring one up",
-    "from the depths and I'll square you",
-    "with the garrison for it."
-   ],
-   "reminder": "Armory still wants that short sword.",
-   "thanks": [
-    "That'll do for the armory.",
-    "Here. The garrison pays its debts."
-   ]
-  },
-  {
-   "id": "Guards_Chainmail",
-   "giver": "Guard_Captain",
-   "title": "Bring Captain Aldric a chain shirt",
-   "wanted_item": "Chain_Shirt",
-   "reward_gold": 25,
-   "offer": [
-    "The armory's short a chain shirt. Bring one up",
-    "from the depths and I'll square you",
-    "with the garrison for it."
-   ],
-   "reminder": "Armory still wants that chain shirt.",
-   "thanks": [
-    "That'll do for the armory.",
-    "Here. The garrison pays its debts."
-   ],
-   "reward_item": "Goblin_Dagger"
-  },
-  {
-   "id": "Guards_Club",
-   "giver": "Guard_Captain",
-   "title": "Bring Captain Aldric a spiked club",
-   "wanted_item": "Spiked_Club",
-   "reward_gold": 35,
-   "offer": [
-    "The armory's short a spiked club. Bring one up",
-    "from the depths and I'll square you",
-    "with the garrison for it."
-   ],
-   "reminder": "Armory still wants that spiked club.",
-   "thanks": [
-    "That'll do for the armory.",
-    "Here. The garrison pays its debts."
-   ]
-  },
-  {
-   "id": "Slay_Pike",
-   "giver": "Guard_Captain",
-   "title": "Slay Pike (depth 8)",
-   "wanted_item": "Pike_Ear",
-   "reward_gold": 52,
-   "offer": [
-    "Pike the Cutthroat is worth a bounty, depth 8.",
-    "Kill it, bring back proof of the kill,",
-    "and the village coffers will open for",
-    "you. Simple as that, adventurer."
-   ],
-   "reminder": "Bounty's still open on Pike, depth 8. Bring proof.",
-   "thanks": [
-    "Pike down. One less name on my list.",
-    "Bounty's yours, paid in full."
-   ]
-  },
-  {
-   "id": "Slay_Grix",
-   "giver": "Guard_Captain",
-   "title": "Slay Grix (depth 13)",
-   "wanted_item": "Grix_Fang",
-   "reward_gold": 72,
-   "offer": [
-    "Grix the Backstabber is worth a bounty, depth 13.",
-    "Kill it, bring back proof of the kill,",
-    "and the village coffers will open for",
-    "you. Simple as that, adventurer."
-   ],
-   "reminder": "Bounty's still open on Grix, depth 13. Bring proof.",
-   "thanks": [
-    "Grix down. One less name on my list.",
-    "Bounty's yours, paid in full."
-   ],
-   "reward_item": "Healing_Potion"
-  },
-  {
-   "id": "Slay_Bruundor",
-   "giver": "Guard_Captain",
-   "title": "Slay Bruundor (depth 18)",
-   "wanted_item": "Bruundor_Tusk",
-   "reward_gold": 92,
-   "offer": [
-    "Bruundor the Wall-Smasher is worth a bounty, depth 18.",
-    "Kill it, bring back proof of the kill,",
-    "and the village coffers will open for",
-    "you. Simple as that, adventurer."
-   ],
-   "reminder": "Bounty's still open on Bruundor, depth 18. Bring proof.",
-   "thanks": [
-    "Bruundor down. One less name on my list.",
-    "Bounty's yours, paid in full."
-   ]
-  },
-  {
-   "id": "Slay_Vozgar",
-   "giver": "Guard_Captain",
-   "title": "Slay Vozgar (depth 23)",
-   "wanted_item": "Vozgar_Claw",
-   "reward_gold": 112,
-   "offer": [
-    "Vozgar the Unyielding is worth a bounty, depth 23.",
-    "Kill it, bring back proof of the kill,",
-    "and the village coffers will open for",
-    "you. Simple as that, adventurer."
-   ],
-   "reminder": "Bounty's still open on Vozgar, depth 23. Bring proof.",
-   "thanks": [
-    "Vozgar down. One less name on my list.",
-    "Bounty's yours, paid in full."
-   ],
-   "reward_item": "Chain_Shirt"
-  },
-  {
-   "id": "Slay_Krenn",
-   "giver": "Guard_Captain",
-   "title": "Slay Krenn (depth 28)",
-   "wanted_item": "Krenn_Skull",
-   "reward_gold": 132,
-   "offer": [
-    "Krenn the Warlord is worth a bounty, depth 28.",
-    "Kill it, bring back proof of the kill,",
-    "and the village coffers will open for",
-    "you. Simple as that, adventurer."
-   ],
-   "reminder": "Bounty's still open on Krenn, depth 28. Bring proof.",
-   "thanks": [
-    "Krenn down. One less name on my list.",
-    "Bounty's yours, paid in full."
-   ]
-  },
-  {
-   "id": "Slay_Korrath",
-   "giver": "Elder",
-   "title": "Slay Korrath (depth 29)",
-   "requires": "Slay_Threk",
-   "wanted_item": "Korrath_Charm",
-   "reward_gold": 136,
-   "offer": [
-    "A golem has woken in the deep dark,",
-    "depth 29, stone given cruel purpose.",
-    "End it, and the village will finally",
-    "believe the depths can be tamed."
-   ],
-   "reminder": "Korrath still stands, depth 29. Stone doesn't tire.",
-   "thanks": [
-    "Korrath, broken at last. Rubble now.",
-    "You've more than earned this, truly."
-   ]
-  },
-  {
-   "id": "Slay_Vaelor",
-   "giver": "Smith",
-   "title": "Slay Vaelor (depth 30)",
-   "requires": "Slay_Molgar",
-   "wanted_item": "Vaelor_Charm",
-   "reward_gold": 140,
-   "offer": [
-    "Vaelor was a smith too, once, before",
-    "the depths remade him into bone and",
-    "rust at depth 30. Put him down, and",
-    "bring back what's left of his craft."
-   ],
-   "reminder": "Vaelor waits at depth 30, still swinging that ruined blade.",
-   "thanks": [
-    "So the old smith finally rests. Good.",
-    "Take this. He'd have wanted you to."
-   ]
-  },
-  {
-   "id": "Slay_Mossback",
-   "giver": "Hunter",
-   "title": "Slay Mossback (depth 31)",
-   "requires": "Slay_Hollow",
-   "wanted_item": "Mossback_Charm",
-   "reward_gold": 144,
-   "offer": [
-    "Mossback has haunted depth 31 longer",
-    "than I've hunted. Moss-backed, ancient,",
-    "and mean. Bring it down, and I'll call",
-    "my hunting done for good."
-   ],
-   "reminder": "Mossback's still out there, depth 31. Old and vicious.",
-   "thanks": [
-    "Ha! The old beast finally fell.",
-    "This is the last bounty I'll ever pay."
-   ]
-  },
-  {
-   "id": "Slay_Sorrow",
-   "giver": "Priestess",
-   "title": "Slay Sorrow (depth 32)",
-   "requires": "Slay_Uldrath",
-   "wanted_item": "Sorrow_Charm",
-   "reward_gold": 148,
-   "offer": [
-    "Something grieves at depth 32, and its",
-    "grief has teeth. Sorrow, the whispering",
-    "dead call it. Silence it, and bring",
-    "back proof so it may finally rest."
-   ],
-   "reminder": "Sorrow still weeps and kills at depth 32. It must be silenced.",
-   "thanks": [
-    "Sorrow is quiet now. At peace, I hope.",
-    "Take this. The Light remembers kindness."
-   ]
-  },
-  {
-   "id": "Slay_Aurek",
-   "giver": "Guard_Captain",
-   "title": "Slay Aurek (depth 33)",
-   "requires": "Slay_Krenn",
-   "wanted_item": "Aurek_Charm",
-   "reward_gold": 152,
-   "offer": [
-    "Aurek, the Last Sentinel, guards depth",
-    "33 for a war long since lost. It will",
-    "kill anything that passes. End it, and",
-    "the bounty's the largest I've ever posted."
-   ],
-   "reminder": "Aurek still guards depth 33. Biggest bounty on my board.",
-   "thanks": [
-    "Aurek down. I didn't think anyone could.",
-    "Full bounty, and my respect besides."
-   ]
-  }
- ],
- "items": [
-  {
-   "id": "Gold",
-   "name": "Gold",
-   "category": "Gold",
-   "icon_column": 0,
-   "flavor": "Goblins love it. So do you.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Healing_Potion",
-   "name": "Healing potion",
-   "category": "Potion",
-   "icon_column": 1,
-   "flavor": "Tastes of cherries and iron.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 2
-   },
-   "sound": ""
-  },
-  {
-   "id": "Short_Sword",
-   "name": "Short sword",
-   "category": "Weapon",
-   "icon_column": 2,
-   "flavor": "Plain and reliable.",
-   "damage_dice": {
-    "count": 1,
-    "sides": 6,
-    "bonus": 1
-   },
-   "weight": "Medium",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": "Blade"
-  },
-  {
-   "id": "Goblin_Dagger",
-   "name": "Goblin dagger",
-   "category": "Weapon",
-   "icon_column": 3,
-   "flavor": "Crude, but it bites.",
-   "damage_dice": {
-    "count": 2,
-    "sides": 3,
-    "bonus": 0
-   },
-   "weight": "Light",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": "Light"
-  },
-  {
-   "id": "Spiked_Club",
-   "name": "Spiked club",
-   "category": "Weapon",
-   "icon_column": 4,
-   "flavor": "Pried from an ogre's fingers.",
-   "damage_dice": {
-    "count": 2,
-    "sides": 4,
-    "bonus": 1
-   },
-   "weight": "Heavy",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": "Heavy"
-  },
-  {
-   "id": "Longsword",
-   "name": "Longsword",
-   "category": "Weapon",
-   "icon_column": 5,
-   "flavor": "Balanced, keen, old.",
-   "damage_dice": {
-    "count": 1,
-    "sides": 8,
-    "bonus": 2
-   },
-   "weight": "Medium",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": "Blade"
-  },
-  {
-   "id": "Leather_Armor",
-   "name": "Leather armor",
-   "category": "Armor",
-   "icon_column": 6,
-   "flavor": "Stiff, but it turns a blade.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 1,
-   "armor_weight": "Light",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Chain_Shirt",
-   "name": "Chain shirt",
-   "category": "Armor",
-   "icon_column": 7,
-   "flavor": "Heavy rings, carefully mended.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 2,
-   "armor_weight": "Medium",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Town_Portal_Scroll",
-   "name": "Scroll of Town Portal",
-   "category": "Scroll",
-   "icon_column": 8,
-   "flavor": "The ink is still faintly warm.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Skreel_Ear",
-   "name": "Skreel's ear",
-   "category": "Quest_Item",
-   "icon_column": 9,
-   "flavor": "Still warm. Someone will want proof.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Dunmarr_Fang",
-   "name": "Dunmarr's fang",
-   "category": "Quest_Item",
-   "icon_column": 10,
-   "flavor": "Yellowed and cracked, but unmistakably his.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Ashka_Tusk",
-   "name": "Ashka's tusk",
-   "category": "Quest_Item",
-   "icon_column": 11,
-   "flavor": "Carved with crude, boastful runes.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Blackmaw_Claw",
-   "name": "Blackmaw's claw",
-   "category": "Quest_Item",
-   "icon_column": 12,
-   "flavor": "Long enough to open a man from throat to belt.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Threk_Skull",
-   "name": "Threk's skull",
-   "category": "Quest_Item",
-   "icon_column": 13,
-   "flavor": "Heavier than it looks. So was he.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Rusk_Ear",
-   "name": "Rusk's ear",
-   "category": "Quest_Item",
-   "icon_column": 14,
-   "flavor": "Notched from a hundred old fights.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Gnarl_Fang",
-   "name": "Gnarl's fang",
-   "category": "Quest_Item",
-   "icon_column": 15,
-   "flavor": "Rimmed black with old poison.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Kroll_Tusk",
-   "name": "Kroll's tusk",
-   "category": "Quest_Item",
-   "icon_column": 16,
-   "flavor": "Chipped where it met the anvil.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Fenrik_Claw",
-   "name": "Fenrik's claw",
-   "category": "Quest_Item",
-   "icon_column": 17,
-   "flavor": "Iron-hard, and just as sharp.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Molgar_Skull",
-   "name": "Molgar's skull",
-   "category": "Quest_Item",
-   "icon_column": 18,
-   "flavor": "The jaw alone could crush a shield.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Snitch_Ear",
-   "name": "Snitch's ear",
-   "category": "Quest_Item",
-   "icon_column": 19,
-   "flavor": "Pierced with a dozen stolen rings.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Marrow_Fang",
-   "name": "Marrow's fang",
-   "category": "Quest_Item",
-   "icon_column": 20,
-   "flavor": "Filed to a wicked point.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Grendle_Tusk",
-   "name": "Grendle's tusk",
-   "category": "Quest_Item",
-   "icon_column": 21,
-   "flavor": "Slick with bog-water, even now.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Karth_Claw",
-   "name": "Karth's claw",
-   "category": "Quest_Item",
-   "icon_column": 22,
-   "flavor": "Still stained dark at the tip.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Hollow_Skull",
-   "name": "The Hollow Fang's skull",
-   "category": "Quest_Item",
-   "icon_column": 23,
-   "flavor": "Its eye sockets never seem to close.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Vex_Ear",
-   "name": "Vex's ear",
-   "category": "Quest_Item",
-   "icon_column": 24,
-   "flavor": "A cursed sigil is scratched behind it.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Morrow_Fang",
-   "name": "Morrow's fang",
-   "category": "Quest_Item",
-   "icon_column": 25,
-   "flavor": "Cold to the touch, even in your pocket.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Ghurn_Tusk",
-   "name": "Ghurn's tusk",
-   "category": "Quest_Item",
-   "icon_column": 26,
-   "flavor": "Blighted black at the root.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Sable_Claw",
-   "name": "Sable's claw",
-   "category": "Quest_Item",
-   "icon_column": 27,
-   "flavor": "Darker than any natural shadow.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Uldrath_Skull",
-   "name": "Uldrath's skull",
-   "category": "Quest_Item",
-   "icon_column": 28,
-   "flavor": "It seems to watch you from the backpack.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Pike_Ear",
-   "name": "Pike's ear",
-   "category": "Quest_Item",
-   "icon_column": 29,
-   "flavor": "A thief's mark is tattooed on it.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Grix_Fang",
-   "name": "Grix's fang",
-   "category": "Quest_Item",
-   "icon_column": 30,
-   "flavor": "Bloodied from one blow too many.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Bruundor_Tusk",
-   "name": "Bruundor's tusk",
-   "category": "Quest_Item",
-   "icon_column": 31,
-   "flavor": "Thick enough to use as a club itself.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Vozgar_Claw",
-   "name": "Vozgar's claw",
-   "category": "Quest_Item",
-   "icon_column": 32,
-   "flavor": "Curved like a reaper's blade.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Krenn_Skull",
-   "name": "Warlord Krenn's skull",
-   "category": "Quest_Item",
-   "icon_column": 33,
-   "flavor": "Crowned still with a dented iron circlet.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Hand_Axe",
-   "name": "Hand axe",
-   "category": "Weapon",
-   "icon_column": 34,
-   "flavor": "A woodsman's axe, better suited to war than wood.",
-   "damage_dice": {
-    "count": 1,
-    "sides": 8,
-    "bonus": 0
-   },
-   "weight": "Medium",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": "Blade"
-  },
-  {
-   "id": "Mace",
-   "name": "Mace",
-   "category": "Weapon",
-   "icon_column": 35,
-   "flavor": "Blunt, honest, and hard to parry.",
-   "damage_dice": {
-    "count": 1,
-    "sides": 6,
-    "bonus": 2
-   },
-   "weight": "Medium",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": "Heavy"
-  },
-  {
-   "id": "War_Hammer",
-   "name": "War hammer",
-   "category": "Weapon",
-   "icon_column": 36,
-   "flavor": "Two hands, one devastating idea.",
-   "damage_dice": {
-    "count": 2,
-    "sides": 6,
-    "bonus": 0
-   },
-   "weight": "Heavy",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": "Heavy"
-  },
-  {
-   "id": "Spear",
-   "name": "Spear",
-   "category": "Weapon",
-   "icon_column": 37,
-   "flavor": "Keeps something dangerous at a distance.",
-   "damage_dice": {
-    "count": 1,
-    "sides": 8,
-    "bonus": 1
-   },
-   "weight": "Medium",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": "Blade"
-  },
-  {
-   "id": "Rapier",
-   "name": "Rapier",
-   "category": "Weapon",
-   "icon_column": 38,
-   "flavor": "Quick, precise, made for the riposte.",
-   "damage_dice": {
-    "count": 1,
-    "sides": 6,
-    "bonus": 1
-   },
-   "weight": "Light",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": "Blade"
-  },
-  {
-   "id": "Wooden_Shield",
-   "name": "Wooden shield",
-   "category": "Armor",
-   "icon_column": 39,
-   "flavor": "A merchant's leftover stock, better than nothing.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 1,
-   "armor_weight": "Light",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Helmet",
-   "name": "Helmet",
-   "category": "Armor",
-   "icon_column": 40,
-   "flavor": "Iron over your skull; the rest you trust to speed.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 2,
-   "armor_weight": "Light",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Antidote",
-   "name": "Antidote",
-   "category": "Potion",
-   "icon_column": 41,
-   "flavor": "Bitter and medicinal. Steadies whatever ails you.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 1,
-    "sides": 8,
-    "bonus": 2
-   },
-   "sound": ""
-  },
-  {
-   "id": "Korrath_Charm",
-   "name": "Korrath's charm",
-   "category": "Quest_Item",
-   "icon_column": 42,
-   "flavor": "Carved bone, still warm from the stone that wore it.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Vaelor_Charm",
-   "name": "Vaelor's charm",
-   "category": "Quest_Item",
-   "icon_column": 43,
-   "flavor": "Strung on old cord, the knots tied by a smith's hands.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Mossback_Charm",
-   "name": "Mossback's charm",
-   "category": "Quest_Item",
-   "icon_column": 44,
-   "flavor": "Slick with moss, ancient long before you were born.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Sorrow_Charm",
-   "name": "Sorrow's charm",
-   "category": "Quest_Item",
-   "icon_column": 45,
-   "flavor": "It doesn't feel like bone anymore. It feels like grief.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  },
-  {
-   "id": "Aurek_Charm",
-   "name": "Aurek's charm",
-   "category": "Quest_Item",
-   "icon_column": 46,
-   "flavor": "The rune on it is still faintly warm to the touch.",
-   "damage_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "weight": "",
-   "armor": 0,
-   "armor_weight": "",
-   "heal_dice": {
-    "count": 0,
-    "sides": 0,
-    "bonus": 0
-   },
-   "sound": ""
-  }
- ]
+  ]
 }

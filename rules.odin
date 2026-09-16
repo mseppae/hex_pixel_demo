@@ -64,7 +64,7 @@ is_on_map :: proc(level: ^Level, hex: hexgrid.Hex) -> bool {
 // "Wall" here means anything you can't walk through, trees included.
 is_wall :: proc(level: ^Level, hex: hexgrid.Hex) -> bool {
 	tile, inside := tile_at(level, hex)
-	return !inside || tile.kind == .Wall || tile.kind == .Forest
+	return !inside || tile.kind == .Wall || tile.kind == .Forest || tile.kind == .Outdoor_Rock
 }
 
 is_open_ground :: proc(level: ^Level, hex: hexgrid.Hex) -> bool {

@@ -197,6 +197,19 @@ add_legacy_sprite_animations :: proc(definition: ^Creature_Definition) {
 	add_grid_sprite_animation(definition, .Death,  1,  false, []int{0},          columns)
 }
 
+// The new common small-creature contract uses the same complete 6 x 9 set as
+// the adventurer: quiet idle, two walk extremes, attack pair, recoil and a
+// two-step death.  It is selected only for 32 px sheets with no explicit JSON
+// animation metadata; older external content retains the 6 x 5 fallback above.
+add_modern_small_sprite_animations :: proc(definition: ^Creature_Definition) {
+	columns := [6]int{0, 1, 2, 3, 4, 5}
+	add_grid_sprite_animation(definition, .Idle,   2,  true,  []int{0, 5},       columns)
+	add_grid_sprite_animation(definition, .Walk,   12, true,  []int{1, 0, 2, 0}, columns)
+	add_grid_sprite_animation(definition, .Attack, 5,  false, []int{3, 4},       columns)
+	add_grid_sprite_animation(definition, .Hurt,   4,  false, []int{6},          columns)
+	add_grid_sprite_animation(definition, .Death,  3,  false, []int{7, 8},       columns)
+}
+
 add_configured_sprite_animations :: proc(definition: ^Creature_Definition, entries: []Content_Sprite_Animation, columns: [6]int) {
 	for entry in entries {
 		state, found := from_name(Sprite_Animation_State, entry.state, "sprite animation state")
@@ -342,7 +355,11 @@ apply_content :: proc(data: []u8) -> (ok: bool) {
 		definition.sprite_anchor = {entry.sprite_anchor[0], entry.sprite_anchor[1]}
 		if definition.sprite_anchor == {} do definition.sprite_anchor = {definition.frame_size.x * 0.5, definition.frame_size.y}
 		if len(entry.animations) == 0 {
-			add_legacy_sprite_animations(&definition)
+			if definition.frame_size == {32, 32} || definition.frame_size == {48, 64} {
+				add_modern_small_sprite_animations(&definition)
+			} else {
+				add_legacy_sprite_animations(&definition)
+			}
 		} else {
 			columns := entry.sprite_columns
 			all_zero := true

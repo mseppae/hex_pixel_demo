@@ -1,0 +1,59 @@
+{
+  "sheet_size": [
+    192,
+    288
+  ],
+  "frame_size": [
+    32,
+    32
+  ],
+  "grid": [
+    6,
+    9
+  ],
+  "anchor": [
+    16,
+    30
+  ],
+  "columns": [
+    "right",
+    "back-right",
+    "back-left",
+    "left",
+    "front-left",
+    "front-right"
+  ],
+  "rows": [
+    "idle",
+    "walk_a",
+    "walk_b",
+    "attack_windup",
+    "attack_strike",
+    "idle_b",
+    "hurt_recoil",
+    "death_start",
+    "death_down"
+  ],
+  "content_json": {
+    "adventurer": {
+      "frame_size": [
+        32,
+        32
+      ],
+      "sprite_anchor": [
+        16,
+        30
+      ]
+    },
+    "goblin": {
+      "frame_size": [
+        32,
+        32
+      ],
+      "sprite_anchor": [
+        16,
+        30
+      ]
+    }
+  }
+}

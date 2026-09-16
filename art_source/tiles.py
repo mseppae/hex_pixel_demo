@@ -64,13 +64,53 @@ def paste_top(atlas, origin, cell, outline):
             # Outside the hex: the outline color, so sampling at the edges never bleeds.
             atlas.putpixel((left + px, top + py), cell[py][px] or outline)
 
-FLOOR = dict(base=rgb("#b59a74"), dark=rgb("#8c7456"), light=rgb("#cdb48d"), outline=rgb("#6e5a43"))
-WALL = dict(base=rgb("#6f7482"), dark=rgb("#555a66"), light=rgb("#8e94a3"), outline=rgb("#3e424c"))
-MOSS, MOSS_DARK = rgb("#6f8f45"), rgb("#4f6a30")
+# A sunlit sandstone floor and cool blue-gray fractured rock.  The wider value
+# separation survives the game's dim fog/light shader much better than the old,
+# uniformly mid-tone palette.
+FLOOR = dict(base=rgb("#b9935f"), dark=rgb("#80613e"), light=rgb("#e0c185"), outline=rgb("#5b432d"))
+WALL = dict(base=rgb("#66707c"), dark=rgb("#414b58"), light=rgb("#9ca8b1"), outline=rgb("#2d3540"))
+SAND_LIGHT, SAND_DARK = rgb("#d4ae71"), rgb("#977247")
+MOSS, MOSS_DARK = rgb("#739557"), rgb("#3f6539")
+
+def pixel_if_hex(cell, x, y, color):
+    if 0 <= x < TOP_W and 0 <= y < TOP_H and in_hex(x, y):
+        cell[y][x] = color
+
+def sediment_marks(cell, rng):
+    # Broken, shallow bands make the floor feel like weathered ground, not noise.
+    for _ in range(5):
+        y = rng.randrange(6, 27)
+        x = rng.randrange(3, 18)
+        length = rng.randrange(3, 7)
+        color = SAND_LIGHT if rng.random() < 0.55 else SAND_DARK
+        for step in range(length):
+            pixel_if_hex(cell, x + step, y + (step // 3 if rng.random() < 0.35 else 0), color)
+
+def sandstone_faces(cell, rng):
+    # Broad, connected planes read as weathered sandstone. Avoid the old
+    # single-pixel confetti: the characters use clustered shading too.
+    for _ in range(5):
+        x, y = rng.randrange(4, 22), rng.randrange(5, 25)
+        for dx, dy, color in ((0, 0, SAND_LIGHT), (1, 0, FLOOR["light"]),
+                              (2, 0, SAND_LIGHT), (0, 1, FLOOR["light"]),
+                              (1, 1, FLOOR["base"]), (2, 1, FLOOR["base"]),
+                              (1, 2, SAND_DARK), (2, 2, FLOOR["dark"])):
+            pixel_if_hex(cell, x + dx, y + dy, color)
+
+def rock_facets(cell, rng):
+    # Larger angular planes give cliffs a sculpted, modern pixel-art surface.
+    for _ in range(5):
+        x, y = rng.randrange(4, 21), rng.randrange(5, 25)
+        for dx, dy, color in ((0, 0, WALL["light"]), (1, 0, WALL["light"]), (2, 0, WALL["base"]),
+                              (0, 1, WALL["light"]), (1, 1, WALL["base"]), (2, 1, WALL["dark"]),
+                              (1, 2, WALL["dark"]), (2, 2, WALL["dark"])):
+            pixel_if_hex(cell, x + dx, y + dy, color)
 
 def floor_top(variant, rng):
     cell = blank_top()
-    speckle(cell, FLOOR["base"], FLOOR["dark"], FLOOR["light"], 0.10, rng)
+    speckle(cell, FLOOR["base"], FLOOR["dark"], FLOOR["light"], 0.012, rng)
+    sediment_marks(cell, rng)
+    sandstone_faces(cell, rng)
     if variant == 1:    # cracked
         for start in ((6, 5, 12), (15, 12, 10), (20, 4, 8)):
             crack(cell, FLOOR["outline"], *start, rng)
@@ -89,7 +129,8 @@ def floor_top(variant, rng):
 
 def wall_top(variant, rng):
     cell = blank_top()
-    speckle(cell, WALL["base"], WALL["dark"], WALL["light"], 0.12, rng)
+    speckle(cell, WALL["base"], WALL["dark"], WALL["light"], 0.012, rng)
+    rock_facets(cell, rng)
     if variant == 1:
         for _ in range(90):
             x, y = int(rng.gauss(18, 5)), int(rng.gauss(10, 5))
@@ -132,7 +173,7 @@ def stairs_up_top(rng):
     return cell
 
 def wall_side(variant, rng):
-    mortar, brick, brick_dark, brick_light = rgb("#3e424c"), rgb("#6a6f7c"), rgb("#545865"), rgb("#7f8594")
+    mortar, brick, brick_dark, brick_light = rgb("#2d3540"), rgb("#626c78"), rgb("#444e5a"), rgb("#8d9aa5")
     pixels = [[None] * 16 for _ in range(24)]
     for py in range(24):
         row = py // 6
@@ -156,6 +197,12 @@ def wall_side(variant, rng):
         for py in range(2, 24):
             pixels[py][x] = mortar
             if rng.random() < 0.4: x = max(1, min(14, x + rng.choice((-1, 1))))
+    # Chipped corner highlights break the former repeated-brick appearance.
+    for _ in range(7):
+        x, y = rng.randrange(1, 14), rng.randrange(1, 22)
+        if pixels[y][x] == brick:
+            pixels[y][x] = brick_light
+            pixels[y + 1][x] = brick_dark
     return pixels
 
 def extrude_rect(atlas, left, top, width, height):

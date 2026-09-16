@@ -152,3 +152,100 @@ build_hex_prism_mesh :: proc(hex_size, prism_height: f32, top_region, side_regio
 	rl.UploadMesh(&mesh, false)
 	return mesh
 }
+
+// A deliberately irregular rocky formation.  The variant changes both its
+// footprint and apex, producing low boulders, blunt chunks and narrow needles
+// rather than the single repeated spire used by the first outdoor pass.
+build_rock_spire_mesh :: proc(hex_size: f32, variant: int, side_region: Atlas_Region) -> rl.Mesh {
+	TRIANGLE_COUNT :: 6
+	VERTEX_COUNT :: TRIANGLE_COUNT * 3
+	builder := Mesh_Builder {
+		positions = make([]f32, VERTEX_COUNT * 3, rl.MemAllocator()),
+		texture_coordinates = make([]f32, VERTEX_COUNT * 2, rl.MemAllocator()),
+		colors = make([]u8, VERTEX_COUNT * 4, rl.MemAllocator()),
+	}
+	heights := [OUTDOOR_ROCK_VARIANT_COUNT]f32{18, 28, 43, 56, 24, 36, 48, 31}
+	radii := [OUTDOOR_ROCK_VARIANT_COUNT]f32{0.78, 0.62, 0.43, 0.28, 0.70, 0.51, 0.36, 0.59}
+	apex_offsets := [OUTDOOR_ROCK_VARIANT_COUNT]rl.Vector2{{-3, 1}, {2, -2}, {-2, -3}, {1, 2}, {3, 0}, {-3, 2}, {2, 3}, {-1, -2}}
+	// Per-corner multipliers prevent the base from being a mechanically perfect hex.
+	edges := [8]f32{0.78, 0.93, 1.08, 0.87, 1.12, 0.96, 1.04, 0.84}
+	height := heights[variant]
+	radius := radii[variant]
+	apex_offset := apex_offsets[variant]
+	apex := rl.Vector3{apex_offset.x, height, apex_offset.y}
+	sun_direction := rl.Vector2Normalize({-1, -1})
+	for corner_index in 0 ..< 6 {
+		first := hex_corner_offset(hex_size * radius * edges[(corner_index + variant) % len(edges)], corner_index)
+		next_index := (corner_index + 1) % 6
+		next := hex_corner_offset(hex_size * radius * edges[(next_index + variant) % len(edges)], next_index)
+		outward_angle := math.to_radians(f32(60 * corner_index))
+		outward := rl.Vector2{math.cos(outward_angle), math.sin(outward_angle)}
+		brightness := u8(125 + 120 * (rl.Vector2DotProduct(outward, sun_direction) + 1) / 2)
+		// Wound counter-clockwise when viewed from outside. The original order
+		// faced inward, so the GPU correctly culled every exterior rock facet.
+		add_vertex(&builder, apex, atlas_texture_coordinate(side_region, 0.5, 0), brightness)
+		add_vertex(&builder, {next.x, FLOOR_HEIGHT, next.y}, atlas_texture_coordinate(side_region, 1, 1), brightness)
+		add_vertex(&builder, {first.x, FLOOR_HEIGHT, first.y}, atlas_texture_coordinate(side_region, 0, 1), brightness)
+	}
+	mesh := rl.Mesh{vertexCount = VERTEX_COUNT, triangleCount = TRIANGLE_COUNT, vertices = raw_data(builder.positions), texcoords = raw_data(builder.texture_coordinates), colors = raw_data(builder.colors)}
+	rl.UploadMesh(&mesh, false)
+	return mesh
+}
+
+// Three intersecting vertical cards make a tree occupy real volume rather than
+// always facing the camera.  Each card samples the same exact frame in
+// trees.png; transparent pixels are discarded by the tree material shader.
+// This keeps the authored pixel silhouette while giving the canopy depth from
+// all six camera turns.
+build_tree_mesh :: proc(variant, wind_frame: int) -> rl.Mesh {
+	PLANE_COUNT :: 3
+	TRIANGLE_COUNT :: PLANE_COUNT * 4 // two sides per plane, two triangles per side
+	VERTEX_COUNT :: TRIANGLE_COUNT * 3
+	builder := Mesh_Builder {
+		positions           = make([]f32, VERTEX_COUNT * 3, rl.MemAllocator()),
+		texture_coordinates = make([]f32, VERTEX_COUNT * 2, rl.MemAllocator()),
+		colors              = make([]u8, VERTEX_COUNT * 4, rl.MemAllocator()),
+	}
+
+	// These measurements are world pixels.  The higher canopy compensates for
+	// the camera's downward angle while the narrow footprint avoids three full
+	// silhouettes reading as a flat row of trees.
+	half_width :: 18.0
+	height :: 108.0
+	texture_left := f32(variant * 48) / 192.0
+	texture_top := f32(wind_frame * 64) / 128.0
+	texture_width :: 48.0 / 192.0
+	texture_height :: 64.0 / 128.0
+	uv_left_bottom := rl.Vector2{texture_left, texture_top + texture_height}
+	uv_right_bottom := rl.Vector2{texture_left + texture_width, texture_top + texture_height}
+	uv_left_top := rl.Vector2{texture_left, texture_top}
+	uv_right_top := rl.Vector2{texture_left + texture_width, texture_top}
+
+	for plane_index in 0 ..< PLANE_COUNT {
+		angle := math.to_radians(f32(plane_index * 60))
+		across := rl.Vector2{math.cos(angle) * half_width, math.sin(angle) * half_width}
+		left_bottom := rl.Vector3{-across.x, FLOOR_HEIGHT, -across.y}
+		right_bottom := rl.Vector3{across.x, FLOOR_HEIGHT, across.y}
+		left_top := left_bottom + rl.Vector3{0, height, 0}
+		right_top := right_bottom + rl.Vector3{0, height, 0}
+
+		// Both windings are present: a tree has foliage on both sides of every
+		// branch plane, and no camera turn can cull it away.
+		add_vertex(&builder, left_bottom, uv_left_bottom, 255)
+		add_vertex(&builder, right_top, uv_right_top, 255)
+		add_vertex(&builder, right_bottom, uv_right_bottom, 255)
+		add_vertex(&builder, left_bottom, uv_left_bottom, 255)
+		add_vertex(&builder, left_top, uv_left_top, 255)
+		add_vertex(&builder, right_top, uv_right_top, 255)
+
+		add_vertex(&builder, left_bottom, uv_left_bottom, 255)
+		add_vertex(&builder, right_bottom, uv_right_bottom, 255)
+		add_vertex(&builder, right_top, uv_right_top, 255)
+		add_vertex(&builder, left_bottom, uv_left_bottom, 255)
+		add_vertex(&builder, right_top, uv_right_top, 255)
+		add_vertex(&builder, left_top, uv_left_top, 255)
+	}
+	mesh := rl.Mesh{vertexCount = VERTEX_COUNT, triangleCount = TRIANGLE_COUNT, vertices = raw_data(builder.positions), texcoords = raw_data(builder.texture_coordinates), colors = raw_data(builder.colors)}
+	rl.UploadMesh(&mesh, false)
+	return mesh
+}

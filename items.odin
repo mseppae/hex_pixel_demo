@@ -17,6 +17,7 @@ import "hexgrid"
 // creatures.odin), it's only meaningful for the run that resolved it: a save file
 // or the ranking list stores the item's `id` string instead. See DESIGN_DATA_DRIVEN.md.
 Item_Kind :: int
+ITEM_ICON_SIZE :: 32
 
 Item_Category :: enum u8 {
 	Gold,
@@ -46,7 +47,7 @@ Item_Definition :: struct {
 	id:           string, // matches content.json and what quests, shops etc. refer to it by
 	name:         string,
 	category:     Item_Category,
-	icon_column:  int,    // which 16 x 16 column of assets/item_icons.png is its icon
+	icon_column:  int,    // which 20 x 20 column of assets/item_icons.png is its icon
 	flavor:       string, // a short line for the tooltip
 	damage_dice:  Dice,   // weapons
 	weight:       Weapon_Weight, // weapons
@@ -344,26 +345,24 @@ Container :: struct {
 	has_been_opened: bool,
 }
 
-// Where each picture is in assets/objects.png (see OBJECT_LAYOUT in art_source/objects.py
-// and items_and_objects_guide.png).
+// Where each picture is in the modern transparent objects atlas. Small creatures
+// have a distinct 32x16 body; the large three-hex creatures use 64x32 bodies.
 CONTAINER_SPRITE_REGIONS := [Container_Kind]rl.Rectangle {
-	.Goblin_Corpse     = {0, 0, 24, 12},
-	.Adventurer_Corpse = {24, 0, 24, 12},
-	.Ogre_Corpse       = {48, 0, 48, 24},
-	.Chest             = {0, 24, 20, 18}, // closed
+	.Goblin_Corpse     = {0, 0, 32, 16},
+	.Adventurer_Corpse = {32, 0, 32, 16},
+	.Ogre_Corpse       = {0, 24, 64, 32},
+	.Chest             = {192, 24, 32, 28}, // closed
 	.Dropped_Items     = {0, 0, 16, 16},  // the item's own icon, from item_icons.png
-	// Reused silhouettes (see the comment on Container_Kind): single-hex creatures
-	// borrow the goblin's corpse, the two big ones borrow the ogre's.
-	.Rat_Corpse        = {0, 0, 24, 12},
-	.Bat_Corpse        = {0, 0, 24, 12},
-	.Spider_Corpse     = {0, 0, 24, 12},
-	.Slime_Corpse      = {0, 0, 24, 12},
-	.Mushroom_Corpse   = {0, 0, 24, 12},
-	.Skeleton_Corpse   = {0, 0, 24, 12},
-	.Troll_Corpse      = {48, 0, 48, 24},
-	.Golem_Corpse      = {48, 0, 48, 24},
+	.Rat_Corpse        = {64, 0, 32, 16},
+	.Bat_Corpse        = {96, 0, 32, 16},
+	.Spider_Corpse     = {128, 0, 32, 16},
+	.Slime_Corpse      = {160, 0, 32, 16},
+	.Mushroom_Corpse   = {192, 0, 32, 16},
+	.Skeleton_Corpse   = {224, 0, 32, 16},
+	.Troll_Corpse      = {64, 24, 64, 32},
+	.Golem_Corpse      = {128, 24, 64, 32},
 }
-OPEN_CHEST_SPRITE_REGION :: rl.Rectangle{20, 24, 20, 18}
+OPEN_CHEST_SPRITE_REGION :: rl.Rectangle{224, 24, 32, 28}
 
 container_name :: proc(kind: Container_Kind) -> string {
 	switch kind {

@@ -2,7 +2,7 @@
 
 A prototype roguelike on a hex grid: pixel-art tiles and sprites drawn as 3D
 meshes and billboards, seen through an orthographic camera, rendered at
-320x180 and scaled up so every pixel stays square.
+640x360 and scaled up so every pixel stays square.
 
 ![The village](screenshots/20_village_quest_offer.png)
 
@@ -61,10 +61,10 @@ from any folder. `saves/` is created next to the program.
 
 ## Pixel-art rendering and creature sprites
 
-The game renders to a **320×180** internal image (16:9) and presents it with
+The game renders to a **640×360** internal image (16:9) and presents it with
 nearest-neighbor filtering. It chooses the largest integer scale that fits the
-window and letterboxes any remaining space: 1280×720 is 4×, 1920×1080 is 6×,
-and 2560×1440 is 8×. A smaller window may use 1× rather than blur the image.
+window and letterboxes any remaining space: 1280×720 is 2×, 1920×1080 is 3×,
+and 2560×1440 is 4×. A smaller window may use 1× rather than blur the image.
 World and hex geometry are still measured in art/world units and do not change
 when a creature's canvas changes.
 
@@ -84,12 +84,16 @@ Creature sprite metadata lives beside creature data in `assets/content.json`:
   `directions` lists. An explicit frame is `{"source": [x, y, width, height]}`;
   this supports irregular atlas packing and frame sizes without gameplay changes.
 
-The existing compiled-in sheets retain their old six-column/five-row layout when
-this metadata is absent. The goblin demonstrates the new metadata with a ground
-anchor and independently timed, variable-length sequences. This refactor does
-not replace the legacy 16×24 artwork; new 32px-class player/goblin art is the next
-visual-production step. Source generators in `art_source/` remain the source-art
-to generated-asset workflow.
+The adventurer and goblin use the validated contract in
+`assets/sprite_contract.json`: six direction columns by nine 32×32 animation
+rows. Their metadata supplies a two-frame idle, four-beat walk, two-frame
+attack, recoil, and two-frame death. Other creatures may retain the legacy
+layout when this metadata is absent. Source generators in `art_source/` remain
+the source-art-to-generated-asset workflow.
+
+The ogre demonstrates that this is not a one-size-only contract: its separate
+`assets/ogre_sprite_contract.json` defines six 40×48 direction cells by nine
+animation rows while retaining its larger three-hex footprint.
 
 ## Status and honest caveats
 

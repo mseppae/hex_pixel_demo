@@ -1,7 +1,7 @@
 package main
 
 // The inventory and loot panels. They're drawn into the same small image as the
-// game (320 x 180), so icons and text get the same big pixels as everything else.
+// game render target, so icons and text get the same crisp pixels as everything else.
 // All positions here are in that small image's pixels.
 
 import "core:fmt"
@@ -16,8 +16,11 @@ Open_Panel :: enum {
 }
 
 UI_FONT_SIZE    :: 10 // raylib's built-in font is pixel-exact at size 10
-SLOT_SIZE       :: 20 // a 16 x 16 icon with a 2 pixel frame
-SLOT_SPACING    :: 22
+// Item artwork is authored at 20 px.  Keeping it at that exact size avoids
+// a 20 -> 16 resample that breaks one-pixel weapon details before the game is
+// enlarged for the display.
+SLOT_SIZE       :: 36 // a native 32 x 32 icon with a 2 pixel frame
+SLOT_SPACING    :: 38
 SLOTS_PER_ROW   :: 6
 
 PANEL_BACKGROUND  :: rl.Color{24, 22, 30, 240}
@@ -29,11 +32,10 @@ TEXT_COLOR        :: rl.Color{236, 230, 214, 255}
 DIM_TEXT_COLOR    :: rl.Color{150, 144, 130, 255}
 GOLD_TEXT_COLOR   :: rl.Color{248, 226, 122, 255}
 
-// Keep existing panel content and type size, but place it within the 320 x 180
-// canvas. The quest log is intentionally viewport-height limited for now.
-INVENTORY_PANEL  :: rl.Rectangle{30, 2, 260, 176}
-LOOT_PANEL       :: rl.Rectangle{30, 28, 260, 128}
-QUEST_LOG_PANEL  :: rl.Rectangle{10, 2, 300, 176}
+// Keep the compact pixel UI, but centre it on any internal render target.
+INVENTORY_PANEL  :: rl.Rectangle{f32(LOW_RES_WIDTH - 260) / 2, f32(LOW_RES_HEIGHT - 220) / 2, 260, 220}
+LOOT_PANEL       :: rl.Rectangle{f32(LOW_RES_WIDTH - 260) / 2, f32(LOW_RES_HEIGHT - 172) / 2, 260, 172}
+QUEST_LOG_PANEL  :: rl.Rectangle{f32(LOW_RES_WIDTH - 300) / 2, f32(LOW_RES_HEIGHT - 176) / 2, 300, 176}
 BAG_BUTTON       :: rl.Rectangle{LOW_RES_WIDTH - 64, LOW_RES_HEIGHT - 20, 60, 16}
 QUEST_LOG_BUTTON :: rl.Rectangle{LOW_RES_WIDTH - 132, LOW_RES_HEIGHT - 20, 64, 16}
 TAKE_ALL_BUTTON  :: rl.Rectangle{LOOT_PANEL.x + 8, LOOT_PANEL.y + LOOT_PANEL.height - 22, 60, 16}
@@ -43,7 +45,7 @@ QUEST_LOG_CLOSE_BUTTON :: rl.Rectangle{QUEST_LOG_PANEL.x + QUEST_LOG_PANEL.width
 backpack_slot_rectangle :: proc(index: int) -> rl.Rectangle {
 	return {
 		INVENTORY_PANEL.x + 8 + f32(index % SLOTS_PER_ROW) * SLOT_SPACING,
-		INVENTORY_PANEL.y + 94 + f32(index / SLOTS_PER_ROW) * SLOT_SPACING,
+		INVENTORY_PANEL.y + 100 + f32(index / SLOTS_PER_ROW) * SLOT_SPACING,
 		SLOT_SIZE,
 		SLOT_SIZE,
 	}
@@ -56,7 +58,7 @@ equipment_slot_rectangle :: proc(slot: Equipment_Slot) -> rl.Rectangle {
 loot_slot_rectangle :: proc(index: int) -> rl.Rectangle {
 	return {
 		LOOT_PANEL.x + 8 + f32(index % SLOTS_PER_ROW) * SLOT_SPACING,
-		LOOT_PANEL.y + 24 + f32(index / SLOTS_PER_ROW) * SLOT_SPACING,
+		LOOT_PANEL.y + 28 + f32(index / SLOTS_PER_ROW) * SLOT_SPACING,
 		SLOT_SIZE,
 		SLOT_SIZE,
 	}
@@ -207,6 +209,7 @@ handle_ui_click :: proc(scene: ^Scene) -> bool {
 			scene.open_panel = .None
 		}
 		return true
+
 	}
 	return false
 }
@@ -295,8 +298,8 @@ draw_slot :: proc(scene: ^Scene, rectangle: rl.Rectangle, stack: Maybe(Item_Stac
 }
 
 draw_item_icon :: proc(scene: ^Scene, kind: Item_Kind, x, y: f32) {
-	source := rl.Rectangle{f32(ITEMS[kind].icon_column) * 16, 0, 16, 16}
-	rl.DrawTexturePro(scene.item_icons, source, {x, y, 16, 16}, {}, 0, rl.WHITE)
+	source := rl.Rectangle{f32(ITEMS[kind].icon_column * ITEM_ICON_SIZE), 0, ITEM_ICON_SIZE, ITEM_ICON_SIZE}
+	rl.DrawTexturePro(scene.item_icons, source, {x, y, ITEM_ICON_SIZE, ITEM_ICON_SIZE}, {}, 0, rl.WHITE)
 }
 
 // Three lines at the bottom of a panel describing the item under the mouse.
@@ -313,7 +316,7 @@ draw_inventory_panel :: proc(scene: ^Scene) {
 	draw_panel(panel, "Inventory")
 
 	// Gold, top right
-	draw_item_icon(scene, GOLD, panel.x + panel.width - 60, panel.y + 3)
+	draw_item_icon(scene, GOLD, panel.x + panel.width - 82, panel.y + 3)
 	draw_text(fmt.tprintf("%d", inventory.gold), i32(panel.x + panel.width) - 40, top + 7, GOLD_TEXT_COLOR)
 
 	hovered_kind: Maybe(Item_Kind)
@@ -341,7 +344,7 @@ draw_inventory_panel :: proc(scene: ^Scene) {
 	draw_text(fmt.tprintf("Stance: %s (T)", stance_name(scene.player.stance)), left + 8, top + 70, TEXT_COLOR)
 
 	// Backpack
-	draw_text(fmt.tprintf("Backpack  %d / %d", len(inventory.backpack), BACKPACK_SLOTS), left + 8, top + 82, DIM_TEXT_COLOR)
+	draw_text(fmt.tprintf("Backpack  %d / %d", len(inventory.backpack), BACKPACK_SLOTS), left + 8, top + 88, DIM_TEXT_COLOR)
 	for index in 0 ..< BACKPACK_SLOTS {
 		stack: Maybe(Item_Stack)
 		if index < len(inventory.backpack) do stack = inventory.backpack[index]
@@ -360,10 +363,10 @@ draw_inventory_panel :: proc(scene: ^Scene) {
 	}
 
 	if kind, has_one := hovered_kind.?; has_one {
-		draw_tooltip(kind, hover_hint, left + 8, top + 140)
+		draw_tooltip(kind, hover_hint, left + 8, top + 186)
 	} else {
-		draw_text("Click an item to use it, right-click to drop it", left + 8, top + 140, DIM_TEXT_COLOR)
-		draw_text("(hold Shift to drop a whole stack).", left + 8, top + 151, DIM_TEXT_COLOR)
+		draw_text("Click an item to use it, right-click to drop it", left + 8, top + 186, DIM_TEXT_COLOR)
+		draw_text("(hold Shift to drop a whole stack).", left + 8, top + 197, DIM_TEXT_COLOR)
 	}
 }
 

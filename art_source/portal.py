@@ -1,18 +1,18 @@
-# A Scroll of Town Portal's rift: a standing oval of swirling color, 20 x 32,
+# A Scroll of Town Portal's rift: a standing oval of swirling color, 32 x 48,
 # in assets/portal.png. Drawn as concentric rings, like looking down a vortex.
 from PIL import Image
 
-WIDTH, HEIGHT = 20, 32
+WIDTH, HEIGHT = 32, 48
 OUTLINE = (18, 12, 40, 255)
 
 def rgb(h): return tuple(int(h[i:i+2], 16) for i in (1, 3, 5)) + (255,)
 
 RINGS = [
     # (rx, ry, base, light, dark) largest (outermost) first
-    (7.0, 15.0, rgb("#3a2470"), rgb("#5c3aa8"), rgb("#241650")),
-    (5.4, 12.2, rgb("#7d4fd6"), rgb("#a377f0"), rgb("#5a35a8")),
-    (3.9,  9.4, rgb("#b98cf5"), rgb("#dcc4ff"), rgb("#8f63d0")),
-    (2.4,  6.4, rgb("#160f38"), rgb("#241a52"), rgb("#0c081f")),
+    (11.0, 22.0, rgb("#332060"), rgb("#6542ae"), rgb("#1b103c")),
+    (8.6,  18.1, rgb("#7248c8"), rgb("#ab7df0"), rgb("#4d2b94")),
+    (6.2,  13.8, rgb("#b37de9"), rgb("#ead5ff"), rgb("#7745bd")),
+    (3.6,   9.2, rgb("#211242"), rgb("#382166"), rgb("#0d071e")),
 ]
 CORE = rgb("#eafcff")
 
@@ -46,8 +46,11 @@ def compose(layers, details=None):
 def portal():
     cx, cy = WIDTH / 2, HEIGHT / 2 - 1
     layers = [Layer((base, light, dark)).ellipse(cx, cy, rx, ry) for rx, ry, base, light, dark in RINGS]
-    # A small bright glint near the top of the void, like light catching the swirl.
-    details = [(int(cx) - 1, int(cy) - 4), (int(cx), int(cy) - 4)]
+    # Several broken glints make the larger rift read as a living spiral rather
+    # than a smooth target painted onto the floor.
+    details = [(int(cx) - 3, int(cy) - 8), (int(cx) - 2, int(cy) - 8),
+               (int(cx) + 4, int(cy) - 2), (int(cx) + 5, int(cy) - 1),
+               (int(cx) - 5, int(cy) + 7)]
     return compose(layers, details)
 
 if __name__ == "__main__":

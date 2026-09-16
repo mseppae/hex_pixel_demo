@@ -1,7 +1,7 @@
 package main
 
 // The start menu, the in-game menu (Esc), and the lists of save slots.
-// Like the other panels, these are drawn into the small 320 x 180 image.
+// Like the other panels, these are drawn into the internal render target.
 
 import "core:fmt"
 import rl "vendor:raylib"
@@ -20,9 +20,9 @@ Menu :: enum {
 	Ranking,    // the Hall of the Fallen, from the start menu or after dying
 }
 
-START_MENU_PANEL :: rl.Rectangle{50, 18, 220, 144}
-GAME_MENU_PANEL  :: rl.Rectangle{50, 5, 220, 170} // one more button, and a note under them
-SLOTS_PANEL      :: rl.Rectangle{30, 7, 260, 166}
+START_MENU_PANEL :: rl.Rectangle{f32(LOW_RES_WIDTH - 220) / 2, f32(LOW_RES_HEIGHT - 144) / 2, 220, 144}
+GAME_MENU_PANEL  :: rl.Rectangle{f32(LOW_RES_WIDTH - 220) / 2, f32(LOW_RES_HEIGHT - 170) / 2, 220, 170}
+SLOTS_PANEL      :: rl.Rectangle{f32(LOW_RES_WIDTH - 260) / 2, f32(LOW_RES_HEIGHT - 166) / 2, 260, 166}
 MENU_BUTTON_SIZE :: rl.Vector2{160, 16}
 
 menu_panel :: proc(scene: ^Scene) -> rl.Rectangle {
@@ -98,7 +98,11 @@ handle_menu_click :: proc(scene: ^Scene) -> bool {
 			case 3:
 				scene.should_quit = true
 			}
+			// Each action may replace scene.menu. Stop immediately so this same
+			// click is never tested against the layout of the newly selected menu.
+			return true
 		}
+		return true
 
 	case .Game:
 		for _, index in game_menu_labels {
@@ -119,7 +123,9 @@ handle_menu_click :: proc(scene: ^Scene) -> bool {
 				scene.screen = .Start_Menu
 				scene.menu = .Start
 			}
+			return true
 		}
+		return true
 
 	case .Ranking:
 		handle_ranking_click(scene)

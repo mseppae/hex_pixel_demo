@@ -35,17 +35,17 @@ import "core:math"
 import "core:math/rand"
 import "core:os"
 import "core:slice"
-import rl "vendor:raylib"
 import "hexgrid"
+import rl "vendor:raylib"
 
 // One world unit = one pixel of art. With size 16, a hex top is 28 x 32 art pixels.
-HEX_SIZE     :: 16.0
-FLOOR_HEIGHT :: 4.0  // matches the 4-pixel-tall floor side art
-WALL_HEIGHT  :: 24.0 // matches the 24-pixel-tall wall side art
+HEX_SIZE :: 16.0
+FLOOR_HEIGHT :: 4.0 // matches the 4-pixel-tall floor side art
+WALL_HEIGHT :: 24.0 // matches the 24-pixel-tall wall side art
 
 // The size of the small image the scene is drawn into before scaling up.
-LOW_RES_WIDTH  :: 320
-LOW_RES_HEIGHT :: 180
+LOW_RES_WIDTH :: 640
+LOW_RES_HEIGHT :: 360
 
 // How far the camera sits from what it looks at. With an orthographic camera this
 // does not change the size of anything. It must be far enough that the stretched
@@ -55,7 +55,7 @@ LOW_RES_HEIGHT :: 180
 CAMERA_DISTANCE :: 700.0
 
 // How far you can see, in steps. Everything farther away stays dark.
-VIEW_RADIUS :: 5
+VIEW_RADIUS :: 9
 
 // The camera tilts you can switch between with W / S, in degrees down from the horizon.
 // Camera changes are instant, never animated: pixel art only looks crisp when the camera
@@ -66,22 +66,23 @@ STARTING_TILT_INDEX :: 2 // 60 degrees
 // The art is built into the program at compile time, so it cannot go missing at
 // run time, no matter which folder the program is started from.
 // These paths are relative to this source file.
-TILES_PNG            :: #load("assets/tiles.png")
+TILES_PNG :: #load("assets/tiles.png")
 ADVENTURER_SHEET_PNG :: #load("assets/adventurer_sheet.png")
-GOBLIN_SHEET_PNG     :: #load("assets/goblin_sheet.png")
-OGRE_SHEET_PNG       :: #load("assets/ogre_sheet.png")
-RAT_SHEET_PNG        :: #load("assets/rat_sheet.png")
-BAT_SHEET_PNG        :: #load("assets/bat_sheet.png")
-SPIDER_SHEET_PNG     :: #load("assets/spider_sheet.png")
-SLIME_SHEET_PNG      :: #load("assets/slime_sheet.png")
-MUSHROOM_SHEET_PNG   :: #load("assets/mushroom_sheet.png")
-SKELETON_SHEET_PNG   :: #load("assets/skeleton_sheet.png")
-TROLL_SHEET_PNG      :: #load("assets/troll_sheet.png")
-GOLEM_SHEET_PNG      :: #load("assets/golem_sheet.png")
-ITEM_ICONS_PNG       :: #load("assets/item_icons.png")
-OBJECTS_PNG          :: #load("assets/objects.png") // corpses and chests
-TREES_PNG            :: #load("assets/trees.png") // trees and bushes on forest tiles
-PORTAL_PNG           :: #load("assets/portal.png") // a Scroll of Town Portal's rift
+GOBLIN_SHEET_PNG :: #load("assets/goblin_sheet.png")
+OGRE_SHEET_PNG :: #load("assets/ogre_sheet.png")
+RAT_SHEET_PNG :: #load("assets/rat_sheet.png")
+BAT_SHEET_PNG :: #load("assets/bat_sheet.png")
+SPIDER_SHEET_PNG :: #load("assets/spider_sheet.png")
+SLIME_SHEET_PNG :: #load("assets/slime_sheet.png")
+MUSHROOM_SHEET_PNG :: #load("assets/mushroom_sheet.png")
+SKELETON_SHEET_PNG :: #load("assets/skeleton_sheet.png")
+TROLL_SHEET_PNG :: #load("assets/troll_sheet.png")
+GOLEM_SHEET_PNG :: #load("assets/golem_sheet.png")
+ITEM_ICONS_PNG :: #load("assets/item_icons.png")
+OBJECTS_PNG :: #load("assets/objects.png") // corpses and chests
+TREES_PNG :: #load("assets/trees.png") // trees and bushes on forest tiles
+ROCKS_PNG :: #load("assets/outdoor_rocks.png")
+PORTAL_PNG :: #load("assets/portal.png") // a Scroll of Town Portal's rift
 
 // A creature names its own sheet in content.json (Creature_Definition.sprite_sheet):
 // its frame rectangles, anchors, direction columns, and animations are metadata too.
@@ -91,19 +92,22 @@ PORTAL_PNG           :: #load("assets/portal.png") // a Scroll of Town Portal's 
 // without a recompile. See DESIGN_DATA_DRIVEN.md. Everything the game ships with is
 // built in, the same as every other piece of art and sound (release builds are one
 // self-contained executable, see release.yml) — assets/ is for what's added later.
-Builtin_Sheet :: struct { name: string, bytes: []u8 }
+Builtin_Sheet :: struct {
+	name:  string,
+	bytes: []u8,
+}
 BUILTIN_CREATURE_SHEETS := [?]Builtin_Sheet {
 	{"adventurer_sheet.png", ADVENTURER_SHEET_PNG},
-	{"goblin_sheet.png",     GOBLIN_SHEET_PNG},
-	{"ogre_sheet.png",       OGRE_SHEET_PNG},
-	{"rat_sheet.png",        RAT_SHEET_PNG},
-	{"bat_sheet.png",        BAT_SHEET_PNG},
-	{"spider_sheet.png",     SPIDER_SHEET_PNG},
-	{"slime_sheet.png",      SLIME_SHEET_PNG},
-	{"mushroom_sheet.png",   MUSHROOM_SHEET_PNG},
-	{"skeleton_sheet.png",   SKELETON_SHEET_PNG},
-	{"troll_sheet.png",      TROLL_SHEET_PNG},
-	{"golem_sheet.png",      GOLEM_SHEET_PNG},
+	{"goblin_sheet.png", GOBLIN_SHEET_PNG},
+	{"ogre_sheet.png", OGRE_SHEET_PNG},
+	{"rat_sheet.png", RAT_SHEET_PNG},
+	{"bat_sheet.png", BAT_SHEET_PNG},
+	{"spider_sheet.png", SPIDER_SHEET_PNG},
+	{"slime_sheet.png", SLIME_SHEET_PNG},
+	{"mushroom_sheet.png", MUSHROOM_SHEET_PNG},
+	{"skeleton_sheet.png", SKELETON_SHEET_PNG},
+	{"troll_sheet.png", TROLL_SHEET_PNG},
+	{"golem_sheet.png", GOLEM_SHEET_PNG},
 }
 
 load_creature_sprite_sheet :: proc(name: string) -> rl.Texture2D {
@@ -143,39 +147,40 @@ BACKGROUND_COLOR :: rl.Color{18, 20, 28, 255}
 
 Scene :: struct {
 	// The dungeon: every level visited so far, and where the player is.
-	game_seed:     u64,
-	levels:        [dynamic]^Level, // levels[0] is depth 1
-	current_depth: int,
-	player:        Actor,           // not part of any level: it travels between them
-	inventory:     Inventory,       // the player's belongings
-	adventure_id:  u64,             // marks this adventure's save files (see save.odin)
-	deepest_depth: int,             // for the score
-	killed_by:     Creature_Kind,   // set when the player dies
-	portal:        Portal,          // a Scroll of Town Portal's open link, if any (see portal.odin)
-	quest_states:  [Quest_Id]Quest_State,
-	named_slain:   [Named_Creature]bool,
-	dialogue_npc_index: int,        // which villager the dialogue panel shows
+	game_seed:                 u64,
+	levels:                    [dynamic]^Level, // levels[0] is depth 1
+	current_depth:             int,
+	player:                    Actor, // not part of any level: it travels between them
+	inventory:                 Inventory, // the player's belongings
+	adventure_id:              u64, // marks this adventure's save files (see save.odin)
+	deepest_depth:             int, // for the score
+	killed_by:                 Creature_Kind, // set when the player dies
+	portal:                    Portal, // a Scroll of Town Portal's open link, if any (see portal.odin)
+	quest_states:              [Quest_Id]Quest_State,
+	named_slain:               [Named_Creature]bool,
+	dialogue_npc_index:        int, // which villager the dialogue panel shows
 
 	// The ranking list
-	ranking:             [dynamic]Ranking_Entry,
-	ranking_after_death: bool,          // the ranking is showing the run that just ended
-	last_run:            Ranking_Entry,
-	last_run_place:      int,           // its place in the list, or -1
-	deleted_save_count:  int,           // saves of the fallen adventure that were deleted
+	ranking:                   [dynamic]Ranking_Entry,
+	ranking_after_death:       bool, // the ranking is showing the run that just ended
+	last_run:                  Ranking_Entry,
+	last_run_place:            int, // its place in the list, or -1
+	deleted_save_count:        int, // saves of the fallen adventure that were deleted
 
 	// Turns
-	turn_phase:             Turn_Phase,
-	monster_turn_index:     int, // which monster of the current level is acting
-	stairs_after_this_step: Stairs_Direction,
-	level_change:           Level_Change,
-	travel_destination:     Maybe(hexgrid.Hex), // walking toward this on its own, one step per turn, until it arrives or a monster wakes
-	travel_adjacent_only:   bool,               // stop next to travel_destination (an NPC or chest) instead of walking onto it
+	turn_phase:                Turn_Phase,
+	monster_turn_index:        int, // which monster of the current level is acting
+	stairs_after_this_step:    Stairs_Direction,
+	level_change:              Level_Change,
+	travel_destination:        Maybe(hexgrid.Hex), // walking toward this on its own, one step per turn, until it arrives or a monster wakes
+	travel_adjacent_only:      bool, // stop next to travel_destination (an NPC or chest) instead of walking onto it
 
 	// Things only needed for drawing
 	creature_sprites:          map[string]rl.Texture2D, // keyed by sprite_sheet file name, shared across kinds that use the same one
 	item_icons:                rl.Texture2D,
 	object_sprites:            rl.Texture2D, // corpses and chests
-	tree_sprites:              rl.Texture2D, // trees and bushes
+	tree_material:             rl.Material, // animated tree sheet mapped onto crossed 3D foliage planes
+	rock_sprites:              rl.Texture2D,
 	portal_sprite:             rl.Texture2D, // a Scroll of Town Portal's rift
 	tile_meshes:               Tile_Meshes,
 	tiles_material:            rl.Material,
@@ -187,19 +192,19 @@ Scene :: struct {
 	view_center:               hexgrid.Hex, // the hex under the player; you see VIEW_RADIUS steps around it
 
 	// Menus
-	screen:      Screen,
-	menu:        Menu,
-	slot_infos:  [SAVE_SLOT_COUNT]Slot_Info, // what's in each save slot, read when a slot list opens
-	should_quit: bool,
+	screen:                    Screen,
+	menu:                      Menu,
+	slot_infos:                [SAVE_SLOT_COUNT]Slot_Info, // what's in each save slot, read when a slot list opens
+	should_quit:               bool,
 
 	// Mouse, panels and messages
-	hovered_hex:            hexgrid.Hex,
-	mouse_is_over_map:      bool,
-	mouse_in_low_res:       rl.Vector2,  // the mouse in the small image's pixels, for the panels
-	open_panel:             Open_Panel,
-	open_container_indices: [dynamic]int, // the containers the loot panel shows (a pile can hold several)
-	message:           string,
-	message_buffer:    [128]u8,
+	hovered_hex:               hexgrid.Hex,
+	mouse_is_over_map:         bool,
+	mouse_in_low_res:          rl.Vector2, // the mouse in the small image's pixels, for the panels
+	open_panel:                Open_Panel,
+	open_container_indices:    [dynamic]int, // the containers the loot panel shows (a pile can hold several)
+	message:                   string,
+	message_buffer:            [128]u8,
 }
 
 main :: proc() {
@@ -208,7 +213,7 @@ main :: proc() {
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 	rl.SetExitKey(.KEY_NULL) // Esc opens the menu instead of closing the window
-	install_click_catcher()  // so quick trackpad taps count as clicks
+	install_click_catcher() // so quick trackpad taps count as clicks
 
 	load_content() // creatures, items, villagers, quests and named creatures, from assets/content.json
 
@@ -227,7 +232,9 @@ main :: proc() {
 	scene.creature_sprites = make(map[string]rl.Texture2D)
 	for definition in CREATURES {
 		if definition.sprite_sheet not_in scene.creature_sprites {
-			scene.creature_sprites[definition.sprite_sheet] = load_creature_sprite_sheet(definition.sprite_sheet)
+			scene.creature_sprites[definition.sprite_sheet] = load_creature_sprite_sheet(
+				definition.sprite_sheet,
+			)
 		}
 	}
 	defer {
@@ -236,21 +243,30 @@ main :: proc() {
 	}
 	scene.item_icons = load_embedded_png_texture(ITEM_ICONS_PNG)
 	scene.object_sprites = load_embedded_png_texture(OBJECTS_PNG)
-	scene.tree_sprites = load_embedded_png_texture(TREES_PNG)
+	scene.rock_sprites = load_embedded_png_texture(ROCKS_PNG)
 	scene.portal_sprite = load_embedded_png_texture(PORTAL_PNG)
 	defer rl.UnloadTexture(scene.item_icons)
 	defer rl.UnloadTexture(scene.object_sprites)
-	defer rl.UnloadTexture(scene.tree_sprites)
+	defer rl.UnloadTexture(scene.rock_sprites)
 	defer rl.UnloadTexture(scene.portal_sprite)
 
 	scene.tile_meshes = build_tile_meshes()
 	defer unload_tile_meshes(&scene.tile_meshes)
 	scene.tiles_material = rl.LoadMaterialDefault()
-	scene.tiles_material.maps[rl.MaterialMapIndex.ALBEDO].texture = load_embedded_png_texture(TILES_PNG)
+	scene.tiles_material.maps[rl.MaterialMapIndex.ALBEDO].texture = load_embedded_png_texture(
+		TILES_PNG,
+	)
 	defer rl.UnloadMaterial(scene.tiles_material) // also unloads the tiles texture
 
 	scene.sprite_shader = rl.LoadShaderFromMemory(nil, SPRITE_CUTOUT_FRAGMENT_SHADER)
 	defer rl.UnloadShader(scene.sprite_shader)
+	scene.tree_material = rl.LoadMaterialDefault()
+	// Materials own their shader at unload time.  Use a dedicated cutout shader
+	// rather than sharing the billboard shader, which would otherwise be freed
+	// once by UnloadMaterial and a second time by the Scene cleanup.
+	scene.tree_material.shader = rl.LoadShaderFromMemory(nil, SPRITE_CUTOUT_FRAGMENT_SHADER)
+	scene.tree_material.maps[rl.MaterialMapIndex.ALBEDO].texture = load_embedded_png_texture(TREES_PNG)
+	defer rl.UnloadMaterial(scene.tree_material)
 
 	low_res_target := rl.LoadRenderTexture(LOW_RES_WIDTH, LOW_RES_HEIGHT)
 	rl.SetTextureFilter(low_res_target.texture, .POINT)
@@ -303,7 +319,9 @@ main :: proc() {
 		// which made the whole picture keep drifting and settling after every step.)
 		player_position := actor_visual_position(&scene.player)
 		player_position.y = FLOOR_HEIGHT // ignore the hop while walking
-		camera := snap_camera_to_pixels(orbit_camera(camera_yaw_degrees, camera_pitch_degrees, player_position))
+		camera := snap_camera_to_pixels(
+			orbit_camera(camera_yaw_degrees, camera_pitch_degrees, player_position),
+		)
 		scene.camera_up = camera_up_direction(camera)
 		scene.view_center = hexgrid.pixel_to_hex({player_position.x, player_position.z}, HEX_SIZE)
 
@@ -312,7 +330,9 @@ main :: proc() {
 		view_camera := camera
 		if scene.screen_shake_seconds_left > 0 {
 			shake_strength := 2.5 * scene.screen_shake_seconds_left / SCREEN_SHAKE_SECONDS
-			shake_offset := rl.Vector3{rand.float32_range(-1, 1), 0, rand.float32_range(-1, 1)} * shake_strength
+			shake_offset :=
+				rl.Vector3{rand.float32_range(-1, 1), 0, rand.float32_range(-1, 1)} *
+				shake_strength
 			view_camera.position += shake_offset
 			view_camera.target += shake_offset
 		}
@@ -322,7 +342,10 @@ main :: proc() {
 		window_width := f32(rl.GetScreenWidth())
 		window_height := f32(rl.GetScreenHeight())
 		// The largest whole-number scale that fits, so every pixel becomes an equal N x N block.
-		pixel_scale := max(1, math.floor(min(window_width / LOW_RES_WIDTH, window_height / LOW_RES_HEIGHT)))
+		pixel_scale := max(
+			1,
+			math.floor(min(window_width / LOW_RES_WIDTH, window_height / LOW_RES_HEIGHT)),
+		)
 		scaled_image := rl.Rectangle {
 			width  = LOW_RES_WIDTH * pixel_scale,
 			height = LOW_RES_HEIGHT * pixel_scale,
@@ -334,9 +357,15 @@ main :: proc() {
 
 		// Convert the window mouse position into a position inside the small image,
 		// then ask raylib for the ray from the camera through that point.
-		mouse_in_low_res := (rl.GetMousePosition() - rl.Vector2{scaled_image.x, scaled_image.y}) / pixel_scale
+		mouse_in_low_res :=
+			(rl.GetMousePosition() - rl.Vector2{scaled_image.x, scaled_image.y}) / pixel_scale
 		scene.mouse_in_low_res = mouse_in_low_res
-		mouse_ray := rl.GetScreenToWorldRayEx(mouse_in_low_res, camera, LOW_RES_WIDTH, LOW_RES_HEIGHT)
+		mouse_ray := rl.GetScreenToWorldRayEx(
+			mouse_in_low_res,
+			camera,
+			LOW_RES_WIDTH,
+			LOW_RES_HEIGHT,
+		)
 
 		scene.mouse_is_over_map = false
 		if mouse_ray.direction.y < 0 {
@@ -355,9 +384,9 @@ main :: proc() {
 		if right_click_happened() do handle_ui_right_click(&scene)
 		clicked := left_click_happened() // counts quick taps too, unlike rl.IsMouseButtonPressed
 		if clicked && handle_menu_click(&scene) do clicked = false // menus get the first look...
-		if clicked && handle_ui_click(&scene) do clicked = false   // ...then the panels...
+		if clicked && handle_ui_click(&scene) do clicked = false // ...then the panels...
 		if clicked && (scene.mouse_is_over_map || scene.turn_phase == .Player_Dead) {
-			handle_click(&scene, scene.hovered_hex)                // ...then the map
+			handle_click(&scene, scene.hovered_hex) // ...then the map
 		}
 		if !paused {
 			update_actor(&scene, &scene.player, frame_seconds)
@@ -365,7 +394,10 @@ main :: proc() {
 				update_actor(&scene, &monster, frame_seconds)
 			}
 			update_effects(&scene.effects, current_level(&scene), frame_seconds)
-			scene.screen_shake_seconds_left = max(0, scene.screen_shake_seconds_left - frame_seconds)
+			scene.screen_shake_seconds_left = max(
+				0,
+				scene.screen_shake_seconds_left - frame_seconds,
+			)
 			advance_turns(&scene)
 			update_level_change(&scene, frame_seconds)
 		}
@@ -392,18 +424,50 @@ main :: proc() {
 		rl.ClearBackground(rl.BLACK)
 		// Render textures are stored upside down, hence the negative height.
 		whole_low_res_image := rl.Rectangle{0, 0, LOW_RES_WIDTH, -LOW_RES_HEIGHT}
-		rl.DrawTexturePro(low_res_target.texture, whole_low_res_image, scaled_image, {0, 0}, 0, rl.WHITE)
+		rl.DrawTexturePro(
+			low_res_target.texture,
+			whole_low_res_image,
+			scaled_image,
+			{0, 0},
+			0,
+			rl.WHITE,
+		)
 
 		// Fade to black while changing levels.
 		darkness := level_change_darkness(&scene)
 		if darkness > 0 {
-			rl.DrawRectangle(0, 0, i32(window_width), i32(window_height), rl.Fade(rl.BLACK, darkness))
+			rl.DrawRectangle(
+				0,
+				0,
+				i32(window_width),
+				i32(window_height),
+				rl.Fade(rl.BLACK, darkness),
+			)
 		}
 
-		if scene.screen == .Playing && scene.menu == .None { // menus cover the whole view
+		if scene.screen == .Playing && scene.menu == .None { 	// menus cover the whole view
 			player := &scene.player
-			rl.DrawText("Q/E: turn   W/S: tilt   I: items   L: quests   T: stance   M: sound   Esc: menu   Click: walk, attack, loot, stairs", 16, 16, 20, rl.RAYWHITE)
-			rl.DrawText(fmt.ctprintf("%s     HP %d / %d     Gold %d     Score %d", depth_name(scene.current_depth), player.hit_points, player.max_hit_points, scene.inventory.gold, current_score(&scene)), 16, 42, 20, rl.RED)
+			rl.DrawText(
+				"Q/E: turn   W/S: tilt   I: items   L: quests   T: stance   M: sound   Esc: menu   Click: walk, attack, loot, stairs",
+				16,
+				16,
+				20,
+				rl.RAYWHITE,
+			)
+			rl.DrawText(
+				fmt.ctprintf(
+					"%s     HP %d / %d     Gold %d     Score %d",
+					depth_name(scene.current_depth),
+					player.hit_points,
+					player.max_hit_points,
+					scene.inventory.gold,
+					current_score(&scene),
+				),
+				16,
+				42,
+				20,
+				rl.RED,
+			)
 			rl.DrawText(fmt.ctprintf("%s", scene.message), 16, 68, 20, rl.GOLD)
 		}
 		rl.EndDrawing()
@@ -427,7 +491,8 @@ orbit_camera :: proc(yaw_degrees, pitch_degrees: f32, focus: rl.Vector3) -> rl.C
 		target     = focus,
 		up         = {0, 1, 0},
 		// For an orthographic camera, fovy is the height of the view in world units.
-		// 180 units on a 180-pixel-tall image means one art pixel = one screen pixel.
+	// Matching the camera height to the render target keeps one world-art pixel per
+	// internal screen pixel while showing a substantially wider modern viewport.
 		fovy       = LOW_RES_HEIGHT,
 		projection = .ORTHOGRAPHIC,
 	}
@@ -445,7 +510,9 @@ snap_camera_to_pixels :: proc(camera: rl.Camera3D) -> rl.Camera3D {
 	// In this orthographic view, one world unit along screen_right or screen_up is exactly one pixel.
 	pixels_across := rl.Vector3DotProduct(camera.target, screen_right)
 	pixels_up := rl.Vector3DotProduct(camera.target, screen_up)
-	correction := screen_right * (math.round(pixels_across) - pixels_across) + screen_up * (math.round(pixels_up) - pixels_up)
+	correction :=
+		screen_right * (math.round(pixels_across) - pixels_across) +
+		screen_up * (math.round(pixels_up) - pixels_up)
 
 	snapped := camera
 	snapped.position += correction
@@ -457,9 +524,12 @@ snap_camera_to_pixels :: proc(camera: rl.Camera3D) -> rl.Camera3D {
 // the last two rings like torchlight, and nothing at all beyond VIEW_RADIUS.
 light_at_distance :: proc(distance: i32) -> f32 {
 	switch {
-	case distance <= VIEW_RADIUS - 2: return 1.0
-	case distance == VIEW_RADIUS - 1: return 0.8
-	case distance == VIEW_RADIUS:     return 0.55
+	case distance <= VIEW_RADIUS - 2:
+		return 1.0
+	case distance == VIEW_RADIUS - 1:
+		return 0.8
+	case distance == VIEW_RADIUS:
+		return 0.55
 	}
 	return 0
 }
@@ -507,11 +577,34 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 		map_position := hexgrid.hex_to_pixel(hex, HEX_SIZE)
 		placement := rl.MatrixTranslate(map_position.x, 0, map_position.y)
 		rl.DrawMesh(mesh_for_tile(&scene.tile_meshes, tile), scene.tiles_material, placement)
+		if tile.kind == .Outdoor_Rock && tile.variant != OUTDOOR_ROCK_NO_FORMATION {
+			rl.DrawMesh(scene.tile_meshes.outdoor_rocks[tile.variant], scene.tiles_material, placement)
+		}
 	}
 	tile_color^ = rl.WHITE
 
+	// Trees are not billboards: their animated sheet frames are mapped across
+	// crossed, upright world-space planes.  The depth buffer then naturally puts
+	// people and foliage in front of one another as the camera turns.
+	tree_color := &scene.tree_material.maps[rl.MaterialMapIndex.ALBEDO].color
+	for &prop in level.props {
+		if prop.kind != .Tree do continue
+		light := light_at_hex(scene, prop.hex)
+		if light == 0 do continue
+		wind_frame := (int(scene.player.visual_seconds * 1.25) + int(prop.hex.q) * 3 + int(prop.hex.r) * 5) % PROP_WIND_FRAMES
+		if wind_frame < 0 do wind_frame += PROP_WIND_FRAMES
+		position := prop_position(&prop)
+		placement := rl.MatrixTranslate(position.x, position.y, position.z) * rl.MatrixScale(prop.scale, prop.scale, prop.scale)
+		tree_color^ = shade(rl.WHITE, light)
+		rl.DrawMesh(scene.tile_meshes.trees[wind_frame][prop.variant], scene.tree_material, placement)
+	}
+	tree_color^ = rl.WHITE
+
 	for stain in level.blood_stains {
-		light := light_at_hex(scene, hexgrid.pixel_to_hex({stain.position.x, stain.position.z}, HEX_SIZE))
+		light := light_at_hex(
+			scene,
+			hexgrid.pixel_to_hex({stain.position.x, stain.position.z}, HEX_SIZE),
+		)
 		if light > 0 do draw_blood_stain(stain, light)
 	}
 
@@ -520,7 +613,11 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 		if hovered_creature != nil && hovered_creature != &scene.player {
 			// Outline every hex the monster covers, so its size is clear.
 			for offset in actor_footprint(hovered_creature) {
-				draw_hex_outline(hexgrid.hex_add(hovered_creature.hex, offset), FLOOR_HEIGHT + 0.2, rl.RED)
+				draw_hex_outline(
+					hexgrid.hex_add(hovered_creature.hex, offset),
+					FLOOR_HEIGHT + 0.2,
+					rl.RED,
+				)
 			}
 		} else if npc_index_at(level, scene.hovered_hex) >= 0 {
 			draw_hex_outline(scene.hovered_hex, FLOOR_HEIGHT + 0.2, rl.GREEN)
@@ -529,15 +626,24 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 			for index in pile {
 				container := &level.containers[index]
 				for offset in container.footprint {
-					draw_hex_outline(hexgrid.hex_add(container.anchor_hex, offset), FLOOR_HEIGHT + 0.2, GOLD_TEXT_COLOR)
+					draw_hex_outline(
+						hexgrid.hex_add(container.anchor_hex, offset),
+						FLOOR_HEIGHT + 0.2,
+						GOLD_TEXT_COLOR,
+					)
 				}
 			}
 		} else if stairs_at(level, scene.hovered_hex) != .None {
 			draw_hex_outline(scene.hovered_hex, FLOOR_HEIGHT + 0.2, rl.SKYBLUE)
-		} else if portal_hex, on_portal := portal_hex_here(scene); on_portal && scene.hovered_hex == portal_hex {
+		} else if portal_hex, on_portal := portal_hex_here(scene);
+		   on_portal && scene.hovered_hex == portal_hex {
 			draw_hex_outline(scene.hovered_hex, FLOOR_HEIGHT + 0.2, rl.PURPLE)
 		} else {
-			draw_hex_outline(scene.hovered_hex, tile_top_height(level, scene.hovered_hex) + 0.2, rl.YELLOW)
+			draw_hex_outline(
+				scene.hovered_hex,
+				tile_top_height(level, scene.hovered_hex) + 0.2,
+				rl.YELLOW,
+			)
 		}
 	}
 
@@ -545,17 +651,43 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 	// pixels from hiding things, but a creature fading out after death is partly
 	// see-through, and those pixels only blend correctly over what's already drawn.
 	Draw_Order_Entry :: struct {
-		drawable:           union {^Actor, ^Container, ^Npc, ^Prop, ^Portal}, // a creature, a corpse or chest, a villager, a tree, or a portal
+		drawable:           union {
+			^Actor,
+			^Container,
+			^Npc,
+			^Prop,
+			^Portal,
+		}, // a creature, a corpse or chest, a villager, a tree, or a portal
 		light:              f32,
 		distance_to_camera: f32,
 	}
 	draw_order := make([dynamic]Draw_Order_Entry, context.temp_allocator)
-	append(&draw_order, Draw_Order_Entry{drawable = &scene.player, light = 1, distance_to_camera = rl.Vector3Distance(camera.position, actor_visual_position(&scene.player))})
+	append(
+		&draw_order,
+		Draw_Order_Entry {
+			drawable = &scene.player,
+			light = 1,
+			distance_to_camera = rl.Vector3Distance(
+				camera.position,
+				actor_visual_position(&scene.player),
+			),
+		},
+	)
 	for &monster in level.monsters {
 		if monster.is_dead && monster.death_seconds >= death_animation_seconds(&CREATURES[monster.kind]) do continue
 		light := light_on_actor(scene, &monster)
 		if light == 0 do continue // out of sight
-		append(&draw_order, Draw_Order_Entry{drawable = &monster, light = light, distance_to_camera = rl.Vector3Distance(camera.position, actor_visual_position(&monster))})
+		append(
+			&draw_order,
+			Draw_Order_Entry {
+				drawable = &monster,
+				light = light,
+				distance_to_camera = rl.Vector3Distance(
+					camera.position,
+					actor_visual_position(&monster),
+				),
+			},
+		)
 	}
 	for &container in level.containers {
 		light: f32 = 0
@@ -563,22 +695,61 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 			light = max(light, light_at_hex(scene, hexgrid.hex_add(container.anchor_hex, offset)))
 		}
 		if light == 0 do continue
-		append(&draw_order, Draw_Order_Entry{drawable = &container, light = light, distance_to_camera = rl.Vector3Distance(camera.position, container_center(&container))})
+		append(
+			&draw_order,
+			Draw_Order_Entry {
+				drawable = &container,
+				light = light,
+				distance_to_camera = rl.Vector3Distance(
+					camera.position,
+					container_center(&container),
+				),
+			},
+		)
 	}
 	for &prop in level.props {
+		// Trees were already drawn as opaque, depth-tested 3D meshes above.
+		if prop.kind == .Tree do continue
 		light := light_at_hex(scene, prop.hex)
 		if light == 0 do continue
-		append(&draw_order, Draw_Order_Entry{drawable = &prop, light = light, distance_to_camera = rl.Vector3Distance(camera.position, prop_position(&prop))})
+		append(
+			&draw_order,
+			Draw_Order_Entry {
+				drawable = &prop,
+				light = light,
+				distance_to_camera = rl.Vector3Distance(camera.position, prop_position(&prop)),
+			},
+		)
 	}
 	for &npc in level.npcs {
 		light := light_at_hex(scene, npc.hex)
 		if light == 0 do continue
-		append(&draw_order, Draw_Order_Entry{drawable = &npc, light = light, distance_to_camera = rl.Vector3Distance(camera.position, hex_floor_position(npc.hex))})
+		append(
+			&draw_order,
+			Draw_Order_Entry {
+				drawable = &npc,
+				light = light,
+				distance_to_camera = rl.Vector3Distance(
+					camera.position,
+					hex_floor_position(npc.hex),
+				),
+			},
+		)
 	}
 	if portal_hex, on_portal := portal_hex_here(scene); on_portal {
 		light := light_at_hex(scene, portal_hex)
 		if light > 0 {
-			append(&draw_order, Draw_Order_Entry{drawable = &scene.portal, light = light, distance_to_camera = rl.Vector3Distance(camera.position, hex_floor_position(portal_hex))})
+			append(
+				&draw_order,
+				Draw_Order_Entry {
+					drawable = &scene.portal,
+					light = light,
+					distance_to_camera = rl.Vector3Distance(
+						camera.position,
+						hex_floor_position(portal_hex),
+					),
+				},
+			)
 		}
 	}
 	slice.sort_by(draw_order[:], proc(first, second: Draw_Order_Entry) -> bool {
@@ -587,11 +758,16 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 	rl.BeginShaderMode(scene.sprite_shader)
 	for entry in draw_order {
 		switch drawable in entry.drawable {
-		case ^Actor:     draw_actor(scene, drawable, camera, entry.light)
-		case ^Container: draw_container(scene, drawable, camera, entry.light)
-		case ^Npc:       draw_npc(scene, drawable, camera, entry.light)
-		case ^Prop:      draw_prop(scene, drawable, camera, entry.light)
-		case ^Portal:    draw_portal(scene, camera, entry.light)
+		case ^Actor:
+			draw_actor(scene, drawable, camera, entry.light)
+		case ^Container:
+			draw_container(scene, drawable, camera, entry.light)
+		case ^Npc:
+			draw_npc(scene, drawable, camera, entry.light)
+		case ^Prop:
+			draw_prop(scene, drawable, camera, entry.light)
+		case ^Portal:
+			draw_portal(scene, camera, entry.light)
 		}
 	}
 	rl.EndShaderMode()
@@ -600,7 +776,9 @@ draw_scene :: proc(scene: ^Scene, camera: rl.Camera3D) {
 	rl.EndMode3D()
 }
 
-// A corpse or chest: an upright picture, like the creatures.
+// A corpse or chest: an upright picture, like the creatures. Chests use a smaller
+// display scale than their atlas cell: they are a one-hex interactable prop, not a
+// person-sized obstacle.
 draw_container :: proc(scene: ^Scene, container: ^Container, camera: rl.Camera3D, light: f32) {
 	source := CONTAINER_SPRITE_REGIONS[container.kind]
 	texture := scene.object_sprites
@@ -609,26 +787,43 @@ draw_container :: proc(scene: ^Scene, container: ^Container, camera: rl.Camera3D
 		// A pile of dropped things is drawn as the icon of whatever lies on top.
 		if len(container.items) == 0 do return
 		texture = scene.item_icons
-		source.x = f32(ITEMS[container.items[len(container.items) - 1].kind].icon_column) * 16
+		source = {f32(ITEMS[container.items[len(container.items) - 1].kind].icon_column * ITEM_ICON_SIZE), 0, ITEM_ICON_SIZE, ITEM_ICON_SIZE}
 	}
-	size := rl.Vector2{source.width, source.height * upright_stretch(camera)}
+	scale := f32(0.7) if container.kind == .Chest else 1.0
+	size := rl.Vector2{source.width * scale, source.height * scale * upright_stretch(camera)}
 
 	// Nudged a tiny bit away from the camera, along the line of sight. That doesn't move
 	// it on screen, but it makes a creature standing on the same hex draw in front of
 	// the body instead of flickering with it.
 	view_direction := rl.Vector3Normalize(camera.target - camera.position)
 	position := container_center(container) + view_direction * 1.5
-	rl.DrawBillboardPro(camera, texture, source, position, {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(rl.WHITE, light))
+	rl.DrawBillboardPro(
+		camera,
+		texture,
+		source,
+		position,
+		{0, 1, 0},
+		size,
+		{size.x / 2, 0},
+		0,
+		shade(rl.WHITE, light),
+	)
 }
 
 // A tree or bush: an upright picture, taller and wider than its hex, so its crown
 // spills over the edges and the grid stops looking like a honeycomb.
-PROP_FRAME :: rl.Vector2{32, 44}
-PROP_VARIANT_COUNT :: 4 // three trees and a bush, in assets/trees.png
+// Modern environment sprites use a denser 48x64 source frame than the old
+// 32x44 placeholders; roots remain anchored at the same world position.
+PROP_FRAME :: rl.Vector2{48, 64}
+PROP_VARIANT_COUNT :: 4 // three trees and a bush, with two wind frames each
+PROP_WIND_FRAMES :: 2
+ROCK_FRAME :: rl.Vector2{48, 64}
+Prop_Kind :: enum { Tree, Rock }
 
 Prop :: struct {
 	hex:     hexgrid.Hex,
 	variant: u8,
+	kind:    Prop_Kind,
 	offset:  rl.Vector2, // nudged off the hex center, in world units
 	scale:   f32,
 }
@@ -639,21 +834,33 @@ prop_position :: proc(prop: ^Prop) -> rl.Vector3 {
 }
 
 draw_prop :: proc(scene: ^Scene, prop: ^Prop, camera: rl.Camera3D, light: f32) {
-	source := rl.Rectangle{f32(prop.variant) * PROP_FRAME.x, 0, PROP_FRAME.x, PROP_FRAME.y}
-	size := rl.Vector2{PROP_FRAME.x * prop.scale, PROP_FRAME.y * prop.scale * upright_stretch(camera)}
-	rl.DrawBillboardPro(camera, scene.tree_sprites, source, prop_position(prop), {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(rl.WHITE, light))
+	if prop.kind == .Rock {
+		size := rl.Vector2{ROCK_FRAME.x * prop.scale, ROCK_FRAME.y * prop.scale * upright_stretch(camera)}
+		rl.DrawBillboardPro(camera, scene.rock_sprites, {f32(prop.variant) * ROCK_FRAME.x, 0, ROCK_FRAME.x, ROCK_FRAME.y}, prop_position(prop), {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(rl.WHITE, light))
+		return
+	}
 }
 
 // A Scroll of Town Portal's rift: a standing rift of shimmering color, like the trees
 // and corpses drawn as an upright picture on its hex.
-PORTAL_FRAME :: rl.Vector2{20, 32}
+PORTAL_FRAME :: rl.Vector2{32, 48}
 
 draw_portal :: proc(scene: ^Scene, camera: rl.Camera3D, light: f32) {
 	portal_hex, on_portal := portal_hex_here(scene)
 	if !on_portal do return
 	source := rl.Rectangle{0, 0, PORTAL_FRAME.x, PORTAL_FRAME.y}
 	size := rl.Vector2{PORTAL_FRAME.x, PORTAL_FRAME.y * upright_stretch(camera)}
-	rl.DrawBillboardPro(camera, scene.portal_sprite, source, hex_floor_position(portal_hex), {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(rl.WHITE, light))
+	rl.DrawBillboardPro(
+		camera,
+		scene.portal_sprite,
+		source,
+		hex_floor_position(portal_hex),
+		{0, 1, 0},
+		size,
+		{size.x / 2, 0},
+		0,
+		shade(rl.WHITE, light),
+	)
 }
 
 // A tiny health bar above a wounded actor's head, drawn in the small image's pixels.
@@ -661,7 +868,8 @@ draw_hit_point_bar :: proc(actor: ^Actor, camera: rl.Camera3D) {
 	if actor.is_dead || actor.hit_points == actor.max_hit_points do return
 	definition := CREATURES[actor.kind]
 	bar_width := i32(definition.frame_size.x * 0.75)
-	above_head := actor_visual_position(actor) + camera_up_direction(camera) * (sprite_height_above_ground(definition) + 3)
+	above_head :=
+		actor_visual_position(actor) + camera_up_direction(camera) * (sprite_height_above_ground(definition) + 3)
 	screen_position := rl.GetWorldToScreenEx(above_head, camera, LOW_RES_WIDTH, LOW_RES_HEIGHT)
 	bar_left := i32(screen_position.x) - bar_width / 2
 	bar_top := i32(screen_position.y)
@@ -676,6 +884,10 @@ draw_hex_outline :: proc(hex: hexgrid.Hex, height: f32, color: rl.Color) {
 	for corner_index in 0 ..< 6 {
 		this_corner := center + hex_corner_offset(HEX_SIZE, corner_index)
 		next_corner := center + hex_corner_offset(HEX_SIZE, (corner_index + 1) % 6)
-		rl.DrawLine3D({this_corner.x, height, this_corner.y}, {next_corner.x, height, next_corner.y}, color)
+		rl.DrawLine3D(
+			{this_corner.x, height, this_corner.y},
+			{next_corner.x, height, next_corner.y},
+			color,
+		)
 	}
 }

@@ -130,7 +130,7 @@ creature_with_article :: proc(kind: Creature_Kind) -> string {
 // The ranking panel
 // ---------------------------------------------------------------------------
 
-RANKING_PANEL :: rl.Rectangle{5, 0, 310, 180}
+RANKING_PANEL :: rl.Rectangle{f32(LOW_RES_WIDTH - 310) / 2, f32(LOW_RES_HEIGHT - 180) / 2, 310, 180}
 
 ranking_button_rectangle :: proc(index: int) -> rl.Rectangle {
 	// Buttons along the bottom, from the right.
@@ -172,7 +172,7 @@ draw_ranking_panel :: proc(scene: ^Scene) {
 		draw_text("No one has fallen yet.", left + 8, rows_top + 14, DIM_TEXT_COLOR)
 	}
 	for entry, index in scene.ranking {
-		// A 320 x 180 screen has room for seven readable rows beside the controls.
+		// The compact ranking card keeps seven readable rows beside its controls.
 		if index >= 7 do break
 		y := rows_top + 13 + i32(index) * 11
 		if scene.ranking_after_death && index == scene.last_run_place {

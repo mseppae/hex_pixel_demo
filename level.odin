@@ -29,11 +29,17 @@ Tile_Kind :: enum u8 {
 	Stairs_Down,
 	Stairs_Up,
 	Forest, // grassy ground you can't walk through: the village is ringed with it
+	Outdoor_Rock, // low village-edge stone with a pointed formation prop
 	// New kinds go at the END: saves store these as numbers.
 }
 
 FLOOR_VARIANT_COUNT :: 4 // plain, cracked, pebbles, mossy
 WALL_VARIANT_COUNT  :: 3 // plain, mossy, cracked
+// Outdoor formations are deliberately more varied than dungeon walls.  A
+// separate variant is used even when a blocked edge hex has no visible spire,
+// so the village boundary does not turn into a continuous rock fence.
+OUTDOOR_ROCK_VARIANT_COUNT :: 8
+OUTDOOR_ROCK_NO_FORMATION :: u8(255)
 
 Tile :: struct {
 	kind:    Tile_Kind,
@@ -235,6 +241,15 @@ choose_tile_variants :: proc(level: ^Level, generator: runtime.Random_Generator)
 			case roll < 0.85: tile.variant = 1 // mossy
 			case:             tile.variant = 2 // cracked
 			}
+		case .Outdoor_Rock:
+			// Most edge cells are still impassable rough ground, but only about a
+			// third grow a visible formation.  This keeps the boundary readable
+			// without making it a picket fence of identical stones.
+			if roll < 0.66 {
+				tile.variant = OUTDOOR_ROCK_NO_FORMATION
+			} else {
+				tile.variant = u8(rand.int_max(OUTDOOR_ROCK_VARIANT_COUNT, generator))
+			}
 		}
 	}
 }
@@ -374,10 +389,12 @@ count_wall_neighbors :: proc(level: ^Level, hex: hexgrid.Hex) -> int {
 // ---------------------------------------------------------------------------
 
 Tile_Meshes :: struct {
-	floors:      [FLOOR_VARIANT_COUNT]rl.Mesh,
-	walls:       [WALL_VARIANT_COUNT]rl.Mesh,
-	stairs_down: rl.Mesh,
-	stairs_up:   rl.Mesh,
+	floors:        [FLOOR_VARIANT_COUNT]rl.Mesh,
+	walls:         [WALL_VARIANT_COUNT]rl.Mesh,
+	outdoor_rocks: [OUTDOOR_ROCK_VARIANT_COUNT]rl.Mesh,
+	trees:         [PROP_WIND_FRAMES][PROP_VARIANT_COUNT]rl.Mesh,
+	stairs_down:   rl.Mesh,
+	stairs_up:     rl.Mesh,
 }
 
 build_tile_meshes :: proc() -> (meshes: Tile_Meshes) {
@@ -387,6 +404,14 @@ build_tile_meshes :: proc() -> (meshes: Tile_Meshes) {
 	for variant in 0 ..< WALL_VARIANT_COUNT {
 		meshes.walls[variant] = build_hex_prism_mesh(HEX_SIZE, WALL_HEIGHT, WALL_TOP_REGIONS[variant], WALL_SIDE_REGIONS[variant])
 	}
+	for variant in 0 ..< OUTDOOR_ROCK_VARIANT_COUNT {
+		meshes.outdoor_rocks[variant] = build_rock_spire_mesh(HEX_SIZE, variant, WALL_SIDE_REGIONS[variant % WALL_VARIANT_COUNT])
+	}
+	for wind_frame in 0 ..< PROP_WIND_FRAMES {
+		for variant in 0 ..< PROP_VARIANT_COUNT {
+			meshes.trees[wind_frame][variant] = build_tree_mesh(variant, wind_frame)
+		}
+	}
 	meshes.stairs_down = build_hex_prism_mesh(HEX_SIZE, FLOOR_HEIGHT, STAIRS_DOWN_TOP_REGION, FLOOR_SIDE_REGION)
 	meshes.stairs_up = build_hex_prism_mesh(HEX_SIZE, FLOOR_HEIGHT, STAIRS_UP_TOP_REGION, FLOOR_SIDE_REGION)
 	return meshes
@@ -395,6 +420,8 @@ build_tile_meshes :: proc() -> (meshes: Tile_Meshes) {
 unload_tile_meshes :: proc(meshes: ^Tile_Meshes) {
 	for mesh in meshes.floors do rl.UnloadMesh(mesh)
 	for mesh in meshes.walls do rl.UnloadMesh(mesh)
+	for mesh in meshes.outdoor_rocks do rl.UnloadMesh(mesh)
+	for frames in meshes.trees do for mesh in frames do rl.UnloadMesh(mesh)
 	rl.UnloadMesh(meshes.stairs_down)
 	rl.UnloadMesh(meshes.stairs_up)
 }
@@ -406,6 +433,7 @@ mesh_for_tile :: proc(meshes: ^Tile_Meshes, tile: Tile) -> rl.Mesh {
 	case .Stairs_Down: return meshes.stairs_down
 	case .Stairs_Up:   return meshes.stairs_up
 	case .Forest:      return meshes.floors[3] // the mossy floor, as woodland ground
+	case .Outdoor_Rock:return meshes.floors[2]
 	}
 	return meshes.floors[0]
 }

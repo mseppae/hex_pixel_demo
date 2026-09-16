@@ -128,8 +128,9 @@ npc_index_at :: proc(level: ^Level, hex: hexgrid.Hex) -> int {
 
 VILLAGE_CENTER :: hexgrid.Hex{q = 8, r = 9}
 VILLAGE_RADIUS :: 7
-// Small houses: three wall hexes each, placed from the village center.
-VILLAGE_HOUSES := [?]hexgrid.Hex{{q = -5, r = -1}, {q = 2, r = -5}, {q = -2, r = 4}, {q = 3, r = 2}}
+// Sparse landmark formations, placed from the village center.  Their exact
+// silhouette is chosen later with the rest of the outdoor rock variants.
+VILLAGE_ROCK_CLUSTERS := [?]hexgrid.Hex{{q = -5, r = -1}, {q = 2, r = -5}, {q = -2, r = 4}}
 
 generate_village :: proc(scene: ^Scene) -> ^Level {
 	level := new(Level)
@@ -146,13 +147,11 @@ generate_village :: proc(scene: ^Scene) -> ^Level {
 		switch {
 		case distance <= VILLAGE_RADIUS && !is_border_index(level, index):     tile.kind = .Floor
 		case distance <= VILLAGE_RADIUS + 3 && !is_border_index(level, index): tile.kind = .Forest
-		case:                                                                 tile.kind = .Wall
+		case:                                                                 tile.kind = .Outdoor_Rock
 		}
 	}
-	for house in VILLAGE_HOUSES {
-		for offset in TRIANGLE_FOOTPRINT {
-			set_tile_kind(level, hexgrid.hex_add(hexgrid.hex_add(VILLAGE_CENTER, house), offset), .Wall)
-		}
+	for rock_cluster in VILLAGE_ROCK_CLUSTERS {
+		set_tile_kind(level, hexgrid.hex_add(VILLAGE_CENTER, rock_cluster), .Outdoor_Rock)
 	}
 	level.has_stairs_up = false
 	level.stairs_up_hex = hexgrid.hex_add(VILLAGE_CENTER, {q = -1, r = 2}) // where a new adventure begins
@@ -372,7 +371,7 @@ note_named_death :: proc(scene: ^Scene, creature: ^Actor) {
 // The dialogue panel
 // ---------------------------------------------------------------------------
 
-DIALOGUE_PANEL         :: rl.Rectangle{10, 24, 300, 132}
+DIALOGUE_PANEL         :: rl.Rectangle{f32(LOW_RES_WIDTH - 300) / 2, f32(LOW_RES_HEIGHT - 132) / 2, 300, 132}
 DIALOGUE_ACTION_BUTTON :: rl.Rectangle{DIALOGUE_PANEL.x + 8, DIALOGUE_PANEL.y + DIALOGUE_PANEL.height - 22, 110, 16}
 DIALOGUE_CLOSE_BUTTON  :: rl.Rectangle{DIALOGUE_PANEL.x + DIALOGUE_PANEL.width - 66, DIALOGUE_PANEL.y + DIALOGUE_PANEL.height - 22, 58, 16}
 
@@ -458,10 +457,16 @@ handle_dialogue_click :: proc(scene: ^Scene) {
 draw_npc :: proc(scene: ^Scene, npc: ^Npc, camera: rl.Camera3D, light: f32) {
 	feet := hex_floor_position(npc.hex)
 	rl.DrawCylinder({feet.x, FLOOR_HEIGHT + 0.1, feet.z}, 6, 6, 0.1, 16, rl.Fade(rl.BLACK, 0.35))
-	frame_size := rl.Vector2{16, 24}
+	definition := &CREATURES[ADVENTURER]
 	column := sprite_frame_for(npc.facing, camera)
-	source := rl.Rectangle{f32(column) * frame_size.x, 0, frame_size.x, frame_size.y}
-	size := rl.Vector2{frame_size.x, frame_size.y * upright_stretch(camera)}
-	adventurer_sheet := scene.creature_sprites[CREATURES[ADVENTURER].sprite_sheet]
-	rl.DrawBillboardPro(camera, adventurer_sheet, source, feet, {0, 1, 0}, size, {size.x / 2, 0}, 0, shade(NPCS[npc.role].tint, light))
+	// Villagers use the adventurer idle frames.  Keep this data-driven: the player
+	// sheet is now 32x32 cells, not the retired 16x24 NPC strip.
+	source := definition.animations[.Idle].directions[column][0].source
+	size := rl.Vector2{source.width, source.height * upright_stretch(camera)}
+	ground_anchor := rl.Vector2{
+		definition.sprite_anchor.x,
+		size.y - definition.sprite_anchor.y * upright_stretch(camera),
+	}
+	adventurer_sheet := scene.creature_sprites[definition.sprite_sheet]
+	rl.DrawBillboardPro(camera, adventurer_sheet, source, feet, {0, 1, 0}, size, ground_anchor, 0, shade(NPCS[npc.role].tint, light))
 }
